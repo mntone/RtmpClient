@@ -18,11 +18,6 @@
 #include <collection.h>
 #include <ppltasks.h>
 
-#include <wrl/client.h>
-#include <wrl/implements.h>
-#include <wrl/wrappers/corewrappers.h>
-#include <wrl/event.h>
-
 using namespace Concurrency;
 
 // This Project Header Files:
