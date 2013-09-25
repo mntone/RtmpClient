@@ -271,7 +271,6 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="RtmpScheme.h" />
     <ClInclude Include="RtmpUri.h" />
-    <ClInclude Include="LiveRtmpClientHelper.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="rtmp_packet.h" />
     <ClInclude Include="Client\SimpleVideoClient.h" />
@@ -300,7 +299,6 @@
     <ClCompile Include="NetStreamAudioReceivedEventArgs.cpp" />
     <ClCompile Include="NetStreamAttachedEventArgs.cpp" />
     <ClCompile Include="NetStreamVideoReceivedEventArgs.cpp" />
-    <ClCompile Include="LiveRtmpClientHelper.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

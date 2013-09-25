@@ -30,8 +30,6 @@ void MainPage::OnStarted( Platform::Object^ sender, Mntone::Rtmp::Client::Simple
 //		Dispatcher->RunAsync( Windows::UI::Core::CoreDispatcherPriority::Low, ref new Windows::UI::Core::DispatchedHandler( [] { } ) );
 //}
 //
-//void MainPage::OnStarted( Mntone::Rtmp::LiveRtmpClientHelper^ sender/*, Rtmp::LiveRtmpClientHelperLiveStartedEventArgs^ args*/ )
-//{
 //	Dispatcher->RunAsync( WUC::CoreDispatcherPriority::High, ref new WUC::DispatchedHandler( [this]()
 //	{
 //
@@ -44,4 +42,3 @@ void MainPage::OnStarted( Platform::Object^ sender, Mntone::Rtmp::Client::Simple
 //		smtc->PlaybackStatus = WM::MediaPlaybackStatus::Playing;
 //
 //	} ) );
-//}

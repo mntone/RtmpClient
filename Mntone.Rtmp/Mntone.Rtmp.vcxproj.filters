@@ -11,7 +11,6 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Utilities.cpp" />
-    <ClCompile Include="LiveRtmpClientHelper.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="Handshaker.cpp" />
     <ClCompile Include="NetConnection.cpp" />
@@ -39,7 +38,6 @@
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Utilities.h" />
-    <ClInclude Include="LiveRtmpClientHelper.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="Handshaker.h" />
     <ClInclude Include="NetConnection.h" />

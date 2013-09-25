@@ -18,8 +18,8 @@ namespace Mntone { namespace Rtmp { namespace Client {
 	void SimpleVideoClient::Connect( RtmpUri^ uri )
 	{
 		_connection = ref new NetConnection();
-		_connection->StatusUpdated += ref new Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs ^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
-		_connection->Closed += ref new Windows::Foundation::EventHandler<NetConnectionClosedEventArgs ^>( this, &SimpleVideoClient::OnClosed );
+		_connection->StatusUpdated += ref new Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
+		_connection->Closed += ref new Windows::Foundation::EventHandler<NetConnectionClosedEventArgs^>( this, &SimpleVideoClient::OnClosed );
 		_connection->Connect( uri );
 	}
 
@@ -96,7 +96,6 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		_videoBuffer.emplace( args );
 		_videoConditionVariable.notify_one();
 	}
-
 
 	void SimpleVideoClient::OnStarting( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceStartingEventArgs^ args )
 	{
