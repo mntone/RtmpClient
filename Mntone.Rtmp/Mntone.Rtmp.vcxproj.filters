@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Command">
+      <UniqueIdentifier>{96feb97c-3d19-4a8d-85d5-b6a6f1941316}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Client">
+      <UniqueIdentifier>{62734a82-29ae-4c67-aff3-dfa31fc6af94}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="LiveRtmpClientHelper.cpp" />
+    <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="Handshaker.cpp" />
+    <ClCompile Include="NetConnection.cpp" />
+    <ClCompile Include="RtmpUri.cpp" />
+    <ClCompile Include="NetStream.cpp" />
+    <ClCompile Include="NetConnectionClosedEventArgs.cpp" />
+    <ClCompile Include="NetStreamVideoReceivedEventArgs.cpp" />
+    <ClCompile Include="NetStreamAudioReceivedEventArgs.cpp" />
+    <ClCompile Include="NetStreamAttachedEventArgs.cpp" />
+    <ClCompile Include="Command\NetConnectionConnectCommand.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Command\RawRtmpCommand.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\SimpleVideoClient.cpp">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="NetStatusUpdatedEventArgs.cpp" />
+    <ClCompile Include="Client\SimpleVideoClientStartedEventArgs.cpp">
+      <Filter>Client</Filter>
+    </ClCompile>
+    <ClCompile Include="Client\SimpleVideoClientStoppedEventArgs.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Utilities.h" />
+    <ClInclude Include="LiveRtmpClientHelper.h" />
+    <ClInclude Include="Connection.h" />
+    <ClInclude Include="Handshaker.h" />
+    <ClInclude Include="NetConnection.h" />
+    <ClInclude Include="RtmpUri.h" />
+    <ClInclude Include="RtmpScheme.h" />
+    <ClInclude Include="Command\IRtmpCommand.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="type_id_type.h" />
+    <ClInclude Include="limit_type.h" />
+    <ClInclude Include="NetStream.h" />
+    <ClInclude Include="rtmp_packet.h" />
+    <ClInclude Include="INetStatusEventArgs.h" />
+    <ClInclude Include="NetStatusType.h" />
+    <ClInclude Include="NetStreamVideoReceivedEventArgs.h" />
+    <ClInclude Include="NetStreamAudioReceivedEventArgs.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="NetConnectionClosedEventArgs.h" />
+    <ClInclude Include="video_type.h" />
+    <ClInclude Include="VideoFormat.h" />
+    <ClInclude Include="avc_decoder_configuration_record.h" />
+    <ClInclude Include="sound_format.h" />
+    <ClInclude Include="sound_rate.h" />
+    <ClInclude Include="sound_size.h" />
+    <ClInclude Include="sound_type.h" />
+    <ClInclude Include="sound_info.h" />
+    <ClInclude Include="UserControlMessageEventType.h" />
+    <ClInclude Include="NetStreamAttachedEventArgs.h" />
+    <ClInclude Include="Command\NetConnectionCommandType.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command\NetConnectionConnectCommand.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command\NetStreamCommandType.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command\RawRtmpCommand.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command\SupportSoundType.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command\SupportVideoFunctionType.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command\SupportVideoType.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\SimpleVideoClient.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="NetStatusUpdatedEventArgs.h" />
+    <ClInclude Include="Client\SimpleVideoClientStartedEventArgs.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\SimpleVideoClientStoppedEventArgs.h" />
+  </ItemGroup>
+</Project>
