@@ -17,6 +17,20 @@ namespace Mntone { namespace Rtmp {
 		connection->AttachNetStream( this );
 	}
 
+	NetStream::~NetStream( void )
+	{
+		using namespace Mntone::Data::Amf;
+
+		auto cmd = ref new AmfArray();
+		cmd->Append( AmfValue::CreateStringValue( "closeStream" ) );	// Command name
+		cmd->Append( AmfValue::CreateDoubleValue( 0.0 ) );				// Transaction id
+		cmd->Append( ref new AmfValue() );								// Command object: set to null type
+		cmd->Append( AmfValue::CreateDoubleValue( _streamId ) );
+		SendWithAction( cmd );
+
+		_parent->UnattachNetStream( this );
+	}
+
 	void NetStream::Attach( NetConnection^ connection )
 	{
 		connection->AttachNetStream( this );

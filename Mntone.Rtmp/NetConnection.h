@@ -40,6 +40,7 @@ namespace Mntone { namespace Rtmp {
 
 		// Utilites
 		void AttachNetStream( NetStream^ stream );
+		void UnattachNetStream( NetStream^ stream );
 		static Mntone::Data::Amf::AmfArray^ ParseAmf0( std::vector<uint8> data, const uint8 count = 4 );
 
 	private:

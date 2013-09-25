@@ -77,6 +77,13 @@ namespace Mntone { namespace Rtmp {
 		SendWithAction( cmd );
 	}
 
+	void NetConnection::UnattachNetStream( NetStream^ stream )
+	{
+		using namespace Mntone::Data::Amf;
+
+		_bindingNetStream.erase( stream->_streamId );
+	}
+
 	Mntone::Data::Amf::AmfArray^ NetConnection::ParseAmf0( std::vector<uint8> data, const uint8 count )
 	{
 		using namespace Mntone::Data::Amf;
@@ -216,7 +223,11 @@ namespace Mntone { namespace Rtmp {
 		if( sid == 0 )
 			OnMessage( *packet.get(), std::move( data ) );
 		else
-			_bindingNetStream[sid]->OnMessage( std::move( *packet.get() ), std::move( data ) );
+		{
+			const auto ret = _bindingNetStream.find( sid );
+			if( ret != _bindingNetStream.end() )
+				ret->second->OnMessage( *packet.get(), std::move( data ) );
+		}
 	}
 
 	void NetConnection::OnMessage( const rtmp_packet packet, std::vector<uint8> data )

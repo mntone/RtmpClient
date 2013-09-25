@@ -18,6 +18,7 @@ namespace Mntone { namespace Rtmp {
 	public:
 		NetStream( void );
 		NetStream( NetConnection^ connection );
+		virtual ~NetStream( void );
 
 		void Attach( NetConnection^ connection );
 
