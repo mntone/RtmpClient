@@ -30,15 +30,14 @@ void MainPage::OnStarted( Platform::Object^ sender, Mntone::Rtmp::Client::Simple
 //		Dispatcher->RunAsync( Windows::UI::Core::CoreDispatcherPriority::Low, ref new Windows::UI::Core::DispatchedHandler( [] { } ) );
 //}
 //
-//	Dispatcher->RunAsync( WUC::CoreDispatcherPriority::High, ref new WUC::DispatchedHandler( [this]()
+//	Dispatcher->RunAsync( Windows::UI::Core::CoreDispatcherPriority::High, ref new Windows::UI::Core::DispatchedHandler( [this]()
 //	{
 //
-//		auto smtc = WM::SystemMediaTransportControls::GetForCurrentView();
-//		smtc->ButtonPressed += ref new WF::TypedEventHandler<WM::SystemMediaTransportControls^, WM::SystemMediaTransportControlsButtonPressedEventArgs^>( this, &MainPage::OnButtonPressed );
+//		auto smtc = Windows::Media::SystemMediaTransportControls::GetForCurrentView();
+//		smtc->ButtonPressed += ref new Windows::Foundation::TypedEventHandler<Windows::Media::SystemMediaTransportControls^, Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs^>( this, &MainPage::OnButtonPressed );
 //		smtc->IsEnabled = true;
 //		smtc->IsPlayEnabled = true;
-//		smtc->IsPauseEnabled = true;
 //		smtc->IsStopEnabled = true;
-//		smtc->PlaybackStatus = WM::MediaPlaybackStatus::Playing;
+//		smtc->PlaybackStatus = Windows::Media::MediaPlaybackStatus::Playing;
 //
 //	} ) );

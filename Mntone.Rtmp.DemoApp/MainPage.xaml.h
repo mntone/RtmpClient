@@ -1,8 +1,5 @@
 ﻿#pragma once
 #include "MainPage.g.h"
-#include <queue>
-#include <mutex>
-#include <condition_variable>
 
 namespace Mntone { namespace Rtmp { namespace DemoApp {
 
