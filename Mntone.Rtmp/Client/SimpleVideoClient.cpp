@@ -50,11 +50,12 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		auto ns = args->NetStatus;
 		if( ns == NetStatusType::NetStream_Play_Start )
 		{
-			_dispatcher->RunAsync( Windows::UI::Core::CoreDispatcherPriority::Normal, ref new Windows::UI::Core::DispatchedHandler( [this]
+			using namespace Windows::UI::Core;
+			_dispatcher->RunAsync( CoreDispatcherPriority::Normal, ref new DispatchedHandler( [this]
 			{
-				using namespace Windows::Media::MediaProperties;
 				using namespace Windows::Media::Core;
 				using namespace Windows::Foundation;
+				using namespace Windows::Media::MediaProperties;
 
 				//auto audio = AudioEncodingProperties::CreateMp3( 44100, 2, 112 );
 				auto audio = AudioEncodingProperties::CreateAac( 44100, 2, 112 );
@@ -73,7 +74,7 @@ namespace Mntone { namespace Rtmp { namespace Client {
 				_mediaStreamSource = ref new MediaStreamSource( vdes, ades );
 
 				TimeSpan d;
-				d.Duration = UINT64_MAX;
+				d.Duration = INT64_MAX;
 				_mediaStreamSource->Duration = d;
 
 				_mediaStreamSource->Starting += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );

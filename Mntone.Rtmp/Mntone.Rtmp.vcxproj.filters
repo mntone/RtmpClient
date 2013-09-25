@@ -50,7 +50,6 @@
     <ClInclude Include="limit_type.h" />
     <ClInclude Include="NetStream.h" />
     <ClInclude Include="rtmp_packet.h" />
-    <ClInclude Include="INetStatusEventArgs.h" />
     <ClInclude Include="NetStatusType.h" />
     <ClInclude Include="NetStreamVideoReceivedEventArgs.h" />
     <ClInclude Include="NetStreamAudioReceivedEventArgs.h" />

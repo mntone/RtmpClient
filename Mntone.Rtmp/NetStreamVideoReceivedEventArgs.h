@@ -9,8 +9,8 @@ namespace Mntone { namespace Rtmp {
 	internal:
 		NetStreamVideoReceivedEventArgs( void );
 
-		void SetDecodeTimestamp( uint64 decodeTimestamp );
-		void SetPresentationTimestamp( uint64 presentationTimestamp );
+		void SetDecodeTimestamp( int64 decodeTimestamp );
+		void SetPresentationTimestamp( int64 presentationTimestamp );
 		void SetData( std::vector<uint8> data, const size_t offset = 0 );
 
 	public:

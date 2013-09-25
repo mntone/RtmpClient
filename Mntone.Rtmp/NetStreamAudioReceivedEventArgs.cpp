@@ -6,9 +6,9 @@ namespace Mntone { namespace Rtmp {
 	NetStreamAudioReceivedEventArgs::NetStreamAudioReceivedEventArgs( void )
 	{ }
 
-	void NetStreamAudioReceivedEventArgs::SetTimestamp( uint64 timestamp )
+	void NetStreamAudioReceivedEventArgs::SetTimestamp( int64 timestamp )
 	{
-		_Timestamp.Duration = timestamp * 10000l;
+		_Timestamp.Duration = timestamp * 10000ll;
 	}
 
 	void NetStreamAudioReceivedEventArgs::SetData( std::vector<uint8> data, const size_t offset )

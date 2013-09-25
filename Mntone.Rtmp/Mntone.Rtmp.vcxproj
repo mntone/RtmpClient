@@ -258,7 +258,6 @@
     <ClInclude Include="Command\SupportVideoType.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="Handshaker.h" />
-    <ClInclude Include="INetStatusEventArgs.h" />
     <ClInclude Include="limit_type.h" />
     <ClInclude Include="NetConnection.h" />
     <ClInclude Include="Command\NetConnectionCommandType.h" />

@@ -6,14 +6,14 @@ namespace Mntone { namespace Rtmp {
 	NetStreamVideoReceivedEventArgs::NetStreamVideoReceivedEventArgs( void )
 	{ }
 
-	void NetStreamVideoReceivedEventArgs::SetDecodeTimestamp( uint64 decodeTimestamp )
+	void NetStreamVideoReceivedEventArgs::SetDecodeTimestamp( int64 decodeTimestamp )
 	{
-		_DecodeTimestamp.Duration = decodeTimestamp * 10000l;
+		_DecodeTimestamp.Duration = decodeTimestamp * 10000ll;
 	}
 
-	void NetStreamVideoReceivedEventArgs::SetPresentationTimestamp( uint64 presentationTimestamp )
+	void NetStreamVideoReceivedEventArgs::SetPresentationTimestamp( int64 presentationTimestamp )
 	{
-		_PresentationTimestamp.Duration = presentationTimestamp * 10000l;
+		_PresentationTimestamp.Duration = presentationTimestamp * 10000ll;
 	}
 
 	void NetStreamVideoReceivedEventArgs::SetData( std::vector<uint8> data, const size_t offset )

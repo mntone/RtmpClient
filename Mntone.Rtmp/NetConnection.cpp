@@ -312,17 +312,17 @@ namespace Mntone { namespace Rtmp {
 				const std::wstring codeStr( codePstr->Data() );
 				const auto lastPhrase = codeStr.substr( 22 /* NetConnection.Connect. */ );
 
-				if( lastPhrase.compare( L"Success" ) == 0 )
+				if( lastPhrase == L"Success" )
 					netStatus = NetStatusType::NetConnection_Connect_Success;
-				else if( lastPhrase.compare( L"Closed" ) == 0 )
+				else if( lastPhrase == L"Closed" )
 					netStatus = NetStatusType::NetConnection_Connect_Closed;
-				else if( lastPhrase.compare( L"Failed" ) == 0 )
+				else if( lastPhrase == L"Failed" )
 					netStatus = NetStatusType::NetConnection_Connect_Failed;
-				else if( lastPhrase.compare( L"Rejected" ) == 0 )
+				else if( lastPhrase == L"Rejected" )
 					netStatus = NetStatusType::NetConnection_Connect_Rejected;
-				else if( lastPhrase.compare( L"InvalidApp" ) == 0 )
+				else if( lastPhrase == L"InvalidApp" )
 					netStatus = NetStatusType::NetConnection_Connect_InvalidApp;
-				else if( lastPhrase.compare( L"AppShutdown" ) == 0 )
+				else if( lastPhrase == L"AppShutdown" )
 					netStatus = NetStatusType::NetConnection_Connect_AppShutdown;
 				else
 					netStatus = NetStatusType::NetConnection_Connect_Other;
