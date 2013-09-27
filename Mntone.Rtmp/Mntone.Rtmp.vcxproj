@@ -267,7 +267,6 @@
     <ClInclude Include="NetStreamAudioReceivedEventArgs.h" />
     <ClInclude Include="NetStreamAttachedEventArgs.h" />
     <ClInclude Include="NetStreamVideoReceivedEventArgs.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="RtmpScheme.h" />
     <ClInclude Include="RtmpUri.h" />
     <ClInclude Include="pch.h" />

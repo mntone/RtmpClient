@@ -53,7 +53,6 @@
     <ClInclude Include="NetStatusType.h" />
     <ClInclude Include="NetStreamVideoReceivedEventArgs.h" />
     <ClInclude Include="NetStreamAudioReceivedEventArgs.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="NetConnectionClosedEventArgs.h" />
     <ClInclude Include="video_type.h" />
     <ClInclude Include="VideoFormat.h" />
