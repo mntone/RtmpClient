@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "SimpleVideoClientStartedEventArgs.h"
 
-namespace Mntone { namespace Rtmp { namespace Client {
+using namespace Mntone::Rtmp::Client;
 
-	SimpleVideoClientStartedEventArgs::SimpleVideoClientStartedEventArgs( Windows::Media::Core::MediaStreamSource^ mediaStreamSource ):
-		_MediaStreamSource( mediaStreamSource )
-	{ }
-
-} } }
+SimpleVideoClientStartedEventArgs::SimpleVideoClientStartedEventArgs( Windows::Media::Core::MediaStreamSource^ mediaStreamSource ) :
+	_MediaStreamSource( mediaStreamSource )
+{ }

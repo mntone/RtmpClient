@@ -1,9 +1,7 @@
 #include "pch.h"
 #include "NetConnectionClosedEventArgs.h"
 
-namespace Mntone { namespace Rtmp {
+using namespace Mntone::Rtmp;
 
-	NetConnectionClosedEventArgs::NetConnectionClosedEventArgs( void )
-	{ }
-
-} }
+NetConnectionClosedEventArgs::NetConnectionClosedEventArgs( void )
+{ }

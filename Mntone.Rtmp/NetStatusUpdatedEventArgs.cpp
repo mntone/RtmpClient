@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "NetStatusUpdatedEventArgs.h"
 
-namespace Mntone { namespace Rtmp {
+using namespace Mntone::Rtmp;
 
-	NetStatusUpdatedEventArgs::NetStatusUpdatedEventArgs( NetStatusType netStatus ) :
-		_NetStatus( netStatus )
-	{ }
-
-} }
+NetStatusUpdatedEventArgs::NetStatusUpdatedEventArgs( NetStatusType netStatus ) :
+	_NetStatus( netStatus )
+{ }

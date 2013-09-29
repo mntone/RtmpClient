@@ -1,9 +1,7 @@
 #include "pch.h"
 #include "NetStreamAttachedEventArgs.h"
 
-namespace Mntone { namespace Rtmp {
+using namespace Mntone::Rtmp;
 
-	NetStreamAttachedEventArgs::NetStreamAttachedEventArgs( void )
-	{ }
-
-} }
+NetStreamAttachedEventArgs::NetStreamAttachedEventArgs( void )
+{ }

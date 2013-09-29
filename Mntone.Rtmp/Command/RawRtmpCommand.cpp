@@ -1,16 +1,14 @@
 #include "pch.h"
 #include "RawRtmpCommand.h"
 
-namespace Mntone { namespace Rtmp { namespace Command {
+using namespace Mntone::Rtmp::Command;
 
-	RawRtmpCommand::RawRtmpCommand( Platform::String^ type, Mntone::Data::Amf::AmfArray^ command ):
-		_Type( type ),
-		_command( command )
-	{ }
+RawRtmpCommand::RawRtmpCommand( Platform::String^ type, Mntone::Data::Amf::AmfArray^ command ) :
+	_Type( type ),
+	_command( command )
+{ }
 
-	Mntone::Data::Amf::AmfArray^ RawRtmpCommand::Commandify( void )
-	{
-		return _command;
-	}
-
-} } }
+Mntone::Data::Amf::AmfArray^ RawRtmpCommand::Commandify( void )
+{
+	return _command;
+}

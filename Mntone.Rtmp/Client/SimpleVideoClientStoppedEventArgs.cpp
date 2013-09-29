@@ -1,9 +1,7 @@
 #include "pch.h"
 #include "SimpleVideoClientStoppedEventArgs.h"
 
-namespace Mntone { namespace Rtmp { namespace Client {
+using namespace Mntone::Rtmp::Client;
 
-	SimpleVideoClientStoppedEventArgs::SimpleVideoClientStoppedEventArgs( void )
-	{ }
-
-} } }
+SimpleVideoClientStoppedEventArgs::SimpleVideoClientStoppedEventArgs( void )
+{ }
