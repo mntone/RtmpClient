@@ -15,3 +15,6 @@ In Windows 8.1 Preview, its version (?) cannot play H.264/AVC video correctly. I
 
 ## TODO!!
 - Implements exit transaction.
+
+## Related projects
+- [Mntone::Data::Amf](//github.com/mntone/Data.Amf)
