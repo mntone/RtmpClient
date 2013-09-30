@@ -3,15 +3,31 @@
 
 using namespace Mntone::Rtmp;
 using namespace Mntone::Rtmp::Client;
+namespace WF = Windows::Foundation;
 
 SimpleVideoClient::SimpleVideoClient( void ) :
 	_dispatcher( Windows::UI::Core::CoreWindow::GetForCurrentThread()->Dispatcher )
 { }
 
 SimpleVideoClient::~SimpleVideoClient( void )
-{ }
+{
+	__Close();
+}
 
-void SimpleVideoClient::Connect( Windows::Foundation::Uri^ uri )
+void SimpleVideoClient::__Close( void )
+{
+	if( _connection != nullptr )
+	{
+		delete _connection;
+
+		if( _stream != nullptr )
+			delete _stream;
+
+		Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
+	}
+}
+
+void SimpleVideoClient::Connect( WF::Uri^ uri )
 {
 	Connect( ref new RtmpUri( uri ) );
 }
@@ -19,8 +35,7 @@ void SimpleVideoClient::Connect( Windows::Foundation::Uri^ uri )
 void SimpleVideoClient::Connect( RtmpUri^ uri )
 {
 	_connection = ref new NetConnection();
-	_connection->StatusUpdated += ref new Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
-	_connection->Closed += ref new Windows::Foundation::EventHandler<NetConnectionClosedEventArgs^>( this, &SimpleVideoClient::OnClosed );
+	_connection->StatusUpdated += ref new WF::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
 	_connection->Connect( uri );
 }
 
@@ -30,16 +45,15 @@ void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, 
 	if( ns == NetStatusType::NetConnection_Connect_Success )
 	{
 		_stream = ref new NetStream();
-		_stream->Attached += ref new Windows::Foundation::EventHandler<NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
-		_stream->StatusUpdated += ref new Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetStreamStatusUpdated );
-		_stream->AudioReceived += ref new Windows::Foundation::EventHandler<NetStreamAudioReceivedEventArgs^>( this, &SimpleVideoClient::OnAudioReceived );
-		_stream->VideoReceived += ref new Windows::Foundation::EventHandler<NetStreamVideoReceivedEventArgs^>( this, &SimpleVideoClient::OnVideoReceived );
+		_stream->Attached += ref new WF::EventHandler<NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
+		_stream->StatusUpdated += ref new WF::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetStreamStatusUpdated );
+		_stream->AudioReceived += ref new WF::EventHandler<NetStreamAudioReceivedEventArgs^>( this, &SimpleVideoClient::OnAudioReceived );
+		_stream->VideoReceived += ref new WF::EventHandler<NetStreamVideoReceivedEventArgs^>( this, &SimpleVideoClient::OnVideoReceived );
 		_stream->Attach( _connection );
 	}
+	else if( ( ns & NetStatusType::NetConnection_Connect ) == NetStatusType::NetConnection_Connect )
+		__Close();
 }
-
-void SimpleVideoClient::OnClosed( Platform::Object^ sender, NetConnectionClosedEventArgs^ args )
-{ }
 
 void SimpleVideoClient::OnAttached( Platform::Object^ sender, NetStreamAttachedEventArgs^ args )
 {

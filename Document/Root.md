@@ -26,7 +26,7 @@ The **Mntone.Rtmp** namespace has these enumerations.
 
 Enumeration                |Description
 ---------------------------|-----------
-NetStatusType              |Defines connection/stream/handshake status type.
+NetStatusType              |Defines connection/stream/sharedobject status type.
 RtmpScheme                 |Defines rtmp scheme type.
 UserControlMessageEventType|Defines user control message event type.
 VideoFormat                |Defines video format type.

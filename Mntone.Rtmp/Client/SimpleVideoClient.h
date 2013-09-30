@@ -23,9 +23,10 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		[Windows::Foundation::Metadata::DefaultOverload] void Connect( RtmpUri^ uri );
 
 	private:
+		void __Close( void );
+
 		// NetConnection
 		void OnNetConnectionStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args );
-		void OnClosed( Platform::Object^ sender, NetConnectionClosedEventArgs^ args );
 
 		// NetStream
 		void OnAttached( Platform::Object^ sender, NetStreamAttachedEventArgs^ args );
@@ -36,7 +37,6 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		// MediaStreamSource
 		void OnStarting( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceStartingEventArgs^ args );
 		void OnSampleRequested( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceSampleRequestedEventArgs^ args );
-
 
 	public:
 		//event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStartedEventArgs^>^ Started;

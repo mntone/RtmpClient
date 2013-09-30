@@ -2,22 +2,30 @@
 #include "MainPage.xaml.h"
 
 using namespace Mntone::Rtmp::DemoApp;
+using namespace Mntone::Rtmp::Client;
+namespace WUIX = Windows::UI::Xaml;
 
 MainPage::MainPage()
 {
 	InitializeComponent();
 }
 
-void MainPage::OnButtonClicked( Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e )
+void MainPage::OnPageUnloaded( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
+{
+	if( _client != nullptr )
+		delete _client;
+}
+
+void MainPage::OnButtonClicked( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
 {
 	auto uri = Uri->Text;
 
 	_client = ref new Mntone::Rtmp::Client::SimpleVideoClient();
-	_client->Started += ref new Windows::Foundation::EventHandler<Mntone::Rtmp::Client::SimpleVideoClientStartedEventArgs ^>( this, &MainPage::OnStarted );
+	_client->Started += ref new Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs ^>( this, &MainPage::OnStarted );
 	_client->Connect( ref new Windows::Foundation::Uri( uri ) );
 }
 
-void MainPage::OnStarted( Platform::Object^ sender, Mntone::Rtmp::Client::SimpleVideoClientStartedEventArgs^ args )
+void MainPage::OnStarted( Platform::Object^ sender, SimpleVideoClientStartedEventArgs^ args )
 {
 	mediaElement->SetMediaStreamSource( args->MediaStreamSource );
 	mediaElement->Play();
