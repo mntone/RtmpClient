@@ -37,7 +37,11 @@ namespace Mntone { namespace Rtmp {
 		void OnAudioMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnVideoMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnDataMessageAmf0( const rtmp_packet packet, std::vector<uint8> data );
+		void OnDataMessageAmf3( const rtmp_packet packet, std::vector<uint8> data );
+		void OnDataMessage( Mntone::Data::Amf::AmfArray^ amf );
 		void OnCommandMessageAmf0( const rtmp_packet packet, std::vector<uint8> data );
+		void OnCommandMessageAmf3( const rtmp_packet packet, std::vector<uint8> data );
+		void OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf );
 
 	private:
 		void SendWithAction( Mntone::Data::Amf::AmfArray^ amf );

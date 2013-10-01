@@ -267,6 +267,7 @@
     <ClInclude Include="NetStreamAudioReceivedEventArgs.h" />
     <ClInclude Include="NetStreamAttachedEventArgs.h" />
     <ClInclude Include="NetStreamVideoReceivedEventArgs.h" />
+    <ClInclude Include="RtmpHelper.h" />
     <ClInclude Include="RtmpScheme.h" />
     <ClInclude Include="RtmpUri.h" />
     <ClInclude Include="pch.h" />
@@ -305,6 +306,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="RtmpHelper.cpp" />
     <ClCompile Include="RtmpUri.cpp" />
     <ClCompile Include="Client\SimpleVideoClient.cpp" />
     <ClCompile Include="Utilities.cpp" />

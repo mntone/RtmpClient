@@ -41,7 +41,6 @@ namespace Mntone { namespace Rtmp {
 		// Utilites
 		void AttachNetStream( NetStream^ stream );
 		void UnattachNetStream( NetStream^ stream );
-		static Mntone::Data::Amf::AmfArray^ ParseAmf0( std::vector<uint8> data, const uint8 count = 4 );
 
 	private:
 		// Connect
@@ -54,6 +53,8 @@ namespace Mntone { namespace Rtmp {
 		void OnNetworkMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnUserControlMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnCommandMessageAmf0( const rtmp_packet packet, std::vector<uint8> data );
+		void OnCommandMessageAmf3( const rtmp_packet packet, std::vector<uint8> data );
+		void OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf );
 
 		// Send
 		void SetChunkSize( uint32 chunkSize );
@@ -99,11 +100,11 @@ namespace Mntone { namespace Rtmp {
 	internal:
 		int64 _startTime;
 		Connection^ _connection;
+		Mntone::Data::Amf::AmfEncodingType _DefaultEncodingType;
 
 	private:
 		RtmpUri^ _Uri;
 		Command::IRtmpCommand^ _connectCommand;
-		Mntone::Data::Amf::AmfEncodingType _DefaultEncodingType;
 		Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ _Client;
 
 		uint32 _latestTransactionId;

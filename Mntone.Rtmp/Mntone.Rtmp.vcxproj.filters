@@ -34,6 +34,7 @@
       <Filter>Client</Filter>
     </ClCompile>
     <ClCompile Include="Client\SimpleVideoClientStoppedEventArgs.cpp" />
+    <ClCompile Include="RtmpHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -93,5 +94,6 @@
       <Filter>Client</Filter>
     </ClInclude>
     <ClInclude Include="Client\SimpleVideoClientStoppedEventArgs.h" />
+    <ClInclude Include="RtmpHelper.h" />
   </ItemGroup>
 </Project>

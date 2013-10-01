@@ -4,6 +4,7 @@
 #include "VideoFormat.h"
 #include "NetStream.h"
 #include "NetConnection.h"
+#include "RtmpHelper.h"
 
 using namespace Mntone::Rtmp;
 
@@ -229,13 +230,30 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 }
 
 void NetStream::OnDataMessageAmf0( const rtmp_packet /*packet*/, std::vector<uint8> /*data*/ )
-{
-	//const auto amf = NetConnection::ParseAmf0( std::move( data ) );
-}
+{ }
+
+void NetStream::OnDataMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
+{ }
+
+void NetStream::OnDataMessage( Mntone::Data::Amf::AmfArray^ amf )
+{ }
 
 void NetStream::OnCommandMessageAmf0( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
-	const auto amf = NetConnection::ParseAmf0( std::move( data ) );
+	OnCommandMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
+}
+
+void NetStream::OnCommandMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
+{
+	if( _parent->DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
+	{ }
+		//OnCommandMessage( std::move( NetConnection::ParseAmf3( std::move( data ) ) ) );
+	else
+		OnCommandMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
+}
+
+void NetStream::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
+{
 	const auto name = amf->GetStringAt( 0 );
 	const auto information = amf->GetObjectAt( 3 );
 
