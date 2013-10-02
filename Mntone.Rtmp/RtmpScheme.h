@@ -5,9 +5,9 @@ namespace Mntone { namespace Rtmp {
 	public enum class RtmpScheme
 	{
 		Rtmp,
+		Rtmpt,
 		Rtmps,
 		Rtmpe,
-		Rtmpt,
 		Rtmpte,
 		// UDP protocol
 		//Rtmpfp,

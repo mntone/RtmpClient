@@ -19,9 +19,13 @@ void SimpleVideoClient::__Close( void )
 	if( _connection != nullptr )
 	{
 		delete _connection;
+		_connection = nullptr;
 
 		if( _stream != nullptr )
+		{
 			delete _stream;
+			_stream = nullptr;
+		}
 
 		Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
 	}
@@ -72,8 +76,8 @@ void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetS
 			using namespace Windows::Foundation;
 			using namespace Windows::Media::MediaProperties;
 
-			//auto audio = AudioEncodingProperties::CreateMp3( 44100, 2, 112 );
-			auto audio = AudioEncodingProperties::CreateAac( 44100, 2, 112 );
+			auto audio = AudioEncodingProperties::CreateMp3( 44100, 2, 112 );
+			//auto audio = AudioEncodingProperties::CreateAac( 44100, 2, 112 );
 			audio->BitsPerSample = 16;
 			const auto ades = ref new AudioStreamDescriptor( audio );
 
