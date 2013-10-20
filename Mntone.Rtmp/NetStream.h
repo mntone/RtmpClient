@@ -49,15 +49,11 @@ namespace Mntone { namespace Rtmp {
 		void AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, NetStreamVideoReceivedEventArgs^& args );
 			
 	public:
-		//event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamStreamAttachedEventArgs^>^ Attached;
-		//event Windows::Foundation::TypedEventHandler<NetStream^, NetStatusUpdatedEventArgs^>^ StatusUpdated;
-		//event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAudioReceivedEventArgs^>^ AudioReceived;
-		//event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>^ VideoReceived;
-		event Windows::Foundation::EventHandler<NetStreamAttachedEventArgs^>^ Attached;
+		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>^ Attached;
 		event Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>^ StatusUpdated;
-		event Windows::Foundation::EventHandler<NetStreamAudioReceivedEventArgs^>^ AudioReceived;
-		event Windows::Foundation::EventHandler<NetStreamVideoReceivedEventArgs^>^ VideoReceived;
-
+		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAudioReceivedEventArgs^>^ AudioReceived;
+		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>^ VideoReceived;
+		
 	internal:
 		NetConnection^ _parent;
 		uint32 _streamId;
@@ -65,6 +61,8 @@ namespace Mntone { namespace Rtmp {
 	private:
 		// for Avc
 		avc_decoder_configuration_record _decoderConfigurationRecord;
+		int64 _timeOffset;
+		int64 _st;
 	};
 
 } }

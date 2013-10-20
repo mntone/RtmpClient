@@ -75,10 +75,8 @@ namespace Mntone { namespace Rtmp {
 		std::vector<uint8> CreateHeader( rtmp_packet packet, bool isFormatTypeZero );
 
 	public:
-		//event Windows::Foundation::TypedEventHandler<NetConnection^, NetStatusUpdatedEventArgs^>^ StatusUpdated;
-		//event Windows::Foundation::TypedEventHandler<NetConnection^, NetConnectionClosedEventArgs^>^ Closed;
 		event Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>^ StatusUpdated;
-		event Windows::Foundation::EventHandler<NetConnectionClosedEventArgs^>^ Closed;
+		event Windows::Foundation::TypedEventHandler<NetConnection^, NetConnectionClosedEventArgs^>^ Closed;
 
 	public:
 		property RtmpUri^ Uri

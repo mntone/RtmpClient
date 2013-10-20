@@ -11,6 +11,8 @@ namespace Mntone { namespace Rtmp {
 		void SetTimestamp( int64 timestamp );
 		void SetData( std::vector<uint8> data, const size_t offset = 0 );
 
+		Windows::Media::Core::MediaStreamSample^ CreateSample( void );
+
 	public:
 		property Windows::Foundation::TimeSpan Timestamp
 		{

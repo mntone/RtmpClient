@@ -49,17 +49,17 @@ void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, 
 	if( ns == NetStatusType::NetConnection_Connect_Success )
 	{
 		_stream = ref new NetStream();
-		_stream->Attached += ref new WF::EventHandler<NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
+		_stream->Attached += ref new WF::TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
 		_stream->StatusUpdated += ref new WF::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetStreamStatusUpdated );
-		_stream->AudioReceived += ref new WF::EventHandler<NetStreamAudioReceivedEventArgs^>( this, &SimpleVideoClient::OnAudioReceived );
-		_stream->VideoReceived += ref new WF::EventHandler<NetStreamVideoReceivedEventArgs^>( this, &SimpleVideoClient::OnVideoReceived );
+		_stream->AudioReceived += ref new WF::TypedEventHandler<NetStream^, NetStreamAudioReceivedEventArgs^>( this, &SimpleVideoClient::OnAudioReceived );
+		_stream->VideoReceived += ref new WF::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>( this, &SimpleVideoClient::OnVideoReceived );
 		_stream->Attach( _connection );
 	}
 	else if( ( ns & NetStatusType::NetConnection_Connect ) == NetStatusType::NetConnection_Connect )
 		__Close();
 }
 
-void SimpleVideoClient::OnAttached( Platform::Object^ sender, NetStreamAttachedEventArgs^ args )
+void SimpleVideoClient::OnAttached( NetStream^ sender, NetStreamAttachedEventArgs^ args )
 {
 	_stream->Play( _connection->Uri->Instance );
 }
@@ -73,44 +73,43 @@ void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetS
 		_dispatcher->RunAsync( CoreDispatcherPriority::Normal, ref new DispatchedHandler( [this]
 		{
 			using namespace Windows::Media::Core;
-			using namespace Windows::Foundation;
 			using namespace Windows::Media::MediaProperties;
 
-			auto audio = AudioEncodingProperties::CreateMp3( 44100, 2, 112 );
-			//auto audio = AudioEncodingProperties::CreateAac( 44100, 2, 112 );
+			auto audio = AudioEncodingProperties::CreateMp3( 44100, 2, 96 );
+			//auto audio = AudioEncodingProperties::CreateAac( 32000, 2, 96 );
 			audio->BitsPerSample = 16;
 			const auto ades = ref new AudioStreamDescriptor( audio );
 
 			auto video = VideoEncodingProperties::CreateH264();
 			video->ProfileId = H264ProfileIds::High;
-			video->Bitrate = 1024;
-			video->FrameRate->Numerator = 24000;
-			video->FrameRate->Denominator = 1000;
-			video->Height = 720;
-			video->Width = 1280;
+			video->Bitrate = 300;
+			video->FrameRate->Numerator = 20;
+			video->FrameRate->Denominator = 1;
+			video->Height = 360;
+			video->Width = 640;
 			auto vdes = ref new VideoStreamDescriptor( video );
 
 			_mediaStreamSource = ref new MediaStreamSource( vdes, ades );
 
-			TimeSpan d;
+			WF::TimeSpan d;
 			d.Duration = INT64_MAX;
 			_mediaStreamSource->Duration = d;
 
-			_mediaStreamSource->Starting += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
-			_mediaStreamSource->SampleRequested += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
+			_mediaStreamSource->Starting += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
+			_mediaStreamSource->SampleRequested += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
 			Started( this, ref new SimpleVideoClientStartedEventArgs( _mediaStreamSource ) );
 		} ) );
 	}
 }
 
-void SimpleVideoClient::OnAudioReceived( Platform::Object^ sender, NetStreamAudioReceivedEventArgs^ args )
+void SimpleVideoClient::OnAudioReceived( NetStream^ sender, NetStreamAudioReceivedEventArgs^ args )
 {
 	std::lock_guard<std::mutex> lock( _audioMutex );
 	_audioBuffer.emplace( args );
 	_audioConditionVariable.notify_one();
 }
 
-void SimpleVideoClient::OnVideoReceived( Platform::Object^ sender, NetStreamVideoReceivedEventArgs^ args )
+void SimpleVideoClient::OnVideoReceived( NetStream^ sender, NetStreamVideoReceivedEventArgs^ args )
 {
 	std::lock_guard<std::mutex> lock( _videoMutex );
 	_videoBuffer.emplace( args );
@@ -142,16 +141,7 @@ void SimpleVideoClient::OnSampleRequested( Windows::Media::Core::MediaStreamSour
 			_audioBuffer.pop();
 		}
 
-		auto sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( data->Data, data->Timestamp );
-		sample->KeyFrame = true;
-		request->Sample = sample;
-
-		//WF::TimeSpan d;
-		//d.Duration = data->Duration * 10000L;
-		//sample->Duration = d;
-
-		//Platform::String^ str( "Audio - TS: " + data->Timestamp + "\n" );
-		//OutputDebugString( str->Data() );
+		request->Sample = data->CreateSample( );
 	}
 	else
 	{
@@ -164,17 +154,7 @@ void SimpleVideoClient::OnSampleRequested( Windows::Media::Core::MediaStreamSour
 			_videoBuffer.pop();
 		}
 
-		auto sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( data->Data, data->PresentationTimestamp );
-		sample->DecodeTimestamp = data->DecodeTimestamp;
-		sample->KeyFrame = data->IsKeyframe;
-		request->Sample = sample;
-
-		//WF::TimeSpan d;
-		//d.Duration = 10 * 10000L;
-		//sample->Duration = d;
-
-		//Platform::String^ str( "Video - DTS: " + data->DecodeTimestamp + ", PTS: " + data->PresentationTimestamp + "\n" );
-		//OutputDebugString( str->Data() );
+		request->Sample = data->CreateSample( );
 	}
 	deferral->Complete();
 }

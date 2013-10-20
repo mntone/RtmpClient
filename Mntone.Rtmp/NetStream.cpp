@@ -9,11 +9,15 @@
 using namespace Mntone::Rtmp;
 
 NetStream::NetStream( void ) :
-	_streamId( 0 )
+	_streamId( 0 ),
+	_timeOffset( 0 ),
+	_st( GetWindowsTime() )
 { }
 
 NetStream::NetStream( NetConnection^ connection ) :
-	_streamId( 0 )
+	_streamId( 0 ),
+	_timeOffset( 0 ),
+	_st( GetWindowsTime( ) )
 {
 	connection->AttachNetStream( this );
 }

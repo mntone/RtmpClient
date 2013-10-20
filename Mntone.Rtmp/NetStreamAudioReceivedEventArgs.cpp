@@ -17,3 +17,10 @@ void NetStreamAudioReceivedEventArgs::SetData( std::vector<uint8> data, const si
 	buf->WriteBytes( Platform::ArrayReference<uint8>( data.data() + offset, static_cast<uint32>( data.size() - offset ) ) );
 	_Data = buf->DetachBuffer();
 }
+
+Windows::Media::Core::MediaStreamSample^ NetStreamAudioReceivedEventArgs::CreateSample( void )
+{
+	const auto& sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( _Data, _Timestamp );
+	sample->KeyFrame = true;
+	return std::move( sample );
+}

@@ -146,23 +146,24 @@ void NetConnection::__Receive( void )
 			_connection->Read( p, 4 );
 			ConvertBigEndian( p, &packet->Timestamp, 4 );
 		}
+		packet->TimestampDelta = packet->Timestamp;
 		break;
 
 	case 1:
 		{
 			_connection->Read( p, 7 );
 
-			uint64 tsd( 0 );
-			ConvertBigEndian( p, &tsd, 3 );
+			packet->TimestampDelta = 0;
+			ConvertBigEndian( p, &packet->TimestampDelta, 3 );
 			ConvertBigEndian( p + 3, &packet->Length, 3 );
 			packet->TypeId = static_cast<type_id_type>( p[6] );
 
-			if( tsd == 0xffffff )
+			if( packet->TimestampDelta == 0xffffff )
 			{
 				_connection->Read( p, 4 );
-				ConvertBigEndian( p, &tsd, 4 );
+				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
 			}
-			packet->Timestamp += tsd;
+			packet->Timestamp += packet->TimestampDelta;
 			break;
 		}
 
@@ -170,20 +171,28 @@ void NetConnection::__Receive( void )
 		{
 			_connection->Read( p, 3 );
 
-			uint64 tsd( 0 );
-			ConvertBigEndian( p, &tsd, 3 );
+			packet->TimestampDelta = 0;
+			ConvertBigEndian( p, &packet->TimestampDelta, 3 );
 
-			if( tsd == 0xffffff )
+			if( packet->TimestampDelta == 0xffffff )
 			{
 				_connection->Read( p, 4 );
-				ConvertBigEndian( p, &tsd, 4 );
+				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
 			}
-			packet->Timestamp += tsd;
+			packet->Timestamp += packet->TimestampDelta;
 			break;
 		}
 
 	case 3:
-		break;
+		{
+			if( packet->TimestampDelta > 0xffffff )
+			{
+				_connection->Read( p, 4 );
+				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
+			}
+			packet->Timestamp += packet->TimestampDelta;
+			break;
+		}
 	}
 
 	// ---[ Read message body ]----------
@@ -533,8 +542,11 @@ std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isForma
 	{
 		if( packet.TypeId == bakPacket->TypeId && packet.Length == bakPacket->Length )
 		{
-			if( packet.Timestamp == bakPacket->Timestamp )
+			if( packet.Timestamp == bakPacket->Timestamp + 2 * bakPacket->TimestampDelta )
+			{
 				formatType = 3;
+				packet.TimestampDelta = bakPacket->TimestampDelta;
+			}
 			else if( packet.Timestamp < bakPacket->Timestamp )
 				formatType = 0;
 			else
@@ -595,39 +607,44 @@ std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isForma
 		break;
 	case 1:
 		{
-			const auto tsd = static_cast<uint32>( packet.Timestamp - bakPacket->Timestamp );
+			packet.TimestampDelta = packet.Timestamp - bakPacket->Timestamp;
 			ConvertBigEndian( &packet.Length, ptr + 3, 3 );
 			ptr[6] = static_cast<uint8>( packet.TypeId );
-			if( tsd >= 0xffffff )
+			if( packet.TimestampDelta >= 0xffffff )
 			{
 				ptr[0] = ptr[1] = ptr[2] = 0xff;
-				ConvertBigEndian( &tsd, ptr + 7, 4 );
+				ConvertBigEndian( &packet.TimestampDelta, ptr + 7, 4 );
 				length += 11;
 			}
 			else
 			{
-				ConvertBigEndian( &tsd, ptr, 3 );
+				ConvertBigEndian( &packet.TimestampDelta, ptr, 3 );
 				length += 7;
 			}
 			break;
 		}
 	case 2:
 		{
-			const auto tsd = static_cast<uint32>( packet.Timestamp - bakPacket->Timestamp );
-			if( tsd >= 0xffffff )
+			packet.TimestampDelta = packet.Timestamp - bakPacket->Timestamp;
+			if( packet.TimestampDelta >= 0xffffff )
 			{
 				ptr[0] = ptr[1] = ptr[2] = 0xff;
-				ConvertBigEndian( &tsd, ptr + 3, 4 );
+				ConvertBigEndian( &packet.TimestampDelta, ptr + 3, 4 );
 				length += 7;
 			}
 			else
 			{
-				ConvertBigEndian( &tsd, ptr, 3 );
+				ConvertBigEndian( &packet.TimestampDelta, ptr, 3 );
 				length += 3;
 			}
 			break;
 		}
-	case 3:
+	case 3:		
+		if( packet.TimestampDelta >= 0xffffff )
+		{
+			ConvertBigEndian( &packet.TimestampDelta, ptr + 3, 4 );
+			length += 4;
+		}
 		break;
 	}
 

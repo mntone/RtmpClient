@@ -13,6 +13,8 @@ namespace Mntone { namespace Rtmp {
 		void SetPresentationTimestamp( int64 presentationTimestamp );
 		void SetData( std::vector<uint8> data, const size_t offset = 0 );
 
+		Windows::Media::Core::MediaStreamSample^ CreateSample( void );
+
 	public:
 		property bool IsKeyframe
 		{

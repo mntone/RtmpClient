@@ -17,7 +17,7 @@
 		</Border>
 		
 		<StackPanel Grid.Row="2" Orientation="Horizontal">
-			<TextBox x:Name="Uri" Text="rtmp://192.168.1.54/flvplayback/test2" Width="300"/>
+			<TextBox x:Name="Uri" Text="rtmp://192.168.1.10/flvplayback/test2" Width="300"/>
 			<Button Click="OnButtonClicked">Send</Button>
 		</StackPanel>
 	</Grid>
