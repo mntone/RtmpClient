@@ -21,11 +21,11 @@ void MainPage::OnButtonClicked( Platform::Object^ sender, WUIX::RoutedEventArgs^
 	auto uri = Uri->Text;
 
 	_client = ref new Mntone::Rtmp::Client::SimpleVideoClient();
-	_client->Started += ref new Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs ^>( this, &MainPage::OnStarted );
+	_client->Started += ref new Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStartedEventArgs ^>( this, &MainPage::OnStarted );
 	_client->Connect( ref new Windows::Foundation::Uri( uri ) );
 }
 
-void MainPage::OnStarted( Platform::Object^ sender, SimpleVideoClientStartedEventArgs^ args )
+void MainPage::OnStarted( SimpleVideoClient^ sender, SimpleVideoClientStartedEventArgs^ args )
 {
 	mediaElement->SetMediaStreamSource( args->MediaStreamSource );
 	mediaElement->Play();

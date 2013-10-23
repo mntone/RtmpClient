@@ -75,18 +75,13 @@ void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetS
 			using namespace Windows::Media::Core;
 			using namespace Windows::Media::MediaProperties;
 
-			auto audio = AudioEncodingProperties::CreateMp3( 44100, 2, 96 );
-			//auto audio = AudioEncodingProperties::CreateAac( 32000, 2, 96 );
+			//auto audio = AudioEncodingProperties::CreateMp3( 44100, 2, 96 );
+			auto audio = AudioEncodingProperties::CreateAac( 44100, 2, 128 );
 			audio->BitsPerSample = 16;
 			const auto ades = ref new AudioStreamDescriptor( audio );
 
 			auto video = VideoEncodingProperties::CreateH264();
 			video->ProfileId = H264ProfileIds::High;
-			video->Bitrate = 300;
-			video->FrameRate->Numerator = 20;
-			video->FrameRate->Denominator = 1;
-			video->Height = 360;
-			video->Width = 640;
 			auto vdes = ref new VideoStreamDescriptor( video );
 
 			_mediaStreamSource = ref new MediaStreamSource( vdes, ades );
@@ -129,6 +124,7 @@ void SimpleVideoClient::OnSampleRequested( Windows::Media::Core::MediaStreamSour
 	auto request = args->Request;
 	auto deferral = request->GetDeferral();
 
+	auto name = request->StreamDescriptor->Name;
 	auto className = request->StreamDescriptor->ToString();
 	if( className == "Windows.Media.Core.AudioStreamDescriptor" )
 	{
@@ -140,8 +136,7 @@ void SimpleVideoClient::OnSampleRequested( Windows::Media::Core::MediaStreamSour
 			data = _audioBuffer.front();
 			_audioBuffer.pop();
 		}
-
-		request->Sample = data->CreateSample( );
+		request->Sample = data->CreateSample();
 	}
 	else
 	{
@@ -153,8 +148,7 @@ void SimpleVideoClient::OnSampleRequested( Windows::Media::Core::MediaStreamSour
 			data = _videoBuffer.front();
 			_videoBuffer.pop();
 		}
-
-		request->Sample = data->CreateSample( );
+		request->Sample = data->CreateSample();
 	}
 	deferral->Complete();
 }

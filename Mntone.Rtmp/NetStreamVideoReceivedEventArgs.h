@@ -24,21 +24,21 @@ namespace Mntone { namespace Rtmp {
 		}
 		property Windows::Foundation::TimeSpan DecodeTimestamp
 		{
-			Windows::Foundation::TimeSpan get() { return _DecodeTimestamp; }
+			Windows::Foundation::TimeSpan get( void ) { return _DecodeTimestamp; }
 		}
 		property Windows::Foundation::TimeSpan PresentationTimestamp
 		{
-			Windows::Foundation::TimeSpan get() { return _PresentationTimestamp; }
+			Windows::Foundation::TimeSpan get( void ) { return _PresentationTimestamp; }
 		}
 		property VideoFormat Format
 		{
-			VideoFormat get() { return _Format; }
+			VideoFormat get( void ) { return _Format; }
 		internal:
 			void set( VideoFormat value ) { _Format = value; }
 		}
 		property Windows::Storage::Streams::IBuffer^ Data
 		{
-			Windows::Storage::Streams::IBuffer^ get() { return _Data; }
+			Windows::Storage::Streams::IBuffer^ get( void ) { return _Data; }
 		}
 
 	private:

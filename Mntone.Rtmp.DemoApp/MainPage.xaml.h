@@ -11,7 +11,7 @@ namespace Mntone { namespace Rtmp { namespace DemoApp {
 	private:
 		void OnPageUnloaded( Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e );
 		void OnButtonClicked( Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e );
-		void OnStarted( Platform::Object^ sender, Mntone::Rtmp::Client::SimpleVideoClientStartedEventArgs^ args );
+		void OnStarted( Mntone::Rtmp::Client::SimpleVideoClient^ sender, Mntone::Rtmp::Client::SimpleVideoClientStartedEventArgs^ args );
 
 	private:
 		Mntone::Rtmp::Client::SimpleVideoClient^ _client;

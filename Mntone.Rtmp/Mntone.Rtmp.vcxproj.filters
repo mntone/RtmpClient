@@ -95,5 +95,12 @@
     </ClInclude>
     <ClInclude Include="Client\SimpleVideoClientStoppedEventArgs.h" />
     <ClInclude Include="RtmpHelper.h" />
+    <ClInclude Include="AudioInfo.h" />
+    <ClInclude Include="AudioFormat.h" />
+    <ClInclude Include="aac_id.h" />
+    <ClInclude Include="aac_protection_absent.h" />
+    <ClInclude Include="aac_profile.h" />
+    <ClInclude Include="aac_sampling_frequency.h" />
+    <ClInclude Include="adts_header.h" />
   </ItemGroup>
 </Project>

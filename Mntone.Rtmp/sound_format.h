@@ -4,10 +4,10 @@ namespace Mntone { namespace Rtmp {
 
 	enum sound_format: uint8
 	{
-		sf_linear_pcm = 0,
+		sf_lpcm = 0,
 		sf_adpcm = 1,
 		sf_mp3 = 2,
-		sf_linear_pcm_little_endian = 3,
+		sf_lpcm_little_endian = 3,
 		sf_nellymoser16khz_mono = 4,
 		sf_nellymoser8khz_mono = 5,
 		sf_nellymoser = 6,

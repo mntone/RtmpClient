@@ -39,10 +39,8 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		void OnSampleRequested( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceSampleRequestedEventArgs^ args );
 
 	public:
-		//event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStartedEventArgs^>^ Started;
-		//event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStoppedEventArgs^>^ Stopped;
-		event Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>^ Started;
-		event Windows::Foundation::EventHandler<SimpleVideoClientStoppedEventArgs^>^ Stopped;
+		event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStartedEventArgs^>^ Started;
+		event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStoppedEventArgs^>^ Stopped;
 
 	private:
 		Windows::UI::Core::CoreDispatcher^ _dispatcher;

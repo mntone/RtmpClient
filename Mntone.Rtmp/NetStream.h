@@ -59,10 +59,11 @@ namespace Mntone { namespace Rtmp {
 		uint32 _streamId;
 
 	private:
+		bool _audioInfoEnabled;
+		AudioInfo^ _audioInfo;
+
 		// for Avc
 		avc_decoder_configuration_record _decoderConfigurationRecord;
-		int64 _timeOffset;
-		int64 _st;
 	};
 
 } }

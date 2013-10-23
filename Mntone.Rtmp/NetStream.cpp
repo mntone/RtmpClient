@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "sound_info.h"
+#include "adts_header.h"
 #include "video_type.h"
 #include "VideoFormat.h"
 #include "NetStream.h"
@@ -10,14 +11,12 @@ using namespace Mntone::Rtmp;
 
 NetStream::NetStream( void ) :
 	_streamId( 0 ),
-	_timeOffset( 0 ),
-	_st( GetWindowsTime() )
+	_audioInfoEnabled( false ),
+	_audioInfo( ref new AudioInfo() )
 { }
 
 NetStream::NetStream( NetConnection^ connection ) :
-	_streamId( 0 ),
-	_timeOffset( 0 ),
-	_st( GetWindowsTime( ) )
+	NetStream()
 {
 	connection->AttachNetStream( this );
 }
@@ -104,8 +103,41 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 		}
 		else if( data[1] == 0x00 )
 		{
+			auto& adts = *reinterpret_cast<adts_header*>( data.data() );
+			_audioInfo->Format = AudioFormat::Aac;
+			_audioInfo->SampleRate = adts.get_sampling_frequency_as_uint();
+			_audioInfo->ChannelCount = adts.get_channel_configuration( );
+			_audioInfo->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
 		}
 		return;
+	}
+
+	if( !_audioInfoEnabled )
+	{
+		switch( si.rate )
+		{
+		case sound_rate::sr_5_5khz: _audioInfo->SampleRate = 5513; break;
+		case sound_rate::sr_11khz: _audioInfo->SampleRate = 11025; break;
+		case sound_rate::sr_22khz: _audioInfo->SampleRate = 22050; break;
+		case sound_rate::sr_44khz: _audioInfo->SampleRate = 44100; break;
+		default: return;
+		}
+
+		switch( si.format )
+		{
+		case sound_format::sf_mp3:
+			_audioInfo->Format = AudioFormat::Mp3;
+			break;
+		case sound_format::sf_mp38khz:
+			_audioInfo->Format = AudioFormat::Mp3;
+			_audioInfo->SampleRate = 8000;
+			break;
+		default: return;
+		}
+
+		_audioInfo->ChannelCount = si.type == sound_type::st_stereo ? 2 : 1;
+		_audioInfo->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
+		_audioInfoEnabled = true;
 	}
 
 	auto args = ref new NetStreamAudioReceivedEventArgs();
@@ -116,8 +148,8 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 
 void NetStream::OnVideoMessage( const rtmp_packet packet, std::vector<uint8> data )
 {
-	const auto vt = static_cast<video_type>( ( data[0] >> 4 ) & 0x0f );
-	const auto vf = static_cast<VideoFormat>( data[0] & 0x0f );
+	const auto& vt = static_cast<video_type>( ( data[0] >> 4 ) & 0x0f );
+	const auto& vf = static_cast<VideoFormat>( data[0] & 0x0f );
 
 	auto args = ref new NetStreamVideoReceivedEventArgs();
 	args->IsKeyframe = vt == video_type::vt_keyframe;
@@ -233,14 +265,24 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 	}
 }
 
-void NetStream::OnDataMessageAmf0( const rtmp_packet /*packet*/, std::vector<uint8> /*data*/ )
-{ }
+void NetStream::OnDataMessageAmf0( const rtmp_packet /*packet*/, std::vector<uint8> data )
+{
+	OnDataMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
+}
 
 void NetStream::OnDataMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
-{ }
+{
+	if( _parent->DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
+	{
+	}
+	//OnDataMessage( std::move( NetConnection::ParseAmf3( std::move( data ) ) ) );
+	else
+		OnDataMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
+}
 
 void NetStream::OnDataMessage( Mntone::Data::Amf::AmfArray^ amf )
-{ }
+{
+}
 
 void NetStream::OnCommandMessageAmf0( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
