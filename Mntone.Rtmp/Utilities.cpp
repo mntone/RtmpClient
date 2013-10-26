@@ -17,32 +17,16 @@ void Mntone::Rtmp::ConvertLittleEndian( const void *const from, void *const to, 
 
 uint64 Mntone::Rtmp::WindowsTimeToUnixTime( const int64 windowsTime )
 {
-	return static_cast<uint64>( ( windowsTime - 116444736000000000ll ) / 10000000ll );
+	return ( windowsTime - 116444736000000000ull ) / 10000000ull;
 }
 
 int64 Mntone::Rtmp::UnixTimeToWindowsTime( const uint64 unixTime )
 {
-	return 10000000ll * static_cast<uint64>( unixTime ) + 116444736000000000ll;
-}
-
-uint64 Mntone::Rtmp::DateTimeToUnixTime( Windows::Foundation::DateTime dateTime )
-{
-	return ::Mntone::Rtmp::WindowsTimeToUnixTime( dateTime.UniversalTime );
-}
-
-Windows::Foundation::DateTime Mntone::Rtmp::UnixTimeToDateTime( const uint64 unixTime )
-{
-	Windows::Foundation::DateTime d;
-	d.UniversalTime = ::Mntone::Rtmp::UnixTimeToWindowsTime( unixTime );
-	return d;
+	return 10000000ll * unixTime + 116444736000000000ll;
 }
 
 Windows::Foundation::DateTime Mntone::Rtmp::GetDateTime( void )
 {
-	//auto calendar = ref new Windows::Globalization::Calendar();
-	//calendar->SetToNow();
-	//return calendar->GetDateTime();
-
 	Windows::Foundation::DateTime dt;
 	dt.UniversalTime = ::Mntone::Rtmp::GetWindowsTime();
 	return dt;
@@ -50,12 +34,10 @@ Windows::Foundation::DateTime Mntone::Rtmp::GetDateTime( void )
 
 int64 Mntone::Rtmp::GetWindowsTime( void )
 {
-	//return GetDateTime().UniversalTime;
-
 	FILETIME ft;
 	GetSystemTimeAsFileTime( &ft );
-
-	return static_cast<uint64>( ft.dwHighDateTime ) << 32 | static_cast<uint64>( ft.dwLowDateTime );
+	const auto& li = *reinterpret_cast<LARGE_INTEGER*>( &ft );
+	return li.QuadPart;
 }
 
 uint32 Mntone::Rtmp::HundredNanoToMilli( int64 hundredNano )

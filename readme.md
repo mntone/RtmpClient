@@ -13,5 +13,11 @@ This component is debugged with Windows 8.1. This can operate. However, implemen
 ## TODO
 - Implements exit transaction.
 
+## Treatment
+Variable handling.
+
+### Time
+Use FILETIME. It is easy to convert Windows::Foundation::DateTime (.NET System.DateTimeOffset). std::chrono under investigation.
+
 ## Related projects
 - [Mntone::Data::Amf](//github.com/mntone/Data.Amf)
