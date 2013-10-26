@@ -3,7 +3,9 @@
 #include "NetConnection.h"
 #include "NetStreamAttachedEventArgs.h"
 #include "NetStatusUpdatedEventArgs.h"
+#include "NetStreamAudioStartedEventArgs.h"
 #include "NetStreamAudioReceivedEventArgs.h"
+#include "NetStreamVideoStartedEventArgs.h"
 #include "NetStreamVideoReceivedEventArgs.h"
 #include "avc_decoder_configuration_record.h"
 
@@ -51,7 +53,9 @@ namespace Mntone { namespace Rtmp {
 	public:
 		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>^ Attached;
 		event Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>^ StatusUpdated;
+		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAudioStartedEventArgs^>^ AudioStarted;
 		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAudioReceivedEventArgs^>^ AudioReceived;
+		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamVideoStartedEventArgs^>^ VideoStarted;
 		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>^ VideoReceived;
 		
 	internal:
@@ -62,8 +66,11 @@ namespace Mntone { namespace Rtmp {
 		bool _audioInfoEnabled;
 		AudioInfo^ _audioInfo;
 
+		bool _videoInfoEnabled;
+		VideoInfo^ _videoInfo;
+
 		// for Avc
-		avc_decoder_configuration_record _decoderConfigurationRecord;
+		uint8 _length_size_minus_one;
 	};
 
 } }

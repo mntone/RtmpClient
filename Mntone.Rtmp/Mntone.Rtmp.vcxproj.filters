@@ -35,6 +35,8 @@
     </ClCompile>
     <ClCompile Include="Client\SimpleVideoClientStoppedEventArgs.cpp" />
     <ClCompile Include="RtmpHelper.cpp" />
+    <ClCompile Include="NetStreamAudioStartedEventArgs.cpp" />
+    <ClCompile Include="NetStreamVideoStartedEventArgs.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -102,5 +104,8 @@
     <ClInclude Include="aac_profile.h" />
     <ClInclude Include="aac_sampling_frequency.h" />
     <ClInclude Include="adts_header.h" />
+    <ClInclude Include="NetStreamAudioStartedEventArgs.h" />
+    <ClInclude Include="NetStreamVideoStartedEventArgs.h" />
+    <ClInclude Include="VideoInfo.h" />
   </ItemGroup>
 </Project>

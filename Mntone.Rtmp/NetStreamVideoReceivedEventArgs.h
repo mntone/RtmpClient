@@ -1,5 +1,5 @@
 #pragma once
-#include "VideoFormat.h"
+#include "VideoInfo.h"
 
 namespace Mntone { namespace Rtmp {
 
@@ -16,6 +16,12 @@ namespace Mntone { namespace Rtmp {
 		Windows::Media::Core::MediaStreamSample^ CreateSample( void );
 
 	public:
+		property VideoInfo^ Info
+		{
+			VideoInfo^ get( void ) { return _Info; }
+		internal:
+			void set( VideoInfo^ value ) { _Info = value; }
+		}
 		property bool IsKeyframe
 		{
 			bool get( void ) { return _IsKeyframe; }
@@ -30,21 +36,15 @@ namespace Mntone { namespace Rtmp {
 		{
 			Windows::Foundation::TimeSpan get( void ) { return _PresentationTimestamp; }
 		}
-		property VideoFormat Format
-		{
-			VideoFormat get( void ) { return _Format; }
-		internal:
-			void set( VideoFormat value ) { _Format = value; }
-		}
 		property Windows::Storage::Streams::IBuffer^ Data
 		{
 			Windows::Storage::Streams::IBuffer^ get( void ) { return _Data; }
 		}
 
 	private:
+		VideoInfo^ _Info;
 		bool _IsKeyframe;
 		Windows::Foundation::TimeSpan _DecodeTimestamp, _PresentationTimestamp;
-		VideoFormat _Format;
 		Windows::Storage::Streams::IBuffer^ _Data;
 	};
 

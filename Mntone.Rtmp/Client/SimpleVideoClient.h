@@ -31,7 +31,9 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		// NetStream
 		void OnAttached( NetStream^ sender, NetStreamAttachedEventArgs^ args );
 		void OnNetStreamStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args );
+		void OnAudioStarted( NetStream^ sender, NetStreamAudioStartedEventArgs^ args );
 		void OnAudioReceived( NetStream^ sender, NetStreamAudioReceivedEventArgs^ args );
+		void OnVideoStarted( NetStream^ sender, NetStreamVideoStartedEventArgs^ args );
 		void OnVideoReceived( NetStream^ sender, NetStreamVideoReceivedEventArgs^ args );
 
 		// MediaStreamSource
@@ -39,7 +41,7 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		void OnSampleRequested( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceSampleRequestedEventArgs^ args );
 
 	public:
-		event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStartedEventArgs^>^ Started;
+		event Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>^ Started;
 		event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStoppedEventArgs^>^ Stopped;
 
 	private:
