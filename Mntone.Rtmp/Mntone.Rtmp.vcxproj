@@ -269,7 +269,7 @@
     <ClInclude Include="NetConnection.h" />
     <ClInclude Include="Command\NetConnectionCommandType.h" />
     <ClInclude Include="NetConnectionClosedEventArgs.h" />
-    <ClInclude Include="NetStatusType.h" />
+    <ClInclude Include="NetStatusCodeType.h" />
     <ClInclude Include="NetStream.h" />
     <ClInclude Include="NetStreamAudioReceivedEventArgs.h" />
     <ClInclude Include="NetStreamAttachedEventArgs.h" />

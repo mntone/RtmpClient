@@ -46,8 +46,8 @@ void SimpleVideoClient::Connect( RtmpUri^ uri )
 
 void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args )
 {
-	auto ns = args->NetStatus;
-	if( ns == NetStatusType::NetConnection_Connect_Success )
+	auto ns = args->NetStatusCode;
+	if( ns == NetStatusCodeType::NetConnection_Connect_Success )
 	{
 		_stream = ref new NetStream();
 		_stream->Attached += ref new WF::TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
@@ -58,7 +58,7 @@ void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, 
 		_stream->VideoReceived += ref new WF::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>( this, &SimpleVideoClient::OnVideoReceived );
 		_stream->Attach( _connection );
 	}
-	else if( ( ns & NetStatusType::NetConnection_Connect ) == NetStatusType::NetConnection_Connect )
+	else if( ( ns & NetStatusCodeType::NetConnection_Connect ) == NetStatusCodeType::NetConnection_Connect )
 		__Close();
 }
 
@@ -69,8 +69,8 @@ void SimpleVideoClient::OnAttached( NetStream^ sender, NetStreamAttachedEventArg
 
 void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args )
 {
-	auto ns = args->NetStatus;
-	if( ns == NetStatusType::NetStream_Play_Start )
+	auto ns = args->NetStatusCode;
+	if( ns == NetStatusCodeType::NetStream_Play_Start )
 	{
 	}
 }

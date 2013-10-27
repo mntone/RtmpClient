@@ -1,5 +1,5 @@
 #pragma once
-#include "NetStatusType.h"
+#include "NetStatusCodeType.h"
 
 namespace Mntone { namespace Rtmp {
 
@@ -7,16 +7,16 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetStatusUpdatedEventArgs sealed
 	{
 	internal:
-		NetStatusUpdatedEventArgs( NetStatusType netStatus );
+		NetStatusUpdatedEventArgs( NetStatusCodeType netStatusCode );
 
 	public:
-		property NetStatusType NetStatus
+		property NetStatusCodeType NetStatusCode
 		{
-			NetStatusType get( void ) { return _NetStatus; }
+			NetStatusCodeType get( void ) { return _NetStatusCode; }
 		}
 
 	private:
-		NetStatusType _NetStatus;
+		NetStatusCodeType _NetStatusCode;
 	};
 
 } }

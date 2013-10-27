@@ -322,32 +322,12 @@ void NetConnection::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
 		//const auto fmsVer = properties->GetNamedString( "fmsVer" );
 		//const auto capabilities = properties->GetNamedDouble( "capabilities" );
 		//const auto level = information->GetNamedString( "level" );
-		const auto codePstr = information->GetNamedString( "code" );
 		//const auto description = information->GetNamedString( "description" );
 		//const auto objectEncoding = information->GetNamedDouble( "objectEncoding" );
 
-		NetStatusType netStatus;
-		{
-			const std::wstring codeStr( codePstr->Data() );
-			const auto lastPhrase = codeStr.substr( 22 /* NetConnection.Connect. */ );
-
-			if( lastPhrase == L"Success" )
-				netStatus = NetStatusType::NetConnection_Connect_Success;
-			else if( lastPhrase == L"Closed" )
-				netStatus = NetStatusType::NetConnection_Connect_Closed;
-			else if( lastPhrase == L"Failed" )
-				netStatus = NetStatusType::NetConnection_Connect_Failed;
-			else if( lastPhrase == L"Rejected" )
-				netStatus = NetStatusType::NetConnection_Connect_Rejected;
-			else if( lastPhrase == L"InvalidApp" )
-				netStatus = NetStatusType::NetConnection_Connect_InvalidApp;
-			else if( lastPhrase == L"AppShutdown" )
-				netStatus = NetStatusType::NetConnection_Connect_AppShutdown;
-			else
-				netStatus = NetStatusType::NetConnection_Connect_Other;
-		}
-
-		StatusUpdated( this, ref new NetStatusUpdatedEventArgs( netStatus ) );
+		const auto& code = information->GetNamedString( "code" );
+		const auto& nsc = RtmpHelper::ParseNetConnectionConnectCode( code->Data() );
+		StatusUpdated( this, ref new NetStatusUpdatedEventArgs( nsc ) );
 		return;
 	}
 

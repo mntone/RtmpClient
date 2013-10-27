@@ -3,6 +3,6 @@
 
 using namespace Mntone::Rtmp;
 
-NetStatusUpdatedEventArgs::NetStatusUpdatedEventArgs( NetStatusType netStatus ) :
-	_NetStatus( netStatus )
+NetStatusUpdatedEventArgs::NetStatusUpdatedEventArgs( NetStatusCodeType netStatusCode ) :
+_NetStatusCode( netStatusCode )
 { }

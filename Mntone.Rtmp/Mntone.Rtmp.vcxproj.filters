@@ -53,7 +53,6 @@
     <ClInclude Include="limit_type.h" />
     <ClInclude Include="NetStream.h" />
     <ClInclude Include="rtmp_packet.h" />
-    <ClInclude Include="NetStatusType.h" />
     <ClInclude Include="NetStreamVideoReceivedEventArgs.h" />
     <ClInclude Include="NetStreamAudioReceivedEventArgs.h" />
     <ClInclude Include="NetConnectionClosedEventArgs.h" />
@@ -107,5 +106,6 @@
     <ClInclude Include="NetStreamAudioStartedEventArgs.h" />
     <ClInclude Include="NetStreamVideoStartedEventArgs.h" />
     <ClInclude Include="VideoInfo.h" />
+    <ClInclude Include="NetStatusCodeType.h" />
   </ItemGroup>
 </Project>

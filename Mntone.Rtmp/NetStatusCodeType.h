@@ -4,7 +4,7 @@ namespace Mntone { namespace Rtmp {
 
 	[Windows::Foundation::Metadata::WebHostHidden]
 	[Platform::Metadata::Flags]
-	public enum class NetStatusType: uint32
+	public enum class NetStatusCodeType: uint32
 	{
 		// # NetConnection (0x1)
 		NetConnection = 0x10000000,
@@ -39,9 +39,15 @@ namespace Mntone { namespace Rtmp {
 		NetStream_Play_Reset = 0x20010004,
 		NetStream_Play_PublishNotify = 0x20010008,
 		NetStream_Play_UnpublishNotify = 0x20010010,
-		NetStream_Play_InsufficientBw = 0x20010020,
-		NetStream_Play_Failed = 0x20010040,
-		NetStream_Play_StreamNotFound = 0x20010080,
+		NetStream_Play_Transition = 0x20010020,
+		NetStream_Play_Switch = 0x20010040,
+		NetStream_Play_Complete = 0x20010080,
+		NetStream_Play_TransitionComplete = 0x20010100,
+		NetStream_Play_InsufficientBandwidth = 0x20010200,
+		NetStream_Play_Failed = 0x20010400,
+		NetStream_Play_StreamNotFound = 0x20010800,
+		NetStream_Play_FileStructureInvalid = 0x20011000,
+		NetStream_Play_NoSupportedTrackFound = 0x20012000,
 		NetStream_Play_Other = 0x20018000,
 
 		// ## Pause (0x002)
@@ -77,8 +83,9 @@ namespace Mntone { namespace Rtmp {
 		NetStream_Record = 0x20400000,
 		NetStream_Record_Start = 0x20400001,
 		NetStream_Record_Stop = 0x20400002,
-		NetStream_Record_Failed = 0x20400004,
-		NetStream_Record_NoAccess = 0x20400008,
+		NetStream_Record_NoAccess = 0x20400004,
+		NetStream_Record_Failed = 0x20400008,
+		NetStream_Record_DiskQuotaExceeded = 0x20400010,
 		NetStream_Record_Other = 0x20408000,
 
 		// ## Buffer (0x080)
@@ -88,8 +95,13 @@ namespace Mntone { namespace Rtmp {
 		NetStream_Buffer_Flush = 0x20800004,
 		NetStream_Buffer_Other = 0x20808000,
 
-		// ## Failed (0x100)
-		NetStream_Failed = 0x21000000,
+		// ## MulticastStream (0x100)
+		NetStream_MulticastStream = 0x21000000,
+		NetStream_MulticastStream_Reset = 0x21000001,
+		NetStream_MulticastStream_Other = 0x21008000,
+
+		// ## Failed (0x200)
+		NetStream_Failed = 0x22000000,
 
 		// ## Other (0x800)
 		NetStream_Other = 0x28000000,
@@ -99,6 +111,7 @@ namespace Mntone { namespace Rtmp {
 		SharedObject_Flush = 0x40010000,
 		SharedObject_Flush_Success = 0x40010001,
 		SharedObject_Flush_Failed = 0x40010002,
+		SharedObject_Flush_Other = 0x40018000,
 		SharedObject_BadPersistence = 0x40020000,
 		SharedObject_UriMismatch = 0x40040000,
 		SharedObject_Other = 0x48000000,
