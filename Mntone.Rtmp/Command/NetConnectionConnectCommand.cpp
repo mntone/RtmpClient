@@ -3,16 +3,16 @@
 
 using namespace Mntone::Rtmp::Command;
 
-NetConnectionConnectCommand::NetConnectionConnectCommand( Platform::String^ app ) :
-	App_( app ),
-	FlashVersion_( "WIN 9,0,262,0" ),
-	SwfUrl_( "http://localhost/dummy.swf" ),
-	Fpad_( false ),
-	AudioCodecs_( SupportSoundType::Mp3 | SupportSoundType::Aac ),
-	VideoCodecs_( SupportVideoType::Sorenson | SupportVideoType::H264 ),
-	VideoFunction_( SupportVideoFunctionType::Seek ),
-	PageUrl_( "http://localhost/dummy.html" ),
-	ObjectEncoding_( Mntone::Data::Amf::AmfEncodingType::Amf0 )
+NetConnectionConnectCommand::NetConnectionConnectCommand( Platform::String^ app )
+	: App_( app )
+	, FlashVersion_( "WIN 9,0,262,0" )
+	, SwfUrl_( "http://localhost/dummy.swf" )
+	, Fpad_( false )
+	, AudioCodecs_( SupportSoundType::Mp3 | SupportSoundType::Aac )
+	, VideoCodecs_( SupportVideoType::Sorenson | SupportVideoType::H264 )
+	, VideoFunction_( SupportVideoFunctionType::Seek )
+	, PageUrl_( "http://localhost/dummy.html" )
+	, ObjectEncoding_( Mntone::Data::Amf::AmfEncodingType::Amf0 )
 { }
 
 Mntone::Data::Amf::AmfArray^ NetConnectionConnectCommand::Commandify()

@@ -3,6 +3,6 @@
 
 using namespace Mntone::Rtmp;
 
-NetStreamAudioStartedEventArgs::NetStreamAudioStartedEventArgs( AudioInfo^ info ):
-	Info_( info )
+NetStreamAudioStartedEventArgs::NetStreamAudioStartedEventArgs( AudioInfo^ info )
+	: Info_( info )
 { }

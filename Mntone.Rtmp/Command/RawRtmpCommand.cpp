@@ -3,12 +3,12 @@
 
 using namespace Mntone::Rtmp::Command;
 
-RawRtmpCommand::RawRtmpCommand( Platform::String^ type, Mntone::Data::Amf::AmfArray^ command ) :
-	_Type( type ),
-	_command( command )
+RawRtmpCommand::RawRtmpCommand( Platform::String^ type, Mntone::Data::Amf::AmfArray^ command )
+	: Type_( type )
+	, command_( command )
 { }
 
 Mntone::Data::Amf::AmfArray^ RawRtmpCommand::Commandify()
 {
-	return _command;
+	return command_;
 }

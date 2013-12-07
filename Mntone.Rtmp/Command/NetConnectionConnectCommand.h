@@ -10,8 +10,8 @@ namespace Mntone { namespace Rtmp { namespace Command {
 	[Windows::Foundation::Metadata::MarshalingBehavior( Windows::Foundation::Metadata::MarshalingType::Agile )]
 	[Windows::Foundation::Metadata::Threading( Windows::Foundation::Metadata::ThreadingModel::Both )]
 	[Windows::Foundation::Metadata::WebHostHidden]
-	public ref class NetConnectionConnectCommand sealed:
-		public IRtmpCommand
+	public ref class NetConnectionConnectCommand sealed
+		: public IRtmpCommand
 	{
 	public:
 		NetConnectionConnectCommand( Platform::String^ app );

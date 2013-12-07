@@ -9,13 +9,13 @@
 
 using namespace Mntone::Rtmp;
 
-NetStream::NetStream() :
-	streamId_( 0 ),
-	audioInfoEnabled_( false ),
-	audioInfo_( ref new AudioInfo() ),
-	videoInfoEnabled_( false ),
-	videoInfo_( ref new VideoInfo() ),
-	lengthSizeMinusOne_( 0 )
+NetStream::NetStream()
+	: streamId_( 0 )
+	, audioInfoEnabled_( false )
+	, audioInfo_( ref new AudioInfo() )
+	, videoInfoEnabled_( false )
+	, videoInfo_( ref new VideoInfo() )
+	, lengthSizeMinusOne_( 0 )
 { }
 
 NetStream::~NetStream()

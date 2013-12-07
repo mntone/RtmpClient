@@ -14,7 +14,7 @@ namespace Mntone { namespace Rtmp { namespace DemoApp {
 		void OnStarted( Platform::Object^ sender, Mntone::Rtmp::Client::SimpleVideoClientStartedEventArgs^ args );
 
 	private:
-		Mntone::Rtmp::Client::SimpleVideoClient^ _client;
+		Mntone::Rtmp::Client::SimpleVideoClient^ client_;
 	};
 
 } } }

@@ -12,17 +12,17 @@ MainPage::MainPage()
 
 void MainPage::OnPageUnloaded( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
 {
-	if( _client != nullptr )
-		delete _client;
+	if( client_ != nullptr )
+		delete client_;
 }
 
 void MainPage::OnButtonClicked( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
 {
 	auto uri = Uri->Text;
 
-	_client = ref new Mntone::Rtmp::Client::SimpleVideoClient();
-	_client->Started += ref new Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>( this, &MainPage::OnStarted );
-	_client->Connect( ref new Windows::Foundation::Uri( uri ) );
+	client_ = ref new Mntone::Rtmp::Client::SimpleVideoClient();
+	client_->Started += ref new Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>( this, &MainPage::OnStarted );
+	client_->Connect( ref new Windows::Foundation::Uri( uri ) );
 }
 
 void MainPage::OnStarted( Platform::Object^ sender, SimpleVideoClientStartedEventArgs^ args )

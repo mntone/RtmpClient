@@ -7,8 +7,8 @@ namespace Mntone { namespace Rtmp { namespace Command {
 	[Windows::Foundation::Metadata::MarshalingBehavior( Windows::Foundation::Metadata::MarshalingType::Agile )]
 	[Windows::Foundation::Metadata::Threading( Windows::Foundation::Metadata::ThreadingModel::Both )]
 	[Windows::Foundation::Metadata::WebHostHidden]
-	public ref class RawRtmpCommand sealed:
-		public IRtmpCommand
+	public ref class RawRtmpCommand sealed
+		: public IRtmpCommand
 	{
 	public:
 		RawRtmpCommand( Platform::String^ type, Mntone::Data::Amf::AmfArray^ command );
@@ -18,12 +18,12 @@ namespace Mntone { namespace Rtmp { namespace Command {
 	public:
 		property Platform::String^ Type
 		{
-			virtual Platform::String^ get() { return _Type; }
+			virtual Platform::String^ get() { return Type_; }
 		}
 
 	private:
-		Platform::String^ _Type;
-		Mntone::Data::Amf::AmfArray^ _command;
+		Platform::String^ Type_;
+		Mntone::Data::Amf::AmfArray^ command_;
 	};
 
 } } }

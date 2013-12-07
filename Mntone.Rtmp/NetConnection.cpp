@@ -11,13 +11,13 @@ const auto DEFAULT_WINDOW_SIZE = 2500000;
 const auto DEFAULT_CHUNK_SIZE = 128;
 const auto DEFAULT_BUFFER_MILLSECONDS = 5000;
 
-NetConnection::NetConnection() :
-	DefaultEncodingType_( Mntone::Data::Amf::AmfEncodingType::Amf3 ),
-	connection_( ref new Connection() ),
-	_latestTransactionId( 2 ),
-	rxHeaderBuffer_( 11 ),
-	rxWindowSize_( DEFAULT_WINDOW_SIZE ), txWindowSize_( DEFAULT_WINDOW_SIZE ),
-	rxChunkSize_( DEFAULT_CHUNK_SIZE ), txChunkSize_( DEFAULT_CHUNK_SIZE )
+NetConnection::NetConnection()
+	: DefaultEncodingType_( Mntone::Data::Amf::AmfEncodingType::Amf3 )
+	, connection_( ref new Connection() )
+	, _latestTransactionId( 2 )
+	, rxHeaderBuffer_( 11 )
+	, rxWindowSize_( DEFAULT_WINDOW_SIZE ), txWindowSize_( DEFAULT_WINDOW_SIZE )
+	, rxChunkSize_( DEFAULT_CHUNK_SIZE ), txChunkSize_( DEFAULT_CHUNK_SIZE )
 { }
 
 NetConnection::~NetConnection()
@@ -48,18 +48,17 @@ Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri )
 
 Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Command::IRtmpCommand^ connectCommand )
 {
-	startTime_ = GetWindowsTime();
-	Uri_ = uri;
-
 	return create_async( [=]
 	{
-		connection_->Connect( Uri_->Host, Uri_->Port.ToString() );
-		Handshaker::Handshake( this );
-		SendWithAction( 0, connectCommand->Commandify() );
+		startTime_ = GetWindowsTime();
+		Uri_ = uri;
 
-		create_task( [=]
+		auto task = connection_->ConnectAsync( Uri_->Host, Uri_->Port.ToString() );
+		return create_task( task ).then( [=]
 		{
-			Receive();
+			Handshaker::Handshake( this );
+			SendWithAction( 0, connectCommand->Commandify() );
+			create_task( [=] { Receive(); } );
 		} );
 	} );
 }

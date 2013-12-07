@@ -5,9 +5,9 @@ using namespace Mntone::Rtmp;
 using namespace Mntone::Rtmp::Client;
 namespace WF = Windows::Foundation;
 
-SimpleVideoClient::SimpleVideoClient() :
-	dispatcher_( Windows::UI::Core::CoreWindow::GetForCurrentThread()->Dispatcher ),
-	mediaStreamSource_( nullptr )
+SimpleVideoClient::SimpleVideoClient()
+	: dispatcher_( Windows::UI::Core::CoreWindow::GetForCurrentThread()->Dispatcher )
+	, mediaStreamSource_( nullptr )
 { }
 
 SimpleVideoClient::~SimpleVideoClient()

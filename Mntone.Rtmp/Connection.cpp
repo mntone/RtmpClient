@@ -3,8 +3,8 @@
 
 using namespace Mntone::Rtmp;
 
-Connection::Connection() :
-	_IsInitialized( false )
+Connection::Connection()
+	: IsInitialized_( false )
 { }
 
 Connection::~Connection()
@@ -14,21 +14,25 @@ Connection::~Connection()
 	delete streamSocket_;
 }
 
-void Connection::Connect( Platform::String^ host, Platform::String^ port )
+Windows::Foundation::IAsyncAction^ Connection::ConnectAsync( Platform::String^ host, Platform::String^ port )
 {
-	using namespace Windows::Networking;
-	using namespace Windows::Networking::Sockets;
-	using namespace Windows::Storage::Streams;
+	return create_async( [=]
+	{
+		using namespace Windows::Networking;
+		using namespace Windows::Networking::Sockets;
+		using namespace Windows::Storage::Streams;
 
-	streamSocket_ = ref new StreamSocket();
-	auto ex = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
-	create_task( ex ).wait();
+		streamSocket_ = ref new StreamSocket();
+		auto task = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
+		return create_task( task ).then( [=]
+		{
+			dataReader_ = ref new DataReader( streamSocket_->InputStream );
+			dataReader_->InputStreamOptions = InputStreamOptions::Partial;
+			dataWriter_ = ref new DataWriter( streamSocket_->OutputStream );
 
-	dataReader_ = ref new DataReader( streamSocket_->InputStream );
-	dataReader_->InputStreamOptions = InputStreamOptions::Partial;
-	dataWriter_ = ref new DataWriter( streamSocket_->OutputStream );
-
-	_IsInitialized = true;
+			IsInitialized_ = true;
+		} );
+	} );
 }
 
 uint32 Connection::TryRead( uint8 *const data, const size_t length )

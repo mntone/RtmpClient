@@ -11,7 +11,7 @@ namespace Mntone { namespace Rtmp {
 		virtual ~Connection();
 
 	internal:
-		void Connect( Platform::String^ host, Platform::String^ port );
+		Windows::Foundation::IAsyncAction^ ConnectAsync( Platform::String^ host, Platform::String^ port );
 
 		uint32 TryRead( uint8 *const data, const size_t length );
 
@@ -26,11 +26,11 @@ namespace Mntone { namespace Rtmp {
 	internal:
 		property bool IsInitialized
 		{
-			bool get() { return _IsInitialized; }
+			bool get( ) { return IsInitialized_; }
 		}
 
 	private:
-		bool _IsInitialized;
+		bool IsInitialized_;
 		Windows::Networking::Sockets::StreamSocket^ streamSocket_;
 		Windows::Storage::Streams::DataReader^ dataReader_;
 		Windows::Storage::Streams::DataWriter^ dataWriter_;
