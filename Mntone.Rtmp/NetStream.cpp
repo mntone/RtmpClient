@@ -9,7 +9,7 @@
 
 using namespace Mntone::Rtmp;
 
-NetStream::NetStream( void ) :
+NetStream::NetStream() :
 	streamId_( 0 ),
 	audioInfoEnabled_( false ),
 	audioInfo_( ref new AudioInfo() ),
@@ -18,13 +18,7 @@ NetStream::NetStream( void ) :
 	lengthSizeMinusOne_( 0 )
 { }
 
-NetStream::NetStream( NetConnection^ connection ) :
-	NetStream()
-{
-	connection->AttachNetStream( this );
-}
-
-NetStream::~NetStream( void )
+NetStream::~NetStream()
 {
 	using namespace Mntone::Data::Amf;
 
@@ -43,7 +37,7 @@ void NetStream::Attach( NetConnection^ connection )
 	connection->AttachNetStream( this );
 }
 
-void NetStream::__Attached( void )
+void NetStream::__Attached()
 {
 	Attached( this, ref new NetStreamAttachedEventArgs() );
 }
@@ -76,8 +70,8 @@ void NetStream::Play( Platform::String^ streamName, int32 start, int32 duration 
 	SendWithAction( cmd );
 }
 
-void NetStream::Pause( void ) { }
-void NetStream::Resume( void ) { }
+void NetStream::Pause() { }
+void NetStream::Resume() { }
 void NetStream::Seek( uint32 /*offset*/ ) { }
 
 void NetStream::OnMessage( const rtmp_packet packet, std::vector<uint8> data )
@@ -109,8 +103,8 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 		{
 			auto& adts = *reinterpret_cast<adts_header*>( data.data() );
 			audioInfo_->Format = AudioFormat::Aac;
-			audioInfo_->SampleRate = adts.get_sampling_frequency_as_uint();
-			audioInfo_->ChannelCount = adts.get_channel_configuration();
+			audioInfo_->SampleRate = adts.sampling_frequency_as_uint();
+			audioInfo_->ChannelCount = adts.channel_configuration();
 			audioInfo_->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
 			AudioStarted( this, ref new NetStreamAudioStartedEventArgs( audioInfo_ ) );
 		}

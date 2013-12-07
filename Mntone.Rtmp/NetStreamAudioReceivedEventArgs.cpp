@@ -3,7 +3,7 @@
 
 using namespace Mntone::Rtmp;
 
-NetStreamAudioReceivedEventArgs::NetStreamAudioReceivedEventArgs( void )
+NetStreamAudioReceivedEventArgs::NetStreamAudioReceivedEventArgs()
 { }
 
 void NetStreamAudioReceivedEventArgs::SetTimestamp( int64 timestamp )
@@ -18,7 +18,7 @@ void NetStreamAudioReceivedEventArgs::SetData( std::vector<uint8> data, const si
 	Data_ = buf->DetachBuffer();
 }
 
-Windows::Media::Core::MediaStreamSample^ NetStreamAudioReceivedEventArgs::CreateSample( void )
+Windows::Media::Core::MediaStreamSample^ NetStreamAudioReceivedEventArgs::CreateSample()
 {
 	const auto& sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( Data_, Timestamp_ );
 	sample->KeyFrame = true;

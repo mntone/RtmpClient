@@ -3,5 +3,5 @@
 
 using namespace Mntone::Rtmp;
 
-NetConnectionClosedEventArgs::NetConnectionClosedEventArgs( void )
+NetConnectionClosedEventArgs::NetConnectionClosedEventArgs()
 { }

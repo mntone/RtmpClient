@@ -12,7 +12,6 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Connection.cpp" />
-    <ClCompile Include="Handshaker.cpp" />
     <ClCompile Include="NetConnection.cpp" />
     <ClCompile Include="RtmpUri.cpp" />
     <ClCompile Include="NetStream.cpp" />
@@ -37,12 +36,12 @@
     <ClCompile Include="RtmpHelper.cpp" />
     <ClCompile Include="NetStreamAudioStartedEventArgs.cpp" />
     <ClCompile Include="NetStreamVideoStartedEventArgs.cpp" />
+    <ClCompile Include="Handshaker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Utilities.h" />
     <ClInclude Include="Connection.h" />
-    <ClInclude Include="Handshaker.h" />
     <ClInclude Include="NetConnection.h" />
     <ClInclude Include="RtmpUri.h" />
     <ClInclude Include="RtmpScheme.h" />
@@ -107,5 +106,6 @@
     <ClInclude Include="NetStreamVideoStartedEventArgs.h" />
     <ClInclude Include="VideoInfo.h" />
     <ClInclude Include="NetStatusCodeType.h" />
+    <ClInclude Include="Handshaker.h" />
   </ItemGroup>
 </Project>

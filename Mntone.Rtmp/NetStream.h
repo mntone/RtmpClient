@@ -18,9 +18,8 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetStream sealed
 	{
 	public:
-		NetStream( void );
-		NetStream( NetConnection^ connection );
-		virtual ~NetStream( void );
+		NetStream();
+		virtual ~NetStream();
 
 		void Attach( NetConnection^ connection );
 
@@ -28,12 +27,12 @@ namespace Mntone { namespace Rtmp {
 		void Play( Platform::String^ streamName, int32 start );
 		void Play( Platform::String^ streamName, int32 start, int32 duration );
 
-		void Pause( void );
-		void Resume( void );
+		void Pause();
+		void Resume();
 		void Seek( uint32 offset );
 
 	internal:
-		void __Attached( void );
+		void __Attached();
 
 		void OnMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnAudioMessage( const rtmp_packet packet, std::vector<uint8> data );

@@ -3,5 +3,5 @@
 
 using namespace Mntone::Rtmp;
 
-NetStreamAttachedEventArgs::NetStreamAttachedEventArgs( void )
+NetStreamAttachedEventArgs::NetStreamAttachedEventArgs()
 { }

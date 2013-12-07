@@ -22,8 +22,8 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetConnection sealed
 	{
 	public:
-		NetConnection( void );
-		virtual ~NetConnection( void );
+		NetConnection();
+		virtual ~NetConnection();
 
 		// Connect
 		void Connect( Windows::Foundation::Uri^ uri );
@@ -32,7 +32,7 @@ namespace Mntone { namespace Rtmp {
 		[Windows::Foundation::Metadata::DefaultOverload] void Connect( RtmpUri^ uri, Command::IRtmpCommand^ connectCommand );
 
 		// This method is not supported.
-		//void Call( void );
+		//void Call();
 
 	internal:
 		// Send
@@ -47,8 +47,8 @@ namespace Mntone { namespace Rtmp {
 		void __Connect( Command::IRtmpCommand^ connectCommand );
 
 		// Receive
-		void Receive( void );
-		void __Receive( void );
+		void Receive();
+		void __Receive();
 		void OnMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnNetworkMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnUserControlMessage( const rtmp_packet packet, std::vector<uint8> data );
@@ -81,17 +81,17 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property RtmpUri^ Uri
 		{
-			RtmpUri^ get( void ) { return Uri_; }
+			RtmpUri^ get() { return Uri_; }
 		}
 		// Now, this property is read-only; however, change read-write when Mntone::Data::Amf implements amf3 format.
 		property Mntone::Data::Amf::AmfEncodingType DefaultEncodingType
 		{
-			Mntone::Data::Amf::AmfEncodingType get( void ) { return DefaultEncodingType_; }
+			Mntone::Data::Amf::AmfEncodingType get() { return DefaultEncodingType_; }
 			//void set( Mntone::Data::Amf::AmfEncodingType value ) { DefaultEncodingType_ = value; }
 		}
 		property Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ Client
 		{
-			Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ get( void ) { return Client_; }
+			Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ get() { return Client_; }
 			void set( Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ value ) { Client_ = value; }
 		}
 

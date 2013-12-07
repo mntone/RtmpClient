@@ -6,7 +6,7 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetStreamAttachedEventArgs sealed
 	{
 	internal:
-		NetStreamAttachedEventArgs( void );
+		NetStreamAttachedEventArgs();
 	};
 
 } }

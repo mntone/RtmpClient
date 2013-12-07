@@ -16,10 +16,10 @@ namespace Mntone { namespace Rtmp { namespace Command {
 	public:
 		NetConnectionConnectCommand( Platform::String^ app );
 
-		virtual Mntone::Data::Amf::AmfArray^ Commandify( void );
+		virtual Mntone::Data::Amf::AmfArray^ Commandify();
 
 		// IStringable
-		virtual Platform::String^ ToString( void ) override sealed;
+		virtual Platform::String^ ToString() override sealed;
 
 	public:
 		property Platform::String^ Type
@@ -33,67 +33,67 @@ namespace Mntone { namespace Rtmp { namespace Command {
 		}
 		property Platform::String^ FlashVersion
 		{
-			Platform::String^ get() { return _FlashVersion; }
-			void set( Platform::String^ value ) { _FlashVersion = value; }
+			Platform::String^ get() { return FlashVersion_; }
+			void set( Platform::String^ value ) { FlashVersion_ = value; }
 		}
 		property Platform::String^ SwfUrl
 		{
-			Platform::String^ get() { return _SwfUrl; }
-			void set( Platform::String^ value ) { _SwfUrl = value; }
+			Platform::String^ get() { return SwfUrl_; }
+			void set( Platform::String^ value ) { SwfUrl_ = value; }
 		}
 		property Platform::String^ TcUrl
 		{
-			Platform::String^ get() { return _TcUrl; }
-			void set( Platform::String^ value ) { _TcUrl = value; }
+			Platform::String^ get() { return TcUrl_; }
+			void set( Platform::String^ value ) { TcUrl_ = value; }
 		}
 		property bool Fpad
 		{
-			bool get() { return _Fpad; }
-			void set( bool value ) { _Fpad = value; }
+			bool get() { return Fpad_; }
+			void set( bool value ) { Fpad_ = value; }
 		}
 		property SupportSoundType AudioCodecs
 		{
-			SupportSoundType get() { return _AudioCodecs; }
-			void set( SupportSoundType value ) { _AudioCodecs = value; }
+			SupportSoundType get() { return AudioCodecs_; }
+			void set( SupportSoundType value ) { AudioCodecs_ = value; }
 		}
 		property SupportVideoType VideoCodecs
 		{
-			SupportVideoType get() { return _VideoCodecs; }
-			void set( SupportVideoType value ) { _VideoCodecs = value; }
+			SupportVideoType get() { return VideoCodecs_; }
+			void set( SupportVideoType value ) { VideoCodecs_ = value; }
 		}
 		property SupportVideoFunctionType VideoFunction
 		{
-			SupportVideoFunctionType get() { return _VideoFunction; }
-			void set( SupportVideoFunctionType value ) { _VideoFunction = value; }
+			SupportVideoFunctionType get() { return VideoFunction_; }
+			void set( SupportVideoFunctionType value ) { VideoFunction_ = value; }
 		}
 		property Platform::String^ PageUrl
 		{
-			Platform::String^ get() { return _PageUrl; }
-			void set( Platform::String^ value ) { _PageUrl = value; }
+			Platform::String^ get() { return PageUrl_; }
+			void set( Platform::String^ value ) { PageUrl_ = value; }
 		}
 		property Mntone::Data::Amf::AmfEncodingType ObjectEncoding
 		{
-			Mntone::Data::Amf::AmfEncodingType get() { return _ObjectEncoding; }
-			//void set( Mntone::Data::Amf::AmfEncodingType value ) { _ObjectEncoding = value; }
+			Mntone::Data::Amf::AmfEncodingType get() { return ObjectEncoding_; }
+			//void set( Mntone::Data::Amf::AmfEncodingType value ) { ObjectEncoding_ = value; }
 		}
 		property Mntone::Data::Amf::IAmfValue^ OptionalUserArguments
 		{
-			Mntone::Data::Amf::IAmfValue^ get() { return _OptionalUserArguments; }
-			void set( Mntone::Data::Amf::IAmfValue^ value ) { _OptionalUserArguments = value; }
+			Mntone::Data::Amf::IAmfValue^ get() { return OptionalUserArguments_; }
+			void set( Mntone::Data::Amf::IAmfValue^ value ) { OptionalUserArguments_ = value; }
 		}
 
 	private:
 		Platform::String^ App_;
-		Platform::String^ _FlashVersion;
-		Platform::String^ _SwfUrl;
-		Platform::String^ _TcUrl;
-		bool _Fpad;
-		SupportSoundType _AudioCodecs;
-		SupportVideoType _VideoCodecs;
-		SupportVideoFunctionType _VideoFunction;
-		Platform::String^ _PageUrl;
-		Mntone::Data::Amf::AmfEncodingType _ObjectEncoding;
-		Mntone::Data::Amf::IAmfValue^ _OptionalUserArguments;
+		Platform::String^ FlashVersion_;
+		Platform::String^ SwfUrl_;
+		Platform::String^ TcUrl_;
+		bool Fpad_;
+		SupportSoundType AudioCodecs_;
+		SupportVideoType VideoCodecs_;
+		SupportVideoFunctionType VideoFunction_;
+		Platform::String^ PageUrl_;
+		Mntone::Data::Amf::AmfEncodingType ObjectEncoding_;
+		Mntone::Data::Amf::IAmfValue^ OptionalUserArguments_;
 	};
 
 } } }

@@ -8,7 +8,7 @@ RawRtmpCommand::RawRtmpCommand( Platform::String^ type, Mntone::Data::Amf::AmfAr
 	_command( command )
 { }
 
-Mntone::Data::Amf::AmfArray^ RawRtmpCommand::Commandify( void )
+Mntone::Data::Amf::AmfArray^ RawRtmpCommand::Commandify()
 {
 	return _command;
 }

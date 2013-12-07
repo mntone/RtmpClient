@@ -13,7 +13,7 @@ namespace Mntone { namespace Rtmp { namespace Command {
 	public:
 		RawRtmpCommand( Platform::String^ type, Mntone::Data::Amf::AmfArray^ command );
 
-		virtual Mntone::Data::Amf::AmfArray^ Commandify( void );
+		virtual Mntone::Data::Amf::AmfArray^ Commandify();
 
 	public:
 		property Platform::String^ Type

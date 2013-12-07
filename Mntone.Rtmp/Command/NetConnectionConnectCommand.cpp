@@ -5,17 +5,17 @@ using namespace Mntone::Rtmp::Command;
 
 NetConnectionConnectCommand::NetConnectionConnectCommand( Platform::String^ app ) :
 	App_( app ),
-	_FlashVersion( "WIN 9,0,262,0" ),
-	_SwfUrl( "http://localhost/dummy.swf" ),
-	_Fpad( false ),
-	_AudioCodecs( SupportSoundType::Mp3 | SupportSoundType::Aac ),
-	_VideoCodecs( SupportVideoType::Sorenson | SupportVideoType::H264 ),
-	_VideoFunction( SupportVideoFunctionType::Seek ),
-	_PageUrl( "http://localhost/dummy.html" ),
-	_ObjectEncoding( Mntone::Data::Amf::AmfEncodingType::Amf0 )
+	FlashVersion_( "WIN 9,0,262,0" ),
+	SwfUrl_( "http://localhost/dummy.swf" ),
+	Fpad_( false ),
+	AudioCodecs_( SupportSoundType::Mp3 | SupportSoundType::Aac ),
+	VideoCodecs_( SupportVideoType::Sorenson | SupportVideoType::H264 ),
+	VideoFunction_( SupportVideoFunctionType::Seek ),
+	PageUrl_( "http://localhost/dummy.html" ),
+	ObjectEncoding_( Mntone::Data::Amf::AmfEncodingType::Amf0 )
 { }
 
-Mntone::Data::Amf::AmfArray^ NetConnectionConnectCommand::Commandify( void )
+Mntone::Data::Amf::AmfArray^ NetConnectionConnectCommand::Commandify()
 {
 	using namespace Mntone::Data::Amf;
 	auto a = ref new AmfArray();
@@ -24,26 +24,26 @@ Mntone::Data::Amf::AmfArray^ NetConnectionConnectCommand::Commandify( void )
 
 	auto obj = ref new AmfObject();
 	obj->Insert( "app", AmfValue::CreateStringValue( App_ ) );
-	obj->Insert( "flashVer", AmfValue::CreateStringValue( _FlashVersion ) );
-	obj->Insert( "swfUrl", AmfValue::CreateStringValue( _SwfUrl ) );
-	obj->Insert( "tcUrl", AmfValue::CreateStringValue( _TcUrl ) );
-	obj->Insert( "fpad", AmfValue::CreateBooleanValue( _Fpad ) );
-	obj->Insert( "audioCodecs", AmfValue::CreateNumberValue( static_cast<float64>( _AudioCodecs ) ) );
-	obj->Insert( "videoCodecs", AmfValue::CreateNumberValue( static_cast<float64>( _VideoCodecs ) ) );
-	obj->Insert( "videoFunction", AmfValue::CreateNumberValue( static_cast<float64>( _VideoFunction ) ) );
-	obj->Insert( "pageUrl", AmfValue::CreateStringValue( _PageUrl ) );
-	obj->Insert( "objectEncoding", AmfValue::CreateNumberValue( static_cast<float64>( _ObjectEncoding ) ) );
+	obj->Insert( "flashVer", AmfValue::CreateStringValue( FlashVersion_ ) );
+	obj->Insert( "swfUrl", AmfValue::CreateStringValue( SwfUrl_ ) );
+	obj->Insert( "tcUrl", AmfValue::CreateStringValue( TcUrl_ ) );
+	obj->Insert( "fpad", AmfValue::CreateBooleanValue( Fpad_ ) );
+	obj->Insert( "audioCodecs", AmfValue::CreateNumberValue( static_cast<float64>( AudioCodecs_ ) ) );
+	obj->Insert( "videoCodecs", AmfValue::CreateNumberValue( static_cast<float64>( VideoCodecs_ ) ) );
+	obj->Insert( "videoFunction", AmfValue::CreateNumberValue( static_cast<float64>( VideoFunction_ ) ) );
+	obj->Insert( "pageUrl", AmfValue::CreateStringValue( PageUrl_ ) );
+	obj->Insert( "objectEncoding", AmfValue::CreateNumberValue( static_cast<float64>( ObjectEncoding_ ) ) );
 	a->Append( obj );
 
-	if( _OptionalUserArguments != nullptr )
-		a->Append( _OptionalUserArguments );
+	if( OptionalUserArguments_ != nullptr )
+		a->Append( OptionalUserArguments_ );
 	else
 		a->Append( ref new AmfValue() );
 
 	return a;
 }
 
-Platform::String^ NetConnectionConnectCommand::ToString( void )
+Platform::String^ NetConnectionConnectCommand::ToString()
 {
 	return "connect (" + App_ + ")";
 }

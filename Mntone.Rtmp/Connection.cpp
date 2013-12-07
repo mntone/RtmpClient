@@ -3,11 +3,11 @@
 
 using namespace Mntone::Rtmp;
 
-Connection::Connection( void ) :
+Connection::Connection() :
 	_IsInitialized( false )
 { }
 
-Connection::~Connection( void )
+Connection::~Connection()
 {
 	delete dataReader_;
 	delete dataWriter_;

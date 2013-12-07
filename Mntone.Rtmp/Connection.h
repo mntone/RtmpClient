@@ -5,10 +5,10 @@ namespace Mntone { namespace Rtmp {
 	ref class Connection sealed
 	{
 	internal:
-		Connection( void );
+		Connection();
 
 	public:
-		virtual ~Connection( void );
+		virtual ~Connection();
 
 	internal:
 		void Connect( Platform::String^ host, Platform::String^ port );

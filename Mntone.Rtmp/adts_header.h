@@ -10,7 +10,7 @@ namespace Mntone { namespace Rtmp {
 	class adts_header
 	{
 	public:
-		adts_header( void ) :
+		adts_header() :
 			sync1( 0xff ),
 			sync2( 0xf ),
 			layer( 0 ),
@@ -22,14 +22,14 @@ namespace Mntone { namespace Rtmp {
 			no_rawData__blocks_in_frame( 0 )
 		{ }
 
-		uint8 get_channel_configuration( void ) const { return static_cast<uint8>( channel_configuration1 << 2 | channel_configuration2 ); }
+		const uint8 channel_configuration() const noexcept{ return static_cast<uint8>( channel_configuration1 << 2 | channel_configuration2 ); }
 		void set_channel_configuration( const uint8 value )
 		{
 			channel_configuration1 = ( value >> 2 ) & 0x01;
 			channel_configuration2 = value & 0x03;
 		}
 
-		uint16 get_frame_length( void ) const { return static_cast<uint16>( frame_length1 << 11 | frame_length2 << 3 | frame_length3 ); }
+		const uint16 frame_length() const noexcept { return static_cast<uint16>( frame_length1 << 11 | frame_length2 << 3 | frame_length3 ); }
 		void set_frame_length( const uint16 value )
 		{
 			frame_length1 = ( value >> 11 ) & 0x03;
@@ -37,7 +37,7 @@ namespace Mntone { namespace Rtmp {
 			frame_length3 = value & 0x07;
 		}
 
-		uint32 get_sampling_frequency_as_uint( void )
+		const uint32 sampling_frequency_as_uint() const
 		{
 			uint32 sampling_frequency;
 			switch( sampling_frequency_index )
@@ -57,6 +57,25 @@ namespace Mntone { namespace Rtmp {
 			default: throw ref new Platform::InvalidArgumentException();
 			}
 			return sampling_frequency;
+		}
+		void set_sampling_frequency_with_uint( const uint32 sampling_frequency )
+		{
+			switch( sampling_frequency )
+			{
+			case 96000: sampling_frequency_index = aac_sampling_frequency::asf_96000; break;
+			case 88200: sampling_frequency_index = aac_sampling_frequency::asf_88200; break;
+			case 64000: sampling_frequency_index = aac_sampling_frequency::asf_64000; break;
+			case 48000: sampling_frequency_index = aac_sampling_frequency::asf_48000; break;
+			case 44100: sampling_frequency_index = aac_sampling_frequency::asf_44100; break;
+			case 32000: sampling_frequency_index = aac_sampling_frequency::asf_32000; break;
+			case 24000: sampling_frequency_index = aac_sampling_frequency::asf_24000; break;
+			case 22050: sampling_frequency_index = aac_sampling_frequency::asf_22050; break;
+			case 16000: sampling_frequency_index = aac_sampling_frequency::asf_16000; break;
+			case 12000: sampling_frequency_index = aac_sampling_frequency::asf_12000; break;
+			case 11025: sampling_frequency_index = aac_sampling_frequency::asf_11025; break;
+			case 8000: sampling_frequency_index = aac_sampling_frequency::asf_8000; break;
+			default: throw ref new Platform::InvalidArgumentException( );
+			}
 		}
 
 	private: unsigned sync1 : 8;

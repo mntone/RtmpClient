@@ -11,7 +11,7 @@ const auto DEFAULT_WINDOW_SIZE = 2500000;
 const auto DEFAULT_CHUNK_SIZE = 128;
 const auto DEFAULT_BUFFER_MILLSECONDS = 5000;
 
-NetConnection::NetConnection( void ) :
+NetConnection::NetConnection() :
 	DefaultEncodingType_( Mntone::Data::Amf::AmfEncodingType::Amf3 ),
 	connection_( ref new Connection() ),
 	_latestTransactionId( 2 ),
@@ -20,7 +20,7 @@ NetConnection::NetConnection( void ) :
 	rxChunkSize_( DEFAULT_CHUNK_SIZE ), txChunkSize_( DEFAULT_CHUNK_SIZE )
 { }
 
-NetConnection::~NetConnection( void )
+NetConnection::~NetConnection()
 {
 	delete connection_;
 	Closed( this, ref new NetConnectionClosedEventArgs() );
@@ -87,13 +87,13 @@ void NetConnection::UnattachNetStream( NetStream^ stream )
 
 #pragma region Network operation (Server to Client)
 
-void NetConnection::Receive( void )
+void NetConnection::Receive()
 {
 	while( true )
 		__Receive();
 }
 
-void NetConnection::__Receive( void )
+void NetConnection::__Receive()
 {
 	const auto& p = rxHeaderBuffer_.data();
 

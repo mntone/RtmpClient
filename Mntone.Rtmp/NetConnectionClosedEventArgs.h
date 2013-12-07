@@ -6,7 +6,7 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetConnectionClosedEventArgs sealed
 	{
 	internal:
-		NetConnectionClosedEventArgs( void );
+		NetConnectionClosedEventArgs();
 	};
 
 } }

@@ -9,8 +9,8 @@ namespace Mntone { namespace Rtmp {
 	extern uint64 WindowsTimeToUnixTime( const int64 windowsTime );
 	extern int64 UnixTimeToWindowsTime( const uint64 unixTime );
 
-	extern Windows::Foundation::DateTime GetDateTime( void );
-	extern int64 GetWindowsTime( void );
+	extern Windows::Foundation::DateTime GetDateTime();
+	extern int64 GetWindowsTime();
 
 	extern uint32 HundredNanoToMilli( int64 hundredNano );
 

@@ -3,7 +3,7 @@
 
 using namespace Mntone::Rtmp;
 
-NetStreamVideoReceivedEventArgs::NetStreamVideoReceivedEventArgs( void )
+NetStreamVideoReceivedEventArgs::NetStreamVideoReceivedEventArgs()
 { }
 
 void NetStreamVideoReceivedEventArgs::SetDecodeTimestamp( int64 decodeTimestamp )
@@ -23,7 +23,7 @@ void NetStreamVideoReceivedEventArgs::SetData( std::vector<uint8> data, const si
 	Data_ = buf->DetachBuffer();
 }
 
-Windows::Media::Core::MediaStreamSample^ NetStreamVideoReceivedEventArgs::CreateSample( void )
+Windows::Media::Core::MediaStreamSample^ NetStreamVideoReceivedEventArgs::CreateSample()
 {
 	const auto& sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( Data_, PresentationTimestamp_ );
 	sample->DecodeTimestamp = DecodeTimestamp_;

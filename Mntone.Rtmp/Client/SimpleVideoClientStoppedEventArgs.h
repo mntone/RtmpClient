@@ -6,7 +6,7 @@ namespace Mntone { namespace Rtmp { namespace Client {
 	public ref class SimpleVideoClientStoppedEventArgs sealed
 	{
 	internal:
-		SimpleVideoClientStoppedEventArgs( void );
+		SimpleVideoClientStoppedEventArgs();
 	};
 
 } } }

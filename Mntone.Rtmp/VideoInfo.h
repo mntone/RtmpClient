@@ -7,12 +7,12 @@ namespace Mntone { namespace Rtmp {
 	public ref class VideoInfo sealed
 	{
 	internal:
-		VideoInfo( void ) { }
+		VideoInfo() { }
 
 	public:
 		property VideoFormat Format
 		{
-			VideoFormat get( void ) { return Format_; }
+			VideoFormat get() { return Format_; }
 		internal:
 			void set( VideoFormat value ) { Format_ = value; }
 		}

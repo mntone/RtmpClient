@@ -11,7 +11,7 @@ namespace Mntone { namespace Rtmp {
 		RtmpUri( Windows::Foundation::Uri^ uri );
 
 		// IStringable
-		virtual Platform::String^ ToString( void ) override sealed;
+		virtual Platform::String^ ToString() override sealed;
 
 	private:
 		void ParseScheme( Platform::String^ schemeName );
@@ -21,23 +21,23 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property RtmpScheme Scheme
 		{
-			RtmpScheme get( void ) { return Scheme_; }
+			RtmpScheme get() { return Scheme_; }
 		}
 		property Platform::String^ Host
 		{
-			Platform::String^ get( void ) { return Host_; }
+			Platform::String^ get() { return Host_; }
 		}
 		property int32 Port
 		{
-			int32 get( void ) { return Port_; }
+			int32 get() { return Port_; }
 		}
 		property Platform::String^ App
 		{
-			Platform::String^ get( void ) { return App_; }
+			Platform::String^ get() { return App_; }
 		}
 		property Platform::String^ Instance
 		{
-			Platform::String^ get( void ) { return Instance_; }
+			Platform::String^ get() { return Instance_; }
 		}
 
 	private:

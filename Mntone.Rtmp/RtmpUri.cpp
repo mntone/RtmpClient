@@ -68,7 +68,7 @@ void RtmpUri::ParsePath( Platform::String^ path )
 	Instance_ = ref new Platform::String( instance.c_str(), static_cast<uint32>( instance.length() ) );
 }
 
-Platform::String^ RtmpUri::ToString( void )
+Platform::String^ RtmpUri::ToString()
 {
 	std::wstringstream buf;
 

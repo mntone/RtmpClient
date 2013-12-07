@@ -10,7 +10,7 @@ namespace Mntone { namespace Rtmp { namespace Command {
 			Platform::String^ get();
 		}
 
-		Mntone::Data::Amf::AmfArray^ Commandify( void );
+		Mntone::Data::Amf::AmfArray^ Commandify();
 	};
 
 } } }

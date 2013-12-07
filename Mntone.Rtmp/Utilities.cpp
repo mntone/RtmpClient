@@ -25,14 +25,14 @@ int64 Mntone::Rtmp::UnixTimeToWindowsTime( const uint64 unixTime )
 	return 10000000ll * unixTime + 116444736000000000ll;
 }
 
-Windows::Foundation::DateTime Mntone::Rtmp::GetDateTime( void )
+Windows::Foundation::DateTime Mntone::Rtmp::GetDateTime()
 {
 	Windows::Foundation::DateTime dt;
 	dt.UniversalTime = ::Mntone::Rtmp::GetWindowsTime();
 	return dt;
 }
 
-int64 Mntone::Rtmp::GetWindowsTime( void )
+int64 Mntone::Rtmp::GetWindowsTime()
 {
 	FILETIME ft;
 	GetSystemTimeAsFileTime( &ft );

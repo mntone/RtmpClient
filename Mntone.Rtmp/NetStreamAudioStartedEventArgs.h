@@ -12,7 +12,7 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property AudioInfo^ Info
 		{
-			AudioInfo^ get( void ) { return Info_; }
+			AudioInfo^ get() { return Info_; }
 		}
 
 	private:

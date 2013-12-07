@@ -3,5 +3,5 @@
 
 using namespace Mntone::Rtmp::Client;
 
-SimpleVideoClientStoppedEventArgs::SimpleVideoClientStoppedEventArgs( void )
+SimpleVideoClientStoppedEventArgs::SimpleVideoClientStoppedEventArgs()
 { }

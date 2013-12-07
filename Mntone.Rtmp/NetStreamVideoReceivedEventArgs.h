@@ -7,38 +7,38 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetStreamVideoReceivedEventArgs sealed
 	{
 	internal:
-		NetStreamVideoReceivedEventArgs( void );
+		NetStreamVideoReceivedEventArgs();
 
 		void SetDecodeTimestamp( int64 decodeTimestamp );
 		void SetPresentationTimestamp( int64 presentationTimestamp );
 		void SetData( std::vector<uint8> data, const size_t offset = 0 );
 
-		Windows::Media::Core::MediaStreamSample^ CreateSample( void );
+		Windows::Media::Core::MediaStreamSample^ CreateSample();
 
 	public:
 		property VideoInfo^ Info
 		{
-			VideoInfo^ get( void ) { return Info_; }
+			VideoInfo^ get() { return Info_; }
 		internal:
 			void set( VideoInfo^ value ) { Info_ = value; }
 		}
 		property bool IsKeyframe
 		{
-			bool get( void ) { return IsKeyframe_; }
+			bool get() { return IsKeyframe_; }
 		internal:
 			void set( bool value ) { IsKeyframe_ = value; }
 		}
 		property Windows::Foundation::TimeSpan DecodeTimestamp
 		{
-			Windows::Foundation::TimeSpan get( void ) { return DecodeTimestamp_; }
+			Windows::Foundation::TimeSpan get() { return DecodeTimestamp_; }
 		}
 		property Windows::Foundation::TimeSpan PresentationTimestamp
 		{
-			Windows::Foundation::TimeSpan get( void ) { return PresentationTimestamp_; }
+			Windows::Foundation::TimeSpan get() { return PresentationTimestamp_; }
 		}
 		property Windows::Storage::Streams::IBuffer^ Data
 		{
-			Windows::Storage::Streams::IBuffer^ get( void ) { return Data_; }
+			Windows::Storage::Streams::IBuffer^ get() { return Data_; }
 		}
 
 	private:

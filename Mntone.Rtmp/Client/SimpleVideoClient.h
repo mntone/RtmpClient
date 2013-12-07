@@ -16,14 +16,14 @@ namespace Mntone { namespace Rtmp { namespace Client {
 	public ref class SimpleVideoClient sealed
 	{
 	public:
-		SimpleVideoClient( void );
-		virtual ~SimpleVideoClient( void );
+		SimpleVideoClient();
+		virtual ~SimpleVideoClient();
 
 		void Connect( Windows::Foundation::Uri^ uri );
 		[Windows::Foundation::Metadata::DefaultOverload] void Connect( RtmpUri^ uri );
 
 	private:
-		void __Close( void );
+		void __Close();
 
 		// NetConnection
 		void OnNetConnectionStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args );
