@@ -54,10 +54,10 @@ Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Co
 		Uri_ = uri;
 
 		auto task = connection_->ConnectAsync( Uri_->Host, Uri_->Port.ToString() );
-		return create_task( task ).then( [=]
+		return task.then( [=]
 		{
 			Handshaker::Handshake( this );
-			SendWithAction( 0, connectCommand->Commandify() );
+			SendActionAsync( 0, connectCommand->Commandify() );
 			create_task( [=] { Receive(); } );
 		} );
 	} );
@@ -76,7 +76,7 @@ void NetConnection::AttachNetStream( NetStream^ stream )
 	cmd->Append( AmfValue::CreateStringValue( "createStream" ) );				// Command name
 	cmd->Append( AmfValue::CreateNumberValue( static_cast<float64>( tid ) ) );	// Transaction id
 	cmd->Append( ref new AmfValue() );											// Command object: set to null type when do not exist
-	SendWithAction( cmd );
+	SendActionAsync( cmd );
 }
 
 void NetConnection::UnattachNetStream( NetStream^ stream )
@@ -91,10 +91,10 @@ void NetConnection::UnattachNetStream( NetStream^ stream )
 void NetConnection::Receive()
 {
 	while( true )
-		__Receive();
+		ReceiveImpl();
 }
 
-void NetConnection::__Receive()
+void NetConnection::ReceiveImpl()
 {
 	const auto& p = rxHeaderBuffer_.data();
 
@@ -254,7 +254,7 @@ void NetConnection::OnNetworkMessage( const rtmp_packet packet, std::vector<uint
 			uint32 buf;
 			ConvertBigEndian( data.data(), &buf, 4 );
 			//const auto limitType = static_cast<limit_type>( data[4] );
-			WindowAcknowledgementSize( buf );
+			WindowAcknowledgementSizeAsync( buf );
 			break;
 		}
 	}
@@ -273,7 +273,7 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, std::vec
 			uint32 streamId;
 			ConvertBigEndian( data.data() + 2, &streamId, 4 );
 			if( streamId == 0 )
-				SetBufferLength( 0, DEFAULT_BUFFER_MILLSECONDS );
+				SetBufferLengthAsync( 0, DEFAULT_BUFFER_MILLSECONDS );
 			break;
 		}
 
@@ -289,7 +289,7 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, std::vec
 		{
 			uint32 timestamp;
 			ConvertBigEndian( data.data() + 2, &timestamp, 4 );
-			PingResponse( timestamp );
+			PingResponseAsync( timestamp );
 			break;
 		}
 	}
@@ -349,8 +349,8 @@ void NetConnection::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
 				auto stream = ret->second;
 				stream->streamId_ = sid;
 				bindingNetStream_.emplace( sid, stream );
-				stream->__Attached();
-				SetBufferLength( sid, DEFAULT_BUFFER_MILLSECONDS );
+				stream->AttachedImpl();
+				SetBufferLengthAsync( sid, DEFAULT_BUFFER_MILLSECONDS );
 			}
 			netStreamTemporary_.erase( ret );
 			return;
@@ -370,7 +370,7 @@ void NetConnection::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
 
 #pragma region Network operation (Client to Server)
 
-void NetConnection::SetChunkSize( uint32 chunkSize )
+task<void> NetConnection::SetChunkSizeAsync( uint32 chunkSize )
 {
 	if( chunkSize > 0x7fffffff )
 		throw ref new Platform::InvalidArgumentException( "Invalid chunkSize. Valid chunkSize is 1 to 2147483647." );
@@ -379,63 +379,63 @@ void NetConnection::SetChunkSize( uint32 chunkSize )
 
 	std::vector<uint8> buf( 4 );
 	ConvertBigEndian( &chunkSize, buf.data(), 4 );
-	SendWithNetwork( type_id_type::tid_set_chunk_size, std::move( buf ) );
+	return SendNetworkAsync( type_id_type::tid_set_chunk_size, std::move( buf ) );
 }
 
-void NetConnection::AbortMessage( uint32 chunkStreamId )
+task<void> NetConnection::AbortMessageAsync( uint32 chunkStreamId )
 {
 	std::vector<uint8> buf( 4 );
 	ConvertBigEndian( &chunkStreamId, buf.data(), 4 );
-	SendWithNetwork( type_id_type::tid_abort_message, std::move( buf ) );
+	return SendNetworkAsync( type_id_type::tid_abort_message, std::move( buf ) );
 }
 
-void NetConnection::Acknowledgement( uint32 sequenceNumber )
+task<void> NetConnection::AcknowledgementAsync( uint32 sequenceNumber )
 {
 	std::vector<uint8> buf( 4 );
 	ConvertBigEndian( &sequenceNumber, buf.data(), 4 );
-	SendWithNetwork( type_id_type::tid_acknowledgement, std::move( buf ) );
+	return SendNetworkAsync( type_id_type::tid_acknowledgement, std::move( buf ) );
 }
 
-void NetConnection::WindowAcknowledgementSize( uint32 acknowledgementWindowSize )
+task<void> NetConnection::WindowAcknowledgementSizeAsync( uint32 acknowledgementWindowSize )
 {
 	txWindowSize_ = acknowledgementWindowSize;
 
 	std::vector<uint8> buf( 4 );
 	ConvertBigEndian( &acknowledgementWindowSize, buf.data(), 4 );
-	SendWithNetwork( type_id_type::tid_window_acknowledgement_size, std::move( buf ) );
+	return SendNetworkAsync( type_id_type::tid_window_acknowledgement_size, std::move( buf ) );
 }
 
-void NetConnection::SetPeerBandWidth( uint32 windowSize, limit_type type )
+task<void> NetConnection::SetPeerBandWidthAsync( uint32 windowSize, limit_type type )
 {
 	std::vector<uint8> buf( 5 );
 	ConvertBigEndian( &windowSize, buf.data(), 4 );
 	buf[4] = type;
-	SendWithNetwork( type_id_type::tid_set_peer_bandwidth, std::move( buf ) );
+	return SendNetworkAsync( type_id_type::tid_set_peer_bandwidth, std::move( buf ) );
 }
 
-void NetConnection::SetBufferLength( const uint32 streamId, const uint32 bufferLength )
+task<void> NetConnection::SetBufferLengthAsync( const uint32 streamId, const uint32 bufferLength )
 {
 	std::vector<uint8> buf( 10 );
 	ConvertBigEndian( &streamId, buf.data() + 2, 4 );
 	ConvertBigEndian( &bufferLength, buf.data() + 6, 4 );
-	UserControlMessageEvent( UserControlMessageEventType::SetBufferLength, std::move( buf ) );
+	return UserControlMessageEventAsync( UserControlMessageEventType::SetBufferLength, std::move( buf ) );
 }
 
-void NetConnection::PingResponse( const uint32 timestamp )
+task<void> NetConnection::PingResponseAsync( const uint32 timestamp )
 {
 	std::vector<uint8> buf( 6 );
 	ConvertBigEndian( &timestamp, buf.data() + 2, 4 );
-	UserControlMessageEvent( UserControlMessageEventType::PingResponse, std::move( buf ) );
+	return UserControlMessageEventAsync( UserControlMessageEventType::PingResponse, std::move( buf ) );
 }
 
-void NetConnection::UserControlMessageEvent( UserControlMessageEventType type, std::vector<uint8> data )
+task<void> NetConnection::UserControlMessageEventAsync( UserControlMessageEventType type, std::vector<uint8> data )
 {
 	const uint16 cType = static_cast<uint16>( type );
 	ConvertBigEndian( &cType, data.data(), 2 );
-	SendWithNetwork( type_id_type::tid_user_control_message, std::move( data ) );
+	return SendNetworkAsync( type_id_type::tid_user_control_message, std::move( data ) );
 }
 
-void NetConnection::SendWithNetwork( const type_id_type type, const std::vector<uint8> data )
+task<void> NetConnection::SendNetworkAsync( const type_id_type type, const std::vector<uint8> data )
 {
 	rtmp_packet packet;
 	packet.ChunkStreamId = 2; // for Network (2)
@@ -444,15 +444,15 @@ void NetConnection::SendWithNetwork( const type_id_type type, const std::vector<
 	packet.TypeId = type;
 	packet.StreamId = 0;
 
-	Send( std::move( packet ), std::move( data ), true );
+	return SendAsync( std::move( packet ), std::move( data ), true );
 }
 
-void NetConnection::SendWithAction( Mntone::Data::Amf::AmfArray^ amf )
+task<void> NetConnection::SendActionAsync( Mntone::Data::Amf::AmfArray^ amf )
 {
-	SendWithAction( 0, amf );
+	return SendActionAsync( 0, amf );
 }
 
-void NetConnection::SendWithAction( uint32 streamId, Mntone::Data::Amf::AmfArray^ amf )
+task<void> NetConnection::SendActionAsync( uint32 streamId, Mntone::Data::Amf::AmfArray^ amf )
 {
 	auto amfData = amf->Sequencify( Mntone::Data::Amf::AmfEncodingType::Amf0 );
 	const auto& length = amfData->Length - 5;
@@ -466,15 +466,15 @@ void NetConnection::SendWithAction( uint32 streamId, Mntone::Data::Amf::AmfArray
 
 	std::vector<uint8> buf( length );
 	memcpy( buf.data(), amfData->Data + 5, length );
-	Send( std::move( packet ), std::move( buf ) );
+	return SendAsync( std::move( packet ), std::move( buf ) );
 }
 
-void NetConnection::Send( const rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero )
+task<void> NetConnection::SendAsync( const rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero )
 {
-	create_task( [=] { __Send( packet, std::move( data ), isFormatTypeZero ); } );
+	return create_task( [=] { SendImpl( packet, std::move( data ), isFormatTypeZero ); } );
 }
 
-void NetConnection::__Send( rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero )
+void NetConnection::SendImpl( rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero )
 {
 	auto inPtr = data.data();
 	const auto inLen = packet.Length;

@@ -22,7 +22,7 @@ namespace Mntone { namespace Rtmp {
 			no_rawData__blocks_in_frame( 0 )
 		{ }
 
-		const uint8 channel_configuration() const noexcept{ return static_cast<uint8>( channel_configuration1 << 2 | channel_configuration2 ); }
+		const uint8 channel_configuration() const noexcept { return static_cast<uint8>( channel_configuration1 << 2 | channel_configuration2 ); }
 		void set_channel_configuration( const uint8 value )
 		{
 			channel_configuration1 = ( value >> 2 ) & 0x01;
@@ -74,7 +74,7 @@ namespace Mntone { namespace Rtmp {
 			case 12000: sampling_frequency_index = aac_sampling_frequency::asf_12000; break;
 			case 11025: sampling_frequency_index = aac_sampling_frequency::asf_11025; break;
 			case 8000: sampling_frequency_index = aac_sampling_frequency::asf_8000; break;
-			default: throw ref new Platform::InvalidArgumentException( );
+			default: throw ref new Platform::InvalidArgumentException();
 			}
 		}
 

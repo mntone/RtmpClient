@@ -14,24 +14,21 @@ Connection::~Connection()
 	delete streamSocket_;
 }
 
-Windows::Foundation::IAsyncAction^ Connection::ConnectAsync( Platform::String^ host, Platform::String^ port )
+task<void> Connection::ConnectAsync( Platform::String^ host, Platform::String^ port )
 {
-	return create_async( [=]
+	using namespace Windows::Networking;
+	using namespace Windows::Networking::Sockets;
+	using namespace Windows::Storage::Streams;
+
+	streamSocket_ = ref new StreamSocket();
+	auto task = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
+	return create_task( task ).then( [=]
 	{
-		using namespace Windows::Networking;
-		using namespace Windows::Networking::Sockets;
-		using namespace Windows::Storage::Streams;
+		dataReader_ = ref new DataReader( streamSocket_->InputStream );
+		dataReader_->InputStreamOptions = InputStreamOptions::Partial;
+		dataWriter_ = ref new DataWriter( streamSocket_->OutputStream );
 
-		streamSocket_ = ref new StreamSocket();
-		auto task = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
-		return create_task( task ).then( [=]
-		{
-			dataReader_ = ref new DataReader( streamSocket_->InputStream );
-			dataReader_->InputStreamOptions = InputStreamOptions::Partial;
-			dataWriter_ = ref new DataWriter( streamSocket_->OutputStream );
-
-			IsInitialized_ = true;
-		} );
+		IsInitialized_ = true;
 	} );
 }
 

@@ -27,7 +27,7 @@ NetStream::~NetStream()
 	cmd->Append( AmfValue::CreateNumberValue( 0.0 ) );				// Transaction id
 	cmd->Append( ref new AmfValue() );								// Command object: set to null type
 	cmd->Append( AmfValue::CreateNumberValue( streamId_ ) );
-	SendWithAction( cmd );
+	SendActionAsync( cmd );
 
 	parent_->UnattachNetStream( this );
 }
@@ -37,7 +37,7 @@ void NetStream::Attach( NetConnection^ connection )
 	connection->AttachNetStream( this );
 }
 
-void NetStream::__Attached()
+void NetStream::AttachedImpl()
 {
 	Attached( this, ref new NetStreamAttachedEventArgs() );
 }
@@ -67,7 +67,7 @@ void NetStream::Play( Platform::String^ streamName, int32 start, int32 duration 
 		if( duration != -1 )
 			cmd->Append( AmfValue::CreateNumberValue( static_cast<float64>( duration ) ) );
 	}
-	SendWithAction( cmd );
+	SendActionAsync( cmd );
 }
 
 void NetStream::Pause() { }
@@ -113,42 +113,7 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 
 	if( !audioInfoEnabled_ )
 	{
-		switch( si.rate )
-		{
-		case sound_rate::sr_5_5khz: audioInfo_->SampleRate = 5513; break;
-		case sound_rate::sr_11khz: audioInfo_->SampleRate = 11025; break;
-		case sound_rate::sr_22khz: audioInfo_->SampleRate = 22050; break;
-		case sound_rate::sr_44khz: audioInfo_->SampleRate = 44100; break;
-		default: return;
-		}
-
-		switch( si.format )
-		{
-		case sound_format::sf_lpcm:	audioInfo_->Format = AudioFormat::Lpcm; break;
-		case sound_format::sf_adpcm: audioInfo_->Format = AudioFormat::Adpcm; break;
-		case sound_format::sf_mp3: audioInfo_->Format = AudioFormat::Mp3; break;
-		case sound_format::sf_lpcm_little_endian: audioInfo_->Format = AudioFormat::LpcmLe; break;
-		case sound_format::sf_nellymoser16khz_mono:
-			audioInfo_->Format = AudioFormat::Nellymoser;
-			audioInfo_->SampleRate = 16000;
-			break;
-		case sound_format::sf_nellymoser8khz_mono:
-			audioInfo_->Format = AudioFormat::Nellymoser;
-			audioInfo_->SampleRate = 8000;
-			break;
-		case sound_format::sf_nellymoser: audioInfo_->Format = AudioFormat::Nellymoser; break;
-		case sound_format::sf_g711_alaw_logarithmic_pcm: audioInfo_->Format = AudioFormat::G711Alaw; break;
-		case sound_format::sf_g711_mulaw_logarithmic_pcm: audioInfo_->Format = AudioFormat::G711Mulaw; break;
-		case sound_format::sf_speex: audioInfo_->Format = AudioFormat::Speex; break;
-		case sound_format::sf_mp38khz:
-			audioInfo_->Format = AudioFormat::Mp3;
-			audioInfo_->SampleRate = 8000;
-			break;
-		default: return;
-		}
-
-		audioInfo_->ChannelCount = si.type == sound_type::st_stereo ? 2 : 1;
-		audioInfo_->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
+		audioInfo_->SetInfo( si );
 		audioInfoEnabled_ = true;
 		AudioStarted( this, ref new NetStreamAudioStartedEventArgs( audioInfo_ ) );
 	}
@@ -342,7 +307,7 @@ void NetStream::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
 	StatusUpdated( this, ref new NetStatusUpdatedEventArgs( nsc ) );
 }
 
-void NetStream::SendWithAction( Mntone::Data::Amf::AmfArray^ amf )
+task<void> NetStream::SendActionAsync( Mntone::Data::Amf::AmfArray^ amf )
 {
-	parent_->SendWithAction( streamId_, amf );
+	return parent_->SendActionAsync( streamId_, amf );
 }

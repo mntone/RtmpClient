@@ -18,7 +18,7 @@ RtmpUri::RtmpUri( Windows::Foundation::Uri^ uri )
 
 void RtmpUri::ParseScheme( Platform::String^ schemeName )
 {
-	if( schemeName->Equals( "rtmp" ) )
+	if( schemeName == "rtmp" )
 	{
 		Scheme_ = RtmpScheme::Rtmp;
 		return;

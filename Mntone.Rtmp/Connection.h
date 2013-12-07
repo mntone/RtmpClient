@@ -11,7 +11,7 @@ namespace Mntone { namespace Rtmp {
 		virtual ~Connection();
 
 	internal:
-		Windows::Foundation::IAsyncAction^ ConnectAsync( Platform::String^ host, Platform::String^ port );
+		Concurrency::task<void> ConnectAsync( Platform::String^ host, Platform::String^ port );
 
 		uint32 TryRead( uint8 *const data, const size_t length );
 
@@ -26,7 +26,7 @@ namespace Mntone { namespace Rtmp {
 	internal:
 		property bool IsInitialized
 		{
-			bool get( ) { return IsInitialized_; }
+			bool get() { return IsInitialized_; }
 		}
 
 	private:

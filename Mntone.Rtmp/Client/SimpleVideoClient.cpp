@@ -166,7 +166,7 @@ void SimpleVideoClient::OnVideoReceived( NetStream^ sender, NetStreamVideoReceiv
 void SimpleVideoClient::OnStarting( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceStartingEventArgs^ args )
 {
 	auto request = args->Request;
-	Windows::Foundation::TimeSpan ts;
+	WF::TimeSpan ts;
 	ts.Duration = 0;
 	request->SetActualStartPosition( ts );
 }

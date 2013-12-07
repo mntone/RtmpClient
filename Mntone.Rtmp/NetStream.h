@@ -32,7 +32,7 @@ namespace Mntone { namespace Rtmp {
 		void Seek( uint32 offset );
 
 	internal:
-		void __Attached();
+		void AttachedImpl();
 
 		void OnMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnAudioMessage( const rtmp_packet packet, std::vector<uint8> data );
@@ -45,7 +45,7 @@ namespace Mntone { namespace Rtmp {
 		void OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf );
 
 	private:
-		void SendWithAction( Mntone::Data::Amf::AmfArray^ amf );
+		Concurrency::task<void> SendActionAsync( Mntone::Data::Amf::AmfArray^ amf );
 
 		void AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, NetStreamVideoReceivedEventArgs^& args );
 			

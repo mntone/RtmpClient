@@ -36,7 +36,7 @@ namespace Mntone { namespace Rtmp {
 
 	internal:
 		// Send
-		void SendWithAction( uint32 streamId, Mntone::Data::Amf::AmfArray^ amf );
+		Concurrency::task<void> SendActionAsync( uint32 streamId, Mntone::Data::Amf::AmfArray^ amf );
 
 		// Utilites
 		void AttachNetStream( NetStream^ stream );
@@ -45,7 +45,7 @@ namespace Mntone { namespace Rtmp {
 	private:
 		// Receive
 		void Receive();
-		void __Receive();
+		void ReceiveImpl();
 		void OnMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnNetworkMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnUserControlMessage( const rtmp_packet packet, std::vector<uint8> data );
@@ -54,21 +54,21 @@ namespace Mntone { namespace Rtmp {
 		void OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf );
 
 		// Send
-		void SetChunkSize( uint32 chunkSize );
-		void AbortMessage( uint32 chunkStreamId );
-		void Acknowledgement( uint32 sequenceNumber );
-		void WindowAcknowledgementSize( uint32 acknowledgementWindowSize );
-		void SetPeerBandWidth( uint32 windowSize, limit_type type );
+		Concurrency::task<void> SetChunkSizeAsync( uint32 chunkSize );
+		Concurrency::task<void> AbortMessageAsync( uint32 chunkStreamId );
+		Concurrency::task<void> AcknowledgementAsync( uint32 sequenceNumber );
+		Concurrency::task<void> WindowAcknowledgementSizeAsync( uint32 acknowledgementWindowSize );
+		Concurrency::task<void> SetPeerBandWidthAsync( uint32 windowSize, limit_type type );
 
-		void SetBufferLength( const uint32 streamId, const uint32 bufferLength );
-		void PingResponse( const uint32 timestamp );
-		void UserControlMessageEvent( UserControlMessageEventType type, std::vector<uint8> data );
+		Concurrency::task<void> SetBufferLengthAsync( const uint32 streamId, const uint32 bufferLength );
+		Concurrency::task<void> PingResponseAsync( const uint32 timestamp );
+		Concurrency::task<void> UserControlMessageEventAsync( UserControlMessageEventType type, std::vector<uint8> data );
 
-		void SendWithNetwork( const type_id_type type, const std::vector<uint8> data );
-		void SendWithAction( Mntone::Data::Amf::AmfArray^ amf );
+		Concurrency::task<void> SendNetworkAsync( const type_id_type type, const std::vector<uint8> data );
+		Concurrency::task<void> SendActionAsync( Mntone::Data::Amf::AmfArray^ amf );
 
-		void Send( const rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero = false );
-		void __Send( rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero = false );
+		Concurrency::task<void> SendAsync( const rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero = false );
+		void SendImpl( rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero = false );
 		std::vector<uint8> CreateHeader( rtmp_packet packet, bool isFormatTypeZero );
 
 	public:
