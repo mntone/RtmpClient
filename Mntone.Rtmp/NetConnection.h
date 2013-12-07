@@ -81,39 +81,39 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property RtmpUri^ Uri
 		{
-			RtmpUri^ get( void ) { return _Uri; }
+			RtmpUri^ get( void ) { return Uri_; }
 		}
 		// Now, this property is read-only; however, change read-write when Mntone::Data::Amf implements amf3 format.
 		property Mntone::Data::Amf::AmfEncodingType DefaultEncodingType
 		{
-			Mntone::Data::Amf::AmfEncodingType get( void ) { return _DefaultEncodingType; }
-			//void set( Mntone::Data::Amf::AmfEncodingType value ) { _DefaultEncodingType = value; }
+			Mntone::Data::Amf::AmfEncodingType get( void ) { return DefaultEncodingType_; }
+			//void set( Mntone::Data::Amf::AmfEncodingType value ) { DefaultEncodingType_ = value; }
 		}
 		property Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ Client
 		{
-			Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ get( void ) { return _Client; }
-			void set( Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ value ) { _Client = value; }
+			Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ get( void ) { return Client_; }
+			void set( Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ value ) { Client_ = value; }
 		}
 
 	internal:
-		int64 _startTime;
-		Connection^ _connection;
-		Mntone::Data::Amf::AmfEncodingType _DefaultEncodingType;
+		int64 startTime_;
+		Connection^ connection_;
+		Mntone::Data::Amf::AmfEncodingType DefaultEncodingType_;
 
 	private:
-		RtmpUri^ _Uri;
-		Command::IRtmpCommand^ _connectCommand;
-		Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ _Client;
+		RtmpUri^ Uri_;
+		Command::IRtmpCommand^ connectCommand_;
+		Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ Client_;
 
 		uint32 _latestTransactionId;
-		std::map<uint32, NetStream^> _netStreamTemporary;
+		std::map<uint32, NetStream^> netStreamTemporary_;
 
-		std::map<uint32, NetStream^> _bindingNetStream;
+		std::map<uint32, NetStream^> bindingNetStream_;
 
-		std::vector<uint8> _rxHeaderBuffer;
-		std::map<uint16, std::shared_ptr<rtmp_packet>> _rxBakPackets, _txBakPackets;
-		uint32 _rxWindowSize, _txWindowSize;
-		uint32 _rxChunkSize, _txChunkSize;
+		std::vector<uint8> rxHeaderBuffer_;
+		std::map<uint16, std::shared_ptr<rtmp_packet>> rxBakPackets_, txBakPackets_;
+		uint32 rxWindowSize_, txWindowSize_;
+		uint32 rxChunkSize_, txChunkSize_;
 	};
 
 } }

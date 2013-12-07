@@ -11,11 +11,11 @@ namespace Mntone { namespace Rtmp { namespace Client {
 	public:
 		property Windows::Media::Core::MediaStreamSource^ MediaStreamSource
 		{
-			Windows::Media::Core::MediaStreamSource^ get() { return _MediaStreamSource; }
+			Windows::Media::Core::MediaStreamSource^ get() { return MediaStreamSource_; }
 		}
 
 	private:
-		Windows::Media::Core::MediaStreamSource^ _MediaStreamSource;
+		Windows::Media::Core::MediaStreamSource^ MediaStreamSource_;
 	};
 
 } } }

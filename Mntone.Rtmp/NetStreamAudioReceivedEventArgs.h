@@ -17,23 +17,23 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property AudioInfo^ Info
 		{
-			AudioInfo^ get( void ) { return _Info; }
+			AudioInfo^ get( void ) { return Info_; }
 		internal:
-			void set( AudioInfo^ value ) { _Info = value; }
+			void set( AudioInfo^ value ) { Info_ = value; }
 		}
 		property Windows::Foundation::TimeSpan Timestamp
 		{
-			Windows::Foundation::TimeSpan get( void ) { return _Timestamp; }
+			Windows::Foundation::TimeSpan get( void ) { return Timestamp_; }
 		}
 		property Windows::Storage::Streams::IBuffer^ Data
 		{
-			Windows::Storage::Streams::IBuffer^ get( void ) { return _Data; }
+			Windows::Storage::Streams::IBuffer^ get( void ) { return Data_; }
 		}
 
 	private:
-		AudioInfo^ _Info;
-		Windows::Foundation::TimeSpan _Timestamp;
-		Windows::Storage::Streams::IBuffer^ _Data;
+		AudioInfo^ Info_;
+		Windows::Foundation::TimeSpan Timestamp_;
+		Windows::Storage::Streams::IBuffer^ Data_;
 	};
 
 } }

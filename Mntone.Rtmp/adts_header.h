@@ -19,7 +19,7 @@ namespace Mntone { namespace Rtmp {
 			frame_length3( 0 ),
 			adts_buffer_fullness1( 0x1f ),
 			adts_buffer_fullness2( 0x3f ),
-			no_raw_data_blocks_in_frame( 0 )
+			no_rawData__blocks_in_frame( 0 )
 		{ }
 
 		uint8 get_channel_configuration( void ) const { return static_cast<uint8>( channel_configuration1 << 2 | channel_configuration2 ); }
@@ -84,7 +84,7 @@ namespace Mntone { namespace Rtmp {
 		unsigned adts_buffer_fullness1 : 5;
 		unsigned frame_length3 : 3;
 
-		unsigned no_raw_data_blocks_in_frame : 2;
+		unsigned no_rawData__blocks_in_frame : 2;
 		unsigned adts_buffer_fullness2 : 6;
 	};
 

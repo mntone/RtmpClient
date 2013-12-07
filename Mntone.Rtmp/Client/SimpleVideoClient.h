@@ -45,17 +45,17 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStoppedEventArgs^>^ Stopped;
 
 	private:
-		Windows::UI::Core::CoreDispatcher^ _dispatcher;
+		Windows::UI::Core::CoreDispatcher^ dispatcher_;
 
-		NetConnection^ _connection;
-		NetStream^ _stream;
-		Windows::Media::Core::MediaStreamSource^ _mediaStreamSource;
+		NetConnection^ connection_;
+		NetStream^ stream_;
+		Windows::Media::Core::MediaStreamSource^ mediaStreamSource_;
 
 		// Buffer
-		mutable std::mutex _audioMutex, _videoMutex;
-		std::condition_variable _audioConditionVariable, _videoConditionVariable;
-		std::queue<NetStreamAudioReceivedEventArgs^> _audioBuffer;
-		std::queue<NetStreamVideoReceivedEventArgs^> _videoBuffer;
+		mutable std::mutex audioMutex_, videoMutex_;
+		std::condition_variable audioConditionVariable_, videoConditionVariable_;
+		std::queue<NetStreamAudioReceivedEventArgs^> audioBuffer_;
+		std::queue<NetStreamVideoReceivedEventArgs^> videoBuffer_;
 	};
 
 } } }

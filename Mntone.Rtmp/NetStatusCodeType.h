@@ -16,7 +16,7 @@ namespace Mntone { namespace Rtmp {
 		NetConnection_Connect_Failed = 0x10010004,
 		NetConnection_Connect_Rejected = 0x10010008,
 		NetConnection_Connect_InvalidApp = 0x10010010,
-		NetConnection_Connect_AppShutdown = 0x10010020,
+		NetConnection_ConnectApp_Shutdown = 0x10010020,
 		NetConnection_Connect_Other = 0x10018000,
 
 		// ## Call (0x002)
@@ -45,7 +45,7 @@ namespace Mntone { namespace Rtmp {
 		NetStream_Play_TransitionComplete = 0x20010100,
 		NetStream_Play_InsufficientBandwidth = 0x20010200,
 		NetStream_Play_Failed = 0x20010400,
-		NetStream_Play_StreamNotFound = 0x20010800,
+		NetStream_Playstream_NotFound = 0x20010800,
 		NetStream_Play_FileStructureInvalid = 0x20011000,
 		NetStream_Play_NoSupportedTrackFound = 0x20012000,
 		NetStream_Play_Other = 0x20018000,
@@ -113,11 +113,15 @@ namespace Mntone { namespace Rtmp {
 		SharedObject_Flush_Failed = 0x40010002,
 		SharedObject_Flush_Other = 0x40018000,
 		SharedObject_BadPersistence = 0x40020000,
-		SharedObject_UriMismatch = 0x40040000,
+		SharedObjectUri_Mismatch = 0x40040000,
 		SharedObject_Other = 0x48000000,
 
 		// # Other (0x8)
 		Other = 0x80000000,
+
+		// # Level Mask
+		Level1Mask = 0xf0000000,
+		Level2Mask = 0xffff0000,
 	};
 
 } }

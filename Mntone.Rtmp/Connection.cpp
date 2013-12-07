@@ -9,9 +9,9 @@ Connection::Connection( void ) :
 
 Connection::~Connection( void )
 {
-	delete _dataReader;
-	delete _dataWriter;
-	delete _streamSocket;
+	delete dataReader_;
+	delete dataWriter_;
+	delete streamSocket_;
 }
 
 void Connection::Connect( Platform::String^ host, Platform::String^ port )
@@ -20,32 +20,32 @@ void Connection::Connect( Platform::String^ host, Platform::String^ port )
 	using namespace Windows::Networking::Sockets;
 	using namespace Windows::Storage::Streams;
 
-	_streamSocket = ref new StreamSocket();
-	auto ex = _streamSocket->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
+	streamSocket_ = ref new StreamSocket();
+	auto ex = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
 	create_task( ex ).wait();
 
-	_dataReader = ref new DataReader( _streamSocket->InputStream );
-	_dataReader->InputStreamOptions = InputStreamOptions::Partial;
-	_dataWriter = ref new DataWriter( _streamSocket->OutputStream );
+	dataReader_ = ref new DataReader( streamSocket_->InputStream );
+	dataReader_->InputStreamOptions = InputStreamOptions::Partial;
+	dataWriter_ = ref new DataWriter( streamSocket_->OutputStream );
 
 	_IsInitialized = true;
 }
 
 uint32 Connection::TryRead( uint8 *const data, const size_t length )
 {
-	auto ex = _dataReader->LoadAsync( static_cast<uint32>( length ) );
+	auto ex = dataReader_->LoadAsync( static_cast<uint32>( length ) );
 	auto actualLength = create_task( ex ).get();
 	if( actualLength != 0 )
-		_dataReader->ReadBytes( Platform::ArrayReference<uint8>( data, actualLength ) );
+		dataReader_->ReadBytes( Platform::ArrayReference<uint8>( data, actualLength ) );
 	return actualLength;
 }
 
 void Connection::Read( uint8 *const data, const size_t length )
 {
-	auto ex = _dataReader->LoadAsync( static_cast<uint32>( length ) );
+	auto ex = dataReader_->LoadAsync( static_cast<uint32>( length ) );
 	auto actualLength = create_task( ex ).get();
 	if( actualLength != 0 )
-		_dataReader->ReadBytes( Platform::ArrayReference<uint8>( data, actualLength ) );
+		dataReader_->ReadBytes( Platform::ArrayReference<uint8>( data, actualLength ) );
 
 	if( actualLength < length )
 		Read( data + actualLength, length - actualLength );
@@ -63,8 +63,8 @@ void Connection::Read( std::vector<uint8>& data, const size_t length )
 
 void Connection::Write( uint8 *const data, const size_t length )
 {
-	_dataWriter->WriteBytes( Platform::ArrayReference<uint8>( data, static_cast<uint32>( length ) ) );
-	auto ex = _dataWriter->StoreAsync();
+	dataWriter_->WriteBytes( Platform::ArrayReference<uint8>( data, static_cast<uint32>( length ) ) );
+	auto ex = dataWriter_->StoreAsync();
 	task<uint32_t>( ex ).wait();
 }
 

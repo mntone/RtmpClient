@@ -21,31 +21,31 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property RtmpScheme Scheme
 		{
-			RtmpScheme get( void ) { return _Scheme; }
+			RtmpScheme get( void ) { return Scheme_; }
 		}
 		property Platform::String^ Host
 		{
-			Platform::String^ get( void ) { return _Host; }
+			Platform::String^ get( void ) { return Host_; }
 		}
 		property int32 Port
 		{
-			int32 get( void ) { return _Port; }
+			int32 get( void ) { return Port_; }
 		}
 		property Platform::String^ App
 		{
-			Platform::String^ get( void ) { return _App; }
+			Platform::String^ get( void ) { return App_; }
 		}
 		property Platform::String^ Instance
 		{
-			Platform::String^ get( void ) { return _Instance; }
+			Platform::String^ get( void ) { return Instance_; }
 		}
 
 	private:
-		RtmpScheme _Scheme;
-		Platform::String^ _Host;
-		int32 _Port;
-		Platform::String^ _App;
-		Platform::String^ _Instance;
+		RtmpScheme Scheme_;
+		Platform::String^ Host_;
+		int32 Port_;
+		Platform::String^ App_;
+		Platform::String^ Instance_;
 	};
 
 } }

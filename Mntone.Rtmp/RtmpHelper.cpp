@@ -39,7 +39,7 @@ NetStatusCodeType RtmpHelper::ParseNetConnectionConnectCode( const std::wstring 
 	else if( lastPhrase == L"InvalidApp" )
 		nsc = NetStatusCodeType::NetConnection_Connect_InvalidApp;
 	else if( lastPhrase == L"AppShutdown" )
-		nsc = NetStatusCodeType::NetConnection_Connect_AppShutdown;
+		nsc = NetStatusCodeType::NetConnection_ConnectApp_Shutdown;
 	else
 		nsc = NetStatusCodeType::NetConnection_Connect_Other;
 
@@ -88,7 +88,7 @@ NetStatusCodeType RtmpHelper::ParseNetStreamCode( const std::wstring code )
 			else if( lastPhrase == L"Failed" )
 				nsc = NetStatusCodeType::NetStream_Play_Failed;
 			else if( lastPhrase == L"StreamNotFound" )
-				nsc = NetStatusCodeType::NetStream_Play_StreamNotFound;
+				nsc = NetStatusCodeType::NetStream_Playstream_NotFound;
 			else if( lastPhrase == L"FileStructureInvalid" )
 				nsc = NetStatusCodeType::NetStream_Play_FileStructureInvalid;
 			else if( lastPhrase == L"NoSupportedTrackFound" )

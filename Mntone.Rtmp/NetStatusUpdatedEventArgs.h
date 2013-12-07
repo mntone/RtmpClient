@@ -12,11 +12,11 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property NetStatusCodeType NetStatusCode
 		{
-			NetStatusCodeType get( void ) { return _NetStatusCode; }
+			NetStatusCodeType get( void ) { return NetStatusCode_; }
 		}
 
 	private:
-		NetStatusCodeType _NetStatusCode;
+		NetStatusCodeType NetStatusCode_;
 	};
 
 } }

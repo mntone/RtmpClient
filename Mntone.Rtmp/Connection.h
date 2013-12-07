@@ -31,9 +31,9 @@ namespace Mntone { namespace Rtmp {
 
 	private:
 		bool _IsInitialized;
-		Windows::Networking::Sockets::StreamSocket^ _streamSocket;
-		Windows::Storage::Streams::DataReader^ _dataReader;
-		Windows::Storage::Streams::DataWriter^ _dataWriter;
+		Windows::Networking::Sockets::StreamSocket^ streamSocket_;
+		Windows::Storage::Streams::DataReader^ dataReader_;
+		Windows::Storage::Streams::DataWriter^ dataWriter_;
 	};
 
 } }

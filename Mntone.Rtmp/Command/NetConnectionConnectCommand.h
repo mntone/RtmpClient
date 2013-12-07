@@ -28,8 +28,8 @@ namespace Mntone { namespace Rtmp { namespace Command {
 		}
 		property Platform::String^ App
 		{
-			Platform::String^ get() { return _App; }
-			void set( Platform::String^ value ) { _App = value; }
+			Platform::String^ get() { return App_; }
+			void set( Platform::String^ value ) { App_ = value; }
 		}
 		property Platform::String^ FlashVersion
 		{
@@ -83,7 +83,7 @@ namespace Mntone { namespace Rtmp { namespace Command {
 		}
 
 	private:
-		Platform::String^ _App;
+		Platform::String^ App_;
 		Platform::String^ _FlashVersion;
 		Platform::String^ _SwfUrl;
 		Platform::String^ _TcUrl;

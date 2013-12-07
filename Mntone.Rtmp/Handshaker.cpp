@@ -20,13 +20,13 @@ void Handshaker::Handshake( NetConnection^ connection )
 
 	// C1 --- time: uint32, zero: uint32, randomData: 1528 bytes
 	// [time]
-	auto time = HundredNanoToMilli( GetWindowsTime() - connection->_startTime );
+	auto time = HundredNanoToMilli( GetWindowsTime() - connection->startTime_ );
 	ConvertBigEndian( &time, sendData.data() + 1, 4 );
 
 	// [zero]
 	memset( sendData.data() + 5, 0x00, 4 );
 
-	// [random_data]
+	// [randomData_]
 #if _DEBUG
 	memset( sendData.data() + 9, 0xff, hsrSize );
 #else
@@ -38,12 +38,12 @@ void Handshaker::Handshake( NetConnection^ connection )
 		*ptr = distribution( engine );
 #endif
 
-	connection->_connection->Write( sendData );
+	connection->connection_->Write( sendData );
 	// ---[ Sent C0+C1 packet ]----------
 
 	std::vector<uint8> receiveData( hs0Size + hs1Size );
 	auto rptr = receiveData.data();
-	connection->_connection->Read( rptr, receiveData.size() );
+	connection->connection_->Read( rptr, receiveData.size() );
 	// ---[ Received S0+S1 packet ]----------
 
 	// S0 --- protocolVersion: uint8
@@ -58,10 +58,10 @@ void Handshaker::Handshake( NetConnection^ connection )
 	ConvertBigEndian( &time, cs2.data() + 4, 4 );	// time2
 	memcpy( cs2.data() + 8, rptr + 9, hsrSize );	// randomData
 
-	connection->_connection->Write( cs2 );
+	connection->connection_->Write( cs2 );
 	// ---[ Sent C2 packet ]----------
 
-	connection->_connection->Read( cs2 );
+	connection->connection_->Read( cs2 );
 	// ---[ Received S2 packet ]----------
 
 	// S2 --- time: uint32, time2: uint32, randomEcho: 1528 bytes

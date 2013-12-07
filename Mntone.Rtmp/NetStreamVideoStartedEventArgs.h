@@ -12,11 +12,11 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property VideoInfo^ Info
 		{
-			VideoInfo^ get( void ) { return _Info; }
+			VideoInfo^ get( void ) { return Info_; }
 		}
 
 	private:
-		VideoInfo^ _Info;
+		VideoInfo^ Info_;
 	};
 
 } }

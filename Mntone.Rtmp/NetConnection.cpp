@@ -12,17 +12,17 @@ const auto DEFAULT_CHUNK_SIZE = 128;
 const auto DEFAULT_BUFFER_MILLSECONDS = 5000;
 
 NetConnection::NetConnection( void ) :
-	_DefaultEncodingType( Mntone::Data::Amf::AmfEncodingType::Amf0 ),
-	_connection( ref new Connection() ),
+	DefaultEncodingType_( Mntone::Data::Amf::AmfEncodingType::Amf3 ),
+	connection_( ref new Connection() ),
 	_latestTransactionId( 2 ),
-	_rxHeaderBuffer( 11 ),
-	_rxWindowSize( DEFAULT_WINDOW_SIZE ), _txWindowSize( DEFAULT_WINDOW_SIZE ),
-	_rxChunkSize( DEFAULT_CHUNK_SIZE ), _txChunkSize( DEFAULT_CHUNK_SIZE )
+	rxHeaderBuffer_( 11 ),
+	rxWindowSize_( DEFAULT_WINDOW_SIZE ), txWindowSize_( DEFAULT_WINDOW_SIZE ),
+	rxChunkSize_( DEFAULT_CHUNK_SIZE ), txChunkSize_( DEFAULT_CHUNK_SIZE )
 { }
 
 NetConnection::~NetConnection( void )
 {
-	delete _connection;
+	delete connection_;
 	Closed( this, ref new NetConnectionClosedEventArgs() );
 }
 
@@ -48,17 +48,17 @@ void NetConnection::Connect( RtmpUri^ uri )
 
 void NetConnection::Connect( RtmpUri^ uri, Command::IRtmpCommand^ connectCommand )
 {
-	_startTime = GetWindowsTime();
-	_Uri = uri;
+	startTime_ = GetWindowsTime();
+	Uri_ = uri;
 
 	create_task( [=] { __Connect( connectCommand ); } );
 }
 
 void NetConnection::__Connect( Command::IRtmpCommand^ connectCommand )
 {
-	_connection->Connect( _Uri->Host, _Uri->Port.ToString() );
+	connection_->Connect( Uri_->Host, Uri_->Port.ToString() );
 	Handshaker::Handshake( this );
-	SendWithAction( connectCommand->Commandify() );
+	SendWithAction( 0, connectCommand->Commandify() );
 	Receive();
 }
 
@@ -66,14 +66,14 @@ void NetConnection::AttachNetStream( NetStream^ stream )
 {
 	using namespace Mntone::Data::Amf;
 
-	stream->_parent = this;
+	stream->parent_ = this;
 
 	const auto tid = _latestTransactionId++;
-	_netStreamTemporary.emplace( tid, stream );
+	netStreamTemporary_.emplace( tid, stream );
 
 	auto cmd = ref new AmfArray();
 	cmd->Append( AmfValue::CreateStringValue( "createStream" ) );				// Command name
-	cmd->Append( AmfValue::CreateDoubleValue( static_cast<float64>( tid ) ) );	// Transaction id
+	cmd->Append( AmfValue::CreateNumberValue( static_cast<float64>( tid ) ) );	// Transaction id
 	cmd->Append( ref new AmfValue() );											// Command object: set to null type when do not exist
 	SendWithAction( cmd );
 }
@@ -82,7 +82,7 @@ void NetConnection::UnattachNetStream( NetStream^ stream )
 {
 	using namespace Mntone::Data::Amf;
 
-	_bindingNetStream.erase( stream->_streamId );
+	bindingNetStream_.erase( stream->streamId_ );
 }
 
 #pragma region Network operation (Server to Client)
@@ -95,36 +95,36 @@ void NetConnection::Receive( void )
 
 void NetConnection::__Receive( void )
 {
-	const auto& p = _rxHeaderBuffer.data();
+	const auto& p = rxHeaderBuffer_.data();
 
 	// ---[ Read and check header ]----------
 	// Copes with Stack Overflow
-	while( _connection->TryRead( p, 1 ) == 0 );
+	while( connection_->TryRead( p, 1 ) == 0 );
 
 	const auto formatType = ( p[0] >> 6 ) & 0x03;
 	uint16 chunkStreamId = p[0] & 0x3f;
 
 	if( chunkStreamId == 0 )
 	{
-		_connection->Read( p, 1 );
+		connection_->Read( p, 1 );
 		chunkStreamId = p[0] + 64;
 	}
 	else if( chunkStreamId == 1 )
 	{
-		_connection->Read( p, 2 );
+		connection_->Read( p, 2 );
 		ConvertBigEndian( p, &chunkStreamId, 2 );
 		chunkStreamId += 64;
 	}
 
 	// ---[ Get object ]----------
 	std::shared_ptr<rtmp_packet> packet;
-	auto ret = _rxBakPackets.find( chunkStreamId );
-	if( ret == _rxBakPackets.end() )
+	auto ret = rxBakPackets_.find( chunkStreamId );
+	if( ret == rxBakPackets_.end() )
 	{
 		packet = std::make_shared<rtmp_packet>( );
 		packet->ChunkStreamId = chunkStreamId;
 		packet->Length = 0;
-		_rxBakPackets.emplace( chunkStreamId, packet );
+		rxBakPackets_.emplace( chunkStreamId, packet );
 	}
 	else
 		packet = ret->second;
@@ -133,7 +133,7 @@ void NetConnection::__Receive( void )
 	switch( formatType )
 	{
 	case 0:
-		_connection->Read( p, 11 );
+		connection_->Read( p, 11 );
 
 		packet->Timestamp = 0; // initialize
 		ConvertBigEndian( p, &packet->Timestamp, 3 );
@@ -143,7 +143,7 @@ void NetConnection::__Receive( void )
 
 		if( packet->Timestamp == 0xffffff )
 		{
-			_connection->Read( p, 4 );
+			connection_->Read( p, 4 );
 			ConvertBigEndian( p, &packet->Timestamp, 4 );
 		}
 		packet->TimestampDelta = packet->Timestamp;
@@ -151,7 +151,7 @@ void NetConnection::__Receive( void )
 
 	case 1:
 		{
-			_connection->Read( p, 7 );
+			connection_->Read( p, 7 );
 
 			packet->TimestampDelta = 0;
 			ConvertBigEndian( p, &packet->TimestampDelta, 3 );
@@ -160,7 +160,7 @@ void NetConnection::__Receive( void )
 
 			if( packet->TimestampDelta == 0xffffff )
 			{
-				_connection->Read( p, 4 );
+				connection_->Read( p, 4 );
 				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
 			}
 			packet->Timestamp += packet->TimestampDelta;
@@ -169,14 +169,14 @@ void NetConnection::__Receive( void )
 
 	case 2:
 		{
-			_connection->Read( p, 3 );
+			connection_->Read( p, 3 );
 
 			packet->TimestampDelta = 0;
 			ConvertBigEndian( p, &packet->TimestampDelta, 3 );
 
 			if( packet->TimestampDelta == 0xffffff )
 			{
-				_connection->Read( p, 4 );
+				connection_->Read( p, 4 );
 				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
 			}
 			packet->Timestamp += packet->TimestampDelta;
@@ -187,7 +187,7 @@ void NetConnection::__Receive( void )
 		{
 			if( packet->TimestampDelta > 0xffffff )
 			{
-				_connection->Read( p, 4 );
+				connection_->Read( p, 4 );
 				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
 			}
 			packet->Timestamp += packet->TimestampDelta;
@@ -203,12 +203,12 @@ void NetConnection::__Receive( void )
 	std::vector<uint8> data( length );
 	{
 		auto dp = data.data();
-		for( auto i = 0u; i < length; i += _rxChunkSize, dp += _rxChunkSize )
+		for( auto i = 0u; i < length; i += rxChunkSize_, dp += rxChunkSize_ )
 		{
-			if( i + _rxChunkSize < length )
-				_connection->Read( dp, _rxChunkSize + 1 );
+			if( i + rxChunkSize_ < length )
+				connection_->Read( dp, rxChunkSize_ + 1 );
 			else
-				_connection->Read( dp, length - i );
+				connection_->Read( dp, length - i );
 		}
 	}
 
@@ -218,8 +218,8 @@ void NetConnection::__Receive( void )
 		OnMessage( *packet.get(), std::move( data ) );
 	else
 	{
-		const auto ret = _bindingNetStream.find( sid );
-		if( ret != _bindingNetStream.end() )
+		const auto ret = bindingNetStream_.find( sid );
+		if( ret != bindingNetStream_.end() )
 			ret->second->OnMessage( *packet.get(), std::move( data ) );
 	}
 }
@@ -243,11 +243,11 @@ void NetConnection::OnNetworkMessage( const rtmp_packet packet, std::vector<uint
 {
 	switch( packet.TypeId )
 	{
-	case type_id_type::tid_set_chunk_size: ConvertBigEndian( data.data(), &_rxChunkSize, 4 ); break;
+	case type_id_type::tid_set_chunk_size: ConvertBigEndian( data.data(), &rxChunkSize_, 4 ); break;
 	case type_id_type::tid_abort_message: break;
 	case type_id_type::tid_acknowledgement: break;
 	case type_id_type::tid_user_control_message: OnUserControlMessage( std::move( packet ), std::move( data ) ); break;
-	case type_id_type::tid_window_acknowledgement_size: ConvertBigEndian( data.data(), &_rxWindowSize, 4 ); break;
+	case type_id_type::tid_window_acknowledgement_size: ConvertBigEndian( data.data(), &rxWindowSize_, 4 ); break;
 	case type_id_type::tid_set_peer_bandwidth:
 		{
 			uint32 buf;
@@ -301,23 +301,25 @@ void NetConnection::OnCommandMessageAmf0( const rtmp_packet /*packet*/, std::vec
 
 void NetConnection::OnCommandMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
-	if( _DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
-	{}
-		//OnCommandMessage( std::move( NetConnection::ParseAmf3( std::move( data ) ) ) );
+	Mntone::Data::Amf::AmfArray^ amf;
+	if( DefaultEncodingType_ == Mntone::Data::Amf::AmfEncodingType::Amf3 )
+	{ }
 	else
-		OnCommandMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
+		amf = RtmpHelper::ParseAmf0( std::move( data ) );
+	OnCommandMessage( std::move( amf ) );
 }
 
 void NetConnection::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
 {
-	const auto name = amf->GetStringAt( 0 );
-	const auto tid = static_cast<uint32>( amf->GetDoubleAt( 1 ) );
-
+	if( amf == nullptr ) return;
+	const auto& name = amf->GetStringAt( 0 );
+	const auto& tid = static_cast<uint32>( amf->GetNumberAt( 1 ) );
+	
 	// for connect result (tid = 1)
 	if( tid == 1 )
 	{
-		const auto properties = amf->GetObjectAt( 2 );
-		const auto information = amf->GetObjectAt( 3 );
+		//const auto& properties = amf->GetObjectAt( 2 );
+		const auto& information = amf->GetObjectAt( 3 );
 
 		//const auto fmsVer = properties->GetNamedString( "fmsVer" );
 		//const auto capabilities = properties->GetNamedDouble( "capabilities" );
@@ -333,23 +335,23 @@ void NetConnection::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
 
 	// for createStream result
 	{
-		const auto ret = _netStreamTemporary.find( tid );
-		if( ret != _netStreamTemporary.end() )
+		const auto ret = netStreamTemporary_.find( tid );
+		if( ret != netStreamTemporary_.end() )
 		{
 			if( name == "_result" )
 			{
 				//const auto commandBuf = amf->GetAt( 2 );
 				//if( commandBuf->ValueType != Mntone::Data::Amf::AmfValueType::Object )
 				//	const auto command = commandBuf->GetObject();
-				const auto sid = static_cast<uint32>( amf->GetDoubleAt( 3 ) );
+				const auto& sid = static_cast<uint32>( amf->GetNumberAt( 3 ) );
 
 				auto stream = ret->second;
-				stream->_streamId = sid;
-				_bindingNetStream.emplace( sid, stream );
+				stream->streamId_ = sid;
+				bindingNetStream_.emplace( sid, stream );
 				stream->__Attached();
 				SetBufferLength( sid, DEFAULT_BUFFER_MILLSECONDS );
 			}
-			_netStreamTemporary.erase( ret );
+			netStreamTemporary_.erase( ret );
 			return;
 		}
 	}
@@ -372,7 +374,7 @@ void NetConnection::SetChunkSize( uint32 chunkSize )
 	if( chunkSize > 0x7fffffff )
 		throw ref new Platform::InvalidArgumentException( "Invalid chunkSize. Valid chunkSize is 1 to 2147483647." );
 
-	_txChunkSize = chunkSize;
+	txChunkSize_ = chunkSize;
 
 	std::vector<uint8> buf( 4 );
 	ConvertBigEndian( &chunkSize, buf.data(), 4 );
@@ -395,7 +397,7 @@ void NetConnection::Acknowledgement( uint32 sequenceNumber )
 
 void NetConnection::WindowAcknowledgementSize( uint32 acknowledgementWindowSize )
 {
-	_txWindowSize = acknowledgementWindowSize;
+	txWindowSize_ = acknowledgementWindowSize;
 
 	std::vector<uint8> buf( 4 );
 	ConvertBigEndian( &acknowledgementWindowSize, buf.data(), 4 );
@@ -436,7 +438,7 @@ void NetConnection::SendWithNetwork( const type_id_type type, const std::vector<
 {
 	rtmp_packet packet;
 	packet.ChunkStreamId = 2; // for Network (2)
-	packet.Timestamp = GetWindowsTime() - _startTime;
+	packet.Timestamp = GetWindowsTime() - startTime_;
 	packet.Length = static_cast<uint32>( data.size() );
 	packet.TypeId = type;
 	packet.StreamId = 0;
@@ -451,12 +453,12 @@ void NetConnection::SendWithAction( Mntone::Data::Amf::AmfArray^ amf )
 
 void NetConnection::SendWithAction( uint32 streamId, Mntone::Data::Amf::AmfArray^ amf )
 {
-	auto amfData = amf->Sequenceify( Mntone::Data::Amf::AmfEncodingType::Amf0 );
-	const auto length = amfData->Length - 5;	// strict_array type (U8) | array count (U32) | ... (Data)
+	auto amfData = amf->Sequencify( Mntone::Data::Amf::AmfEncodingType::Amf0 );
+	const auto& length = amfData->Length - 5;
 
 	rtmp_packet packet;
 	packet.ChunkStreamId = 3; // for Action (3)
-	packet.Timestamp = GetWindowsTime() - _startTime;
+	packet.Timestamp = GetWindowsTime() - startTime_;
 	packet.Length = length;
 	packet.TypeId = type_id_type::tid_command_message_amf0;
 	packet.StreamId = streamId;
@@ -475,7 +477,7 @@ void NetConnection::__Send( rtmp_packet packet, const std::vector<uint8> data, c
 {
 	auto inPtr = data.data();
 	const auto inLen = packet.Length;
-	const auto chunkSize = _txChunkSize;
+	const auto chunkSize = txChunkSize_;
 
 	// ---[ Header ]----------
 	const auto header = CreateHeader( std::move( packet ), isFormatTypeZero );
@@ -497,7 +499,7 @@ void NetConnection::__Send( rtmp_packet packet, const std::vector<uint8> data, c
 	memcpy( outPtr, inPtr, inLen % chunkSize );
 
 	// ---[ Send ]----------
-	_connection->Write( buf );
+	connection_->Write( buf );
 }
 
 std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isFormatTypeZero )
@@ -508,8 +510,8 @@ std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isForma
 
 	// ---[ Get object ]----------
 	std::shared_ptr<rtmp_packet> bakPacket;
-	auto ret = _txBakPackets.find( packet.ChunkStreamId );
-	if( ret == _txBakPackets.end() )
+	auto ret = txBakPackets_.find( packet.ChunkStreamId );
+	if( ret == txBakPackets_.end() )
 		isFormatTypeZero = true;
 	else
 		bakPacket = ret->second;
@@ -629,7 +631,7 @@ std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isForma
 	}
 
 	data.resize( length );
-	_txBakPackets.emplace( packet.ChunkStreamId, std::make_shared<rtmp_packet>( std::move( packet ) ) );
+	txBakPackets_.emplace( packet.ChunkStreamId, std::make_shared<rtmp_packet>( std::move( packet ) ) );
 	return std::move( data );
 }
 

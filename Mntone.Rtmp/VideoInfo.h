@@ -12,13 +12,13 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property VideoFormat Format
 		{
-			VideoFormat get( void ) { return _Format; }
+			VideoFormat get( void ) { return Format_; }
 		internal:
-			void set( VideoFormat value ) { _Format = value; }
+			void set( VideoFormat value ) { Format_ = value; }
 		}
 
 	private:
-		VideoFormat _Format;
+		VideoFormat Format_;
 	};
 
 } }

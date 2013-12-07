@@ -4,7 +4,7 @@
 using namespace Mntone::Rtmp::Command;
 
 NetConnectionConnectCommand::NetConnectionConnectCommand( Platform::String^ app ) :
-	_App( app ),
+	App_( app ),
 	_FlashVersion( "WIN 9,0,262,0" ),
 	_SwfUrl( "http://localhost/dummy.swf" ),
 	_Fpad( false ),
@@ -20,19 +20,19 @@ Mntone::Data::Amf::AmfArray^ NetConnectionConnectCommand::Commandify( void )
 	using namespace Mntone::Data::Amf;
 	auto a = ref new AmfArray();
 	a->Append( AmfValue::CreateStringValue( "connect" ) );	// Command name
-	a->Append( AmfValue::CreateDoubleValue( 1.0 ) );		// Transaction id: always set to 1.
+	a->Append( AmfValue::CreateNumberValue( 1.0 ) );			// Transaction id: always set to 1.
 
 	auto obj = ref new AmfObject();
-	obj->Insert( "app", AmfValue::CreateStringValue( _App ) );
+	obj->Insert( "app", AmfValue::CreateStringValue( App_ ) );
 	obj->Insert( "flashVer", AmfValue::CreateStringValue( _FlashVersion ) );
 	obj->Insert( "swfUrl", AmfValue::CreateStringValue( _SwfUrl ) );
 	obj->Insert( "tcUrl", AmfValue::CreateStringValue( _TcUrl ) );
 	obj->Insert( "fpad", AmfValue::CreateBooleanValue( _Fpad ) );
-	obj->Insert( "audioCodecs", AmfValue::CreateDoubleValue( static_cast<double>( _AudioCodecs ) ) );
-	obj->Insert( "videoCodecs", AmfValue::CreateDoubleValue( static_cast<double>( _VideoCodecs ) ) );
-	obj->Insert( "videoFunction", AmfValue::CreateDoubleValue( static_cast<double>( _VideoFunction ) ) );
+	obj->Insert( "audioCodecs", AmfValue::CreateNumberValue( static_cast<float64>( _AudioCodecs ) ) );
+	obj->Insert( "videoCodecs", AmfValue::CreateNumberValue( static_cast<float64>( _VideoCodecs ) ) );
+	obj->Insert( "videoFunction", AmfValue::CreateNumberValue( static_cast<float64>( _VideoFunction ) ) );
 	obj->Insert( "pageUrl", AmfValue::CreateStringValue( _PageUrl ) );
-	obj->Insert( "objectEncoding", AmfValue::CreateDoubleValue( static_cast<double>( _ObjectEncoding ) ) );
+	obj->Insert( "objectEncoding", AmfValue::CreateNumberValue( static_cast<float64>( _ObjectEncoding ) ) );
 	a->Append( obj );
 
 	if( _OptionalUserArguments != nullptr )
@@ -45,5 +45,5 @@ Mntone::Data::Amf::AmfArray^ NetConnectionConnectCommand::Commandify( void )
 
 Platform::String^ NetConnectionConnectCommand::ToString( void )
 {
-	return "connect (" + _App + ")";
+	return "connect (" + App_ + ")";
 }

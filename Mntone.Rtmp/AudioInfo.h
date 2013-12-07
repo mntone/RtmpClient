@@ -12,39 +12,39 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property AudioFormat Format
 		{
-			AudioFormat get( void ) { return _Format; }
+			AudioFormat get( void ) { return Format_; }
 		internal:
-			void set( AudioFormat value ) { _Format = value; }
+			void set( AudioFormat value ) { Format_ = value; }
 		}
 		property uint32 SampleRate
 		{
-			uint32 get( void ) { return _SampleRate; }
+			uint32 get( void ) { return SampleRate_; }
 		internal:
-			void set( uint32 value ) { _SampleRate = value; }
+			void set( uint32 value ) { SampleRate_ = value; }
 		}
 		property uint16 ChannelCount
 		{
-			uint16 get( void ) { return _ChannelCount; }
+			uint16 get( void ) { return ChannelCount_; }
 		internal:
-			void set( uint16 value ) { _ChannelCount = value; }
+			void set( uint16 value ) { ChannelCount_ = value; }
 		}
 		property uint16 Bitrate
 		{
-			uint16 get( void ) { return _Bitrate; }
+			uint16 get( void ) { return Bitrate_; }
 		internal:
-			void set( uint16 value ) { _Bitrate = value; }
+			void set( uint16 value ) { Bitrate_ = value; }
 		}
 		property uint16 BitsPerSample
 		{
-			uint16 get( void ) { return _BitsPerSample; }
+			uint16 get( void ) { return BitsPerSample_; }
 		internal:
-			void set( uint16 value ) { _BitsPerSample = value; }
+			void set( uint16 value ) { BitsPerSample_ = value; }
 		}
 
 	private:
-		AudioFormat _Format;
-		uint32 _SampleRate;
-		uint16 _ChannelCount, _Bitrate, _BitsPerSample;
+		AudioFormat Format_;
+		uint32 SampleRate_;
+		uint16 ChannelCount_, Bitrate_, BitsPerSample_;
 	};
 
 } }

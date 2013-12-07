@@ -10,12 +10,12 @@
 using namespace Mntone::Rtmp;
 
 NetStream::NetStream( void ) :
-	_streamId( 0 ),
-	_audioInfoEnabled( false ),
-	_audioInfo( ref new AudioInfo() ),
-	_videoInfoEnabled( false ),
-	_videoInfo( ref new VideoInfo() ),
-	_length_size_minus_one( 0 )
+	streamId_( 0 ),
+	audioInfoEnabled_( false ),
+	audioInfo_( ref new AudioInfo() ),
+	videoInfoEnabled_( false ),
+	videoInfo_( ref new VideoInfo() ),
+	lengthSizeMinusOne_( 0 )
 { }
 
 NetStream::NetStream( NetConnection^ connection ) :
@@ -30,12 +30,12 @@ NetStream::~NetStream( void )
 
 	auto cmd = ref new AmfArray();
 	cmd->Append( AmfValue::CreateStringValue( "closeStream" ) );	// Command name
-	cmd->Append( AmfValue::CreateDoubleValue( 0.0 ) );				// Transaction id
+	cmd->Append( AmfValue::CreateNumberValue( 0.0 ) );				// Transaction id
 	cmd->Append( ref new AmfValue() );								// Command object: set to null type
-	cmd->Append( AmfValue::CreateDoubleValue( _streamId ) );
+	cmd->Append( AmfValue::CreateNumberValue( streamId_ ) );
 	SendWithAction( cmd );
 
-	_parent->UnattachNetStream( this );
+	parent_->UnattachNetStream( this );
 }
 
 void NetStream::Attach( NetConnection^ connection )
@@ -64,14 +64,14 @@ void NetStream::Play( Platform::String^ streamName, int32 start, int32 duration 
 
 	auto cmd = ref new AmfArray();
 	cmd->Append( AmfValue::CreateStringValue( "play" ) );	// Command name
-	cmd->Append( AmfValue::CreateDoubleValue( 0.0 ) );		// Transaction id
+	cmd->Append( AmfValue::CreateNumberValue( 0.0 ) );		// Transaction id
 	cmd->Append( ref new AmfValue() );						// Command object: set to null type
 	cmd->Append( AmfValue::CreateStringValue( streamName ) );
 	if( start != -2 )
 	{
-		cmd->Append( AmfValue::CreateDoubleValue( static_cast<float64>( start ) ) );
+		cmd->Append( AmfValue::CreateNumberValue( static_cast<float64>( start ) ) );
 		if( duration != -1 )
-			cmd->Append( AmfValue::CreateDoubleValue( static_cast<float64>( duration ) ) );
+			cmd->Append( AmfValue::CreateNumberValue( static_cast<float64>( duration ) ) );
 	}
 	SendWithAction( cmd );
 }
@@ -86,7 +86,7 @@ void NetStream::OnMessage( const rtmp_packet packet, std::vector<uint8> data )
 	{
 	case type_id_type::tid_audio_message: OnAudioMessage( std::move( packet ), std::move( data ) ); break;
 	case type_id_type::tid_video_message: OnVideoMessage( std::move( packet ), std::move( data ) ); break;
-	case type_id_type::tid_data_message_amf0: OnDataMessageAmf0( std::move( packet ), std::move( data ) ); break;
+	case type_id_type::tidData__message_amf0: OnDataMessageAmf0( std::move( packet ), std::move( data ) ); break;
 	case type_id_type::tid_command_message_amf0: OnCommandMessageAmf0( std::move( packet ), std::move( data ) ); break;
 	}
 }
@@ -100,7 +100,7 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 		if( data[1] == 0x01 )
 		{
 			auto args = ref new NetStreamAudioReceivedEventArgs();
-			args->Info = _audioInfo;
+			args->Info = audioInfo_;
 			args->SetTimestamp( packet.Timestamp );
 			args->SetData( std::move( data ), 2 );
 			AudioReceived( this, args );
@@ -108,59 +108,59 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 		else if( data[1] == 0x00 )
 		{
 			auto& adts = *reinterpret_cast<adts_header*>( data.data() );
-			_audioInfo->Format = AudioFormat::Aac;
-			_audioInfo->SampleRate = adts.get_sampling_frequency_as_uint();
-			_audioInfo->ChannelCount = adts.get_channel_configuration();
-			_audioInfo->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
-			AudioStarted( this, ref new NetStreamAudioStartedEventArgs( _audioInfo ) );
+			audioInfo_->Format = AudioFormat::Aac;
+			audioInfo_->SampleRate = adts.get_sampling_frequency_as_uint();
+			audioInfo_->ChannelCount = adts.get_channel_configuration();
+			audioInfo_->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
+			AudioStarted( this, ref new NetStreamAudioStartedEventArgs( audioInfo_ ) );
 		}
 		return;
 	}
 
-	if( !_audioInfoEnabled )
+	if( !audioInfoEnabled_ )
 	{
 		switch( si.rate )
 		{
-		case sound_rate::sr_5_5khz: _audioInfo->SampleRate = 5513; break;
-		case sound_rate::sr_11khz: _audioInfo->SampleRate = 11025; break;
-		case sound_rate::sr_22khz: _audioInfo->SampleRate = 22050; break;
-		case sound_rate::sr_44khz: _audioInfo->SampleRate = 44100; break;
+		case sound_rate::sr_5_5khz: audioInfo_->SampleRate = 5513; break;
+		case sound_rate::sr_11khz: audioInfo_->SampleRate = 11025; break;
+		case sound_rate::sr_22khz: audioInfo_->SampleRate = 22050; break;
+		case sound_rate::sr_44khz: audioInfo_->SampleRate = 44100; break;
 		default: return;
 		}
 
 		switch( si.format )
 		{
-		case sound_format::sf_lpcm:	_audioInfo->Format = AudioFormat::Lpcm; break;
-		case sound_format::sf_adpcm: _audioInfo->Format = AudioFormat::Adpcm; break;
-		case sound_format::sf_mp3: _audioInfo->Format = AudioFormat::Mp3; break;
-		case sound_format::sf_lpcm_little_endian: _audioInfo->Format = AudioFormat::LpcmLe; break;
+		case sound_format::sf_lpcm:	audioInfo_->Format = AudioFormat::Lpcm; break;
+		case sound_format::sf_adpcm: audioInfo_->Format = AudioFormat::Adpcm; break;
+		case sound_format::sf_mp3: audioInfo_->Format = AudioFormat::Mp3; break;
+		case sound_format::sf_lpcm_little_endian: audioInfo_->Format = AudioFormat::LpcmLe; break;
 		case sound_format::sf_nellymoser16khz_mono:
-			_audioInfo->Format = AudioFormat::Nellymoser;
-			_audioInfo->SampleRate = 16000;
+			audioInfo_->Format = AudioFormat::Nellymoser;
+			audioInfo_->SampleRate = 16000;
 			break;
 		case sound_format::sf_nellymoser8khz_mono:
-			_audioInfo->Format = AudioFormat::Nellymoser;
-			_audioInfo->SampleRate = 8000;
+			audioInfo_->Format = AudioFormat::Nellymoser;
+			audioInfo_->SampleRate = 8000;
 			break;
-		case sound_format::sf_nellymoser: _audioInfo->Format = AudioFormat::Nellymoser; break;
-		case sound_format::sf_g711_alaw_logarithmic_pcm: _audioInfo->Format = AudioFormat::G711Alaw; break;
-		case sound_format::sf_g711_mulaw_logarithmic_pcm: _audioInfo->Format = AudioFormat::G711Mulaw; break;
-		case sound_format::sf_speex: _audioInfo->Format = AudioFormat::Speex; break;
+		case sound_format::sf_nellymoser: audioInfo_->Format = AudioFormat::Nellymoser; break;
+		case sound_format::sf_g711_alaw_logarithmic_pcm: audioInfo_->Format = AudioFormat::G711Alaw; break;
+		case sound_format::sf_g711_mulaw_logarithmic_pcm: audioInfo_->Format = AudioFormat::G711Mulaw; break;
+		case sound_format::sf_speex: audioInfo_->Format = AudioFormat::Speex; break;
 		case sound_format::sf_mp38khz:
-			_audioInfo->Format = AudioFormat::Mp3;
-			_audioInfo->SampleRate = 8000;
+			audioInfo_->Format = AudioFormat::Mp3;
+			audioInfo_->SampleRate = 8000;
 			break;
 		default: return;
 		}
 
-		_audioInfo->ChannelCount = si.type == sound_type::st_stereo ? 2 : 1;
-		_audioInfo->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
-		_audioInfoEnabled = true;
-		AudioStarted( this, ref new NetStreamAudioStartedEventArgs( _audioInfo ) );
+		audioInfo_->ChannelCount = si.type == sound_type::st_stereo ? 2 : 1;
+		audioInfo_->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
+		audioInfoEnabled_ = true;
+		AudioStarted( this, ref new NetStreamAudioStartedEventArgs( audioInfo_ ) );
 	}
 
-	auto args = ref new NetStreamAudioReceivedEventArgs( );
-	args->Info = _audioInfo;
+	auto args = ref new NetStreamAudioReceivedEventArgs();
+	args->Info = audioInfo_;
 	args->SetTimestamp( packet.Timestamp );
 	args->SetData( std::move( data ), 1 );
 	AudioReceived( this, args );
@@ -183,13 +183,13 @@ void NetStream::OnVideoMessage( const rtmp_packet packet, std::vector<uint8> dat
 		return;
 	}
 
-	if( !_videoInfoEnabled )
+	if( !videoInfoEnabled_ )
 	{
-		_videoInfo->Format = vf;
-		_videoInfoEnabled = true;
+		videoInfo_->Format = vf;
+		videoInfoEnabled_ = true;
 	}
 
-	args->Info = _videoInfo;
+	args->Info = videoInfo_;
 	args->SetPresentationTimestamp( packet.Timestamp );
 	args->SetData( std::move( data ), 1 );
 	VideoReceived( this, args );
@@ -200,7 +200,7 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 	// AVC NALU
 	if( data[1] == 0x01 )
 	{
-		args->Info = _videoInfo;
+		args->Info = videoInfo_;
 
 		int64 compositionTimeOffset( 0 );
 		ConvertBigEndian( data.data() + 2, &compositionTimeOffset, 3 );
@@ -210,22 +210,22 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 
 		const uint8 startCode[3] = { 0x00, 0x00, 0x01 };
 		auto p = data.data() + 5;
-		const auto ep = data.data() + data.size();
+		const auto& ep = data.data() + data.size();
 		std::basic_stringstream<uint8> st;
 		do
 		{
 			uint32 length( 0 );
-			if( _length_size_minus_one == 0x03 )
+			if( lengthSizeMinusOne_ == 0x03 )
 			{
 				ConvertBigEndian( p, &length, 4 );
 				p += 4;
 			}
-			else if( _length_size_minus_one == 0x01 )
+			else if( lengthSizeMinusOne_ == 0x01 )
 			{
 				ConvertBigEndian( p, &length, 2 );
 				p += 2;
 			}
-			else if( _length_size_minus_one == 0x00 )
+			else if( lengthSizeMinusOne_ == 0x00 )
 				length = *( p++ );
 			else
 				throw ref new Platform::FailureException();
@@ -249,12 +249,12 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 	if( data[1] == 0x00 )
 	{
 		const auto& dcr = *reinterpret_cast<avc_decoder_configuration_record*>( data.data() + 5 );
-		_length_size_minus_one = dcr.length_size_minus_one;
-		_videoInfo->Format = VideoFormat::Avc;
-		_videoInfoEnabled = true;
-		VideoStarted( this, ref new NetStreamVideoStartedEventArgs( _videoInfo ) );
+		lengthSizeMinusOne_ = dcr.length_size_minus_one;
+		videoInfo_->Format = VideoFormat::Avc;
+		videoInfoEnabled_ = true;
+		VideoStarted( this, ref new NetStreamVideoStartedEventArgs( videoInfo_ ) );
 
-		args->Info = _videoInfo;
+		args->Info = videoInfo_;
 
 		const uint8 startCode[3] = { 0x00, 0x00, 0x01 };
 		auto p = data.data() + 10;
@@ -296,7 +296,7 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 		buf[2] = 0x01; // startCode
 		buf[3] = 0 /* fixed-pattern(1b) forbidden_zero_bit */ | 0x60 /* uint(2b) nal_ref_idc */ | 10 /* uint(5b) nal_unit_type */;
 
-		args->Info = _videoInfo;
+		args->Info = videoInfo_;
 		args->SetData( std::move( buf ) );
 	}
 }
@@ -308,12 +308,12 @@ void NetStream::OnDataMessageAmf0( const rtmp_packet /*packet*/, std::vector<uin
 
 void NetStream::OnDataMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
-	if( _parent->DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
-	{
-	}
-	//OnDataMessage( std::move( NetConnection::ParseAmf3( std::move( data ) ) ) );
+	Mntone::Data::Amf::AmfArray^ amf;
+	if( parent_->DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
+	{ }
 	else
-		OnDataMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
+		amf = RtmpHelper::ParseAmf0( std::move( data ) );
+	OnDataMessage( std::move( amf ) );
 }
 
 void NetStream::OnDataMessage( Mntone::Data::Amf::AmfArray^ amf )
@@ -327,17 +327,18 @@ void NetStream::OnCommandMessageAmf0( const rtmp_packet /*packet*/, std::vector<
 
 void NetStream::OnCommandMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
-	if( _parent->DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
+	Mntone::Data::Amf::AmfArray^ amf;
+	if( parent_->DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
 	{ }
-		//OnCommandMessage( std::move( NetConnection::ParseAmf3( std::move( data ) ) ) );
 	else
-		OnCommandMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
+		amf = RtmpHelper::ParseAmf0( std::move( data ) );
+	OnCommandMessage( std::move( amf ) );
 }
 
 void NetStream::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
 {
-	const auto name = amf->GetStringAt( 0 );
-	const auto information = amf->GetObjectAt( 3 );
+	const auto& name = amf->GetStringAt( 0 );
+	const auto& information = amf->GetObjectAt( 3 );
 
 	if( name != "onStatus" )
 		return;
@@ -349,5 +350,5 @@ void NetStream::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
 
 void NetStream::SendWithAction( Mntone::Data::Amf::AmfArray^ amf )
 {
-	_parent->SendWithAction( _streamId, amf );
+	parent_->SendWithAction( streamId_, amf );
 }

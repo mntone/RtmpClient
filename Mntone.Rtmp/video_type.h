@@ -8,7 +8,7 @@ namespace Mntone { namespace Rtmp {
 		vt_interframe = 2,
 		vt_disposable_interframe = 3,
 		vt_generated_keyframe = 4,
-		vt_video_info_or_command_frame = 5,
+		vt_videoInfo__or_command_frame = 5,
 	};
 
 } }

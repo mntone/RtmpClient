@@ -18,34 +18,34 @@ namespace Mntone { namespace Rtmp {
 	public:
 		property VideoInfo^ Info
 		{
-			VideoInfo^ get( void ) { return _Info; }
+			VideoInfo^ get( void ) { return Info_; }
 		internal:
-			void set( VideoInfo^ value ) { _Info = value; }
+			void set( VideoInfo^ value ) { Info_ = value; }
 		}
 		property bool IsKeyframe
 		{
-			bool get( void ) { return _IsKeyframe; }
+			bool get( void ) { return IsKeyframe_; }
 		internal:
-			void set( bool value ) { _IsKeyframe = value; }
+			void set( bool value ) { IsKeyframe_ = value; }
 		}
 		property Windows::Foundation::TimeSpan DecodeTimestamp
 		{
-			Windows::Foundation::TimeSpan get( void ) { return _DecodeTimestamp; }
+			Windows::Foundation::TimeSpan get( void ) { return DecodeTimestamp_; }
 		}
 		property Windows::Foundation::TimeSpan PresentationTimestamp
 		{
-			Windows::Foundation::TimeSpan get( void ) { return _PresentationTimestamp; }
+			Windows::Foundation::TimeSpan get( void ) { return PresentationTimestamp_; }
 		}
 		property Windows::Storage::Streams::IBuffer^ Data
 		{
-			Windows::Storage::Streams::IBuffer^ get( void ) { return _Data; }
+			Windows::Storage::Streams::IBuffer^ get( void ) { return Data_; }
 		}
 
 	private:
-		VideoInfo^ _Info;
-		bool _IsKeyframe;
-		Windows::Foundation::TimeSpan _DecodeTimestamp, _PresentationTimestamp;
-		Windows::Storage::Streams::IBuffer^ _Data;
+		VideoInfo^ Info_;
+		bool IsKeyframe_;
+		Windows::Foundation::TimeSpan DecodeTimestamp_, PresentationTimestamp_;
+		Windows::Storage::Streams::IBuffer^ Data_;
 	};
 
 } }

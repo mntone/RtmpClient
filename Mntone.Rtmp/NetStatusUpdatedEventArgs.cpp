@@ -4,5 +4,5 @@
 using namespace Mntone::Rtmp;
 
 NetStatusUpdatedEventArgs::NetStatusUpdatedEventArgs( NetStatusCodeType netStatusCode ) :
-_NetStatusCode( netStatusCode )
+NetStatusCode_( netStatusCode )
 { }
