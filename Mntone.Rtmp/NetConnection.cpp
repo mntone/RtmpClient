@@ -26,40 +26,42 @@ NetConnection::~NetConnection()
 	Closed( this, ref new NetConnectionClosedEventArgs() );
 }
 
-void NetConnection::Connect( Windows::Foundation::Uri^ uri )
+Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( Windows::Foundation::Uri^ uri )
 {
-	Connect( ref new RtmpUri( uri ) );
+	return ConnectAsync( ref new RtmpUri( uri ) );
 }
 
-void NetConnection::Connect( Windows::Foundation::Uri^ uri, Command::IRtmpCommand^ connectCommand )
+Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( Windows::Foundation::Uri^ uri, Command::IRtmpCommand^ connectCommand )
 {
 	if( connectCommand->Type != "connect" )
 		throw ref new Platform::InvalidArgumentException();
 
-	Connect( ref new RtmpUri( uri ), connectCommand );
+	return ConnectAsync( ref new RtmpUri( uri ), connectCommand );
 }
 
-void NetConnection::Connect( RtmpUri^ uri )
+Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri )
 {
 	auto connect = ref new Command::NetConnectionConnectCommand( uri->App );
 	connect->TcUrl = uri->ToString();
-	Connect( uri, connect );
+	return ConnectAsync( uri, connect );
 }
 
-void NetConnection::Connect( RtmpUri^ uri, Command::IRtmpCommand^ connectCommand )
+Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Command::IRtmpCommand^ connectCommand )
 {
 	startTime_ = GetWindowsTime();
 	Uri_ = uri;
 
-	create_task( [=] { __Connect( connectCommand ); } );
-}
+	return create_async( [=]
+	{
+		connection_->Connect( Uri_->Host, Uri_->Port.ToString() );
+		Handshaker::Handshake( this );
+		SendWithAction( 0, connectCommand->Commandify() );
 
-void NetConnection::__Connect( Command::IRtmpCommand^ connectCommand )
-{
-	connection_->Connect( Uri_->Host, Uri_->Port.ToString() );
-	Handshaker::Handshake( this );
-	SendWithAction( 0, connectCommand->Commandify() );
-	Receive();
+		create_task( [=]
+		{
+			Receive();
+		} );
+	} );
 }
 
 void NetConnection::AttachNetStream( NetStream^ stream )

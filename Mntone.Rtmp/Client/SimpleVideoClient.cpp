@@ -41,7 +41,7 @@ void SimpleVideoClient::Connect( RtmpUri^ uri )
 {
 	connection_ = ref new NetConnection();
 	connection_->StatusUpdated += ref new WF::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
-	connection_->Connect( uri );
+	connection_->ConnectAsync( uri );
 }
 
 void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args )

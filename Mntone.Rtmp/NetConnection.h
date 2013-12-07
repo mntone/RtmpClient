@@ -26,10 +26,10 @@ namespace Mntone { namespace Rtmp {
 		virtual ~NetConnection();
 
 		// Connect
-		void Connect( Windows::Foundation::Uri^ uri );
-		void Connect( Windows::Foundation::Uri^ uri, Command::IRtmpCommand^ connectCommand );
-		[Windows::Foundation::Metadata::DefaultOverload] void Connect( RtmpUri^ uri );
-		[Windows::Foundation::Metadata::DefaultOverload] void Connect( RtmpUri^ uri, Command::IRtmpCommand^ connectCommand );
+		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri );
+		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri, Command::IRtmpCommand^ connectCommand );
+		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri );
+		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri, Command::IRtmpCommand^ connectCommand );
 
 		// This method is not supported.
 		//void Call();
@@ -43,9 +43,6 @@ namespace Mntone { namespace Rtmp {
 		void UnattachNetStream( NetStream^ stream );
 
 	private:
-		// Connect
-		void __Connect( Command::IRtmpCommand^ connectCommand );
-
 		// Receive
 		void Receive();
 		void __Receive();
