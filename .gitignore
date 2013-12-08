@@ -1,6 +1,8 @@
+/bin
 /obj
 /ipch
-/bin
-/Mntone.Rtmp.sdf
+*.opensdf
+*.sdf
+*.suo
+*.vcxproj.user
 /Mntone.Rtmp.DemoApp/Generated Files
-Mntone.Rtmp.opensdf
