@@ -62,69 +62,47 @@
     <OutDir>$(SolutionDir)bin\$(Platform)-$(Configuration)\$(MSBuildProjectName)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)-$(Configuration)\$(MSBuildProjectName)\</IntDir>
   </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <SDLCheck>true</SDLCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <PreprocessorDefinitions>WIN32;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>4453</DisableSpecificWarnings>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
     <ClCompile>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
+    <Link>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
     <ClCompile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453</DisableSpecificWarnings>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+  <ItemDefinitionGroup Condition="'$(Platform)'=='ARM'">
     <ClCompile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453</DisableSpecificWarnings>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <PreprocessorDefinitions>ARM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <WarningLevel>Level4</WarningLevel>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453</DisableSpecificWarnings>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <WarningLevel>Level4</WarningLevel>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453</DisableSpecificWarnings>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <Optimization>Full</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <WarningLevel>Level4</WarningLevel>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453</DisableSpecificWarnings>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <WarningLevel>Level4</WarningLevel>
-    </ClCompile>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453</DisableSpecificWarnings>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <Optimization>Full</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -174,12 +152,12 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mntone.Data.Amf">
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\Mntone.Data.Amf\bin\Win32\Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\Mntone.Data.Amf\bin\Win32\Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\Mntone.Data.Amf\bin\x64\Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\Mntone.Data.Amf\bin\x64\Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">..\..\Mntone.Data.Amf\bin\ARM\Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">..\..\Mntone.Data.Amf\bin\ARM\Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
+      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\Mntone.Data.Amf\bin\Win32-Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
+      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\Mntone.Data.Amf\bin\Win32-Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
+      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\Mntone.Data.Amf\bin\x64-Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
+      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\Mntone.Data.Amf\bin\x64-Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
+      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">..\..\Mntone.Data.Amf\bin\ARM-Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
+      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">..\..\Mntone.Data.Amf\bin\ARM-Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
       <IsWinMDFile>true</IsWinMDFile>
     </Reference>
   </ItemGroup>

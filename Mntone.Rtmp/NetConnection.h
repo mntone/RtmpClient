@@ -102,7 +102,7 @@ namespace Mntone { namespace Rtmp {
 		Command::IRtmpCommand^ connectCommand_;
 		Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ Client_;
 
-		uint32 _latestTransactionId;
+		uint32 latestTransactionId_;
 		std::map<uint32, NetStream^> netStreamTemporary_;
 
 		std::map<uint32, NetStream^> bindingNetStream_;

@@ -1,14 +1,16 @@
 #include "pch.h"
+#if !_DEBUG
 #include <random>
+#endif
 #include "Connection.h"
 #include "Handshaker.h"
 
 using namespace Mntone::Rtmp;
 
-const auto hs0Size = 1;
-const auto hsrSize = 1528;
-const auto hs1Size = 8 + hsrSize;
-const auto hs2Size = 8 + hsrSize;
+const auto hs0Size = 1u;
+const auto hsrSize = 1528u;
+const auto hs1Size = 8u + hsrSize;
+const auto hs2Size = 8u + hsrSize;
 
 void Handshaker::Handshake( NetConnection^ connection )
 {
@@ -32,8 +34,8 @@ void Handshaker::Handshake( NetConnection^ connection )
 #else
 	std::mt19937 engine;
 	std::uniform_int_distribution<uint64_t> distribution( 0x0000000000000000, 0xffffffffffffffff );
-	auto sptr = reinterpret_cast<uint64_t *>( sendData.data() + 9 );
-	auto eptr = reinterpret_cast<uint64_t *>( sendData.data() + 9 + hsrSize );
+	auto sptr = reinterpret_cast<uint64_t*>( sendData.data() + 9 );
+	auto eptr = reinterpret_cast<uint64_t*>( sendData.data() + 9 + hsrSize );
 	for( auto ptr = sptr; ptr != eptr; ++ptr )
 		*ptr = distribution( engine );
 #endif

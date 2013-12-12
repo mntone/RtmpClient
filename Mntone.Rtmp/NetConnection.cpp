@@ -14,7 +14,7 @@ const auto DEFAULT_BUFFER_MILLSECONDS = 5000;
 NetConnection::NetConnection()
 	: DefaultEncodingType_( Mntone::Data::Amf::AmfEncodingType::Amf3 )
 	, connection_( ref new Connection() )
-	, _latestTransactionId( 2 )
+	, latestTransactionId_( 2 )
 	, rxHeaderBuffer_( 11 )
 	, rxWindowSize_( DEFAULT_WINDOW_SIZE ), txWindowSize_( DEFAULT_WINDOW_SIZE )
 	, rxChunkSize_( DEFAULT_CHUNK_SIZE ), txChunkSize_( DEFAULT_CHUNK_SIZE )
@@ -58,8 +58,8 @@ Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Co
 		{
 			Handshaker::Handshake( this );
 			SendActionAsync( 0, connectCommand->Commandify() );
-			create_task( [=] { Receive(); } );
-		} );
+			create_task( [=] { Receive(); }, task_continuation_context::use_arbitrary() );
+		}, task_continuation_context::use_arbitrary() );
 	} );
 }
 
@@ -69,7 +69,7 @@ void NetConnection::AttachNetStream( NetStream^ stream )
 
 	stream->parent_ = this;
 
-	const auto tid = _latestTransactionId++;
+	const auto tid = latestTransactionId_++;
 	netStreamTemporary_.emplace( tid, stream );
 
 	auto cmd = ref new AmfArray();

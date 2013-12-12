@@ -32,7 +32,7 @@ task<void> Connection::ConnectAsync( Platform::String^ host, Platform::String^ p
 	} );
 }
 
-uint32 Connection::TryRead( uint8 *const data, const size_t length )
+uint32 Connection::TryRead( uint8* const data, const size_t length )
 {
 	auto ex = dataReader_->LoadAsync( static_cast<uint32>( length ) );
 	auto actualLength = create_task( ex ).get();
@@ -41,7 +41,7 @@ uint32 Connection::TryRead( uint8 *const data, const size_t length )
 	return actualLength;
 }
 
-void Connection::Read( uint8 *const data, const size_t length )
+void Connection::Read( uint8* const data, const size_t length )
 {
 	auto ex = dataReader_->LoadAsync( static_cast<uint32>( length ) );
 	auto actualLength = create_task( ex ).get();
@@ -62,19 +62,19 @@ void Connection::Read( std::vector<uint8>& data, const size_t length )
 	Read( data.data(), length );
 }
 
-void Connection::Write( uint8 *const data, const size_t length )
+void Connection::Write( const uint8* const data, const size_t length )
 {
-	dataWriter_->WriteBytes( Platform::ArrayReference<uint8>( data, static_cast<uint32>( length ) ) );
+	dataWriter_->WriteBytes( Platform::ArrayReference<uint8>( const_cast<uint8_t*>( data ), static_cast<uint32>( length ) ) );
 	auto ex = dataWriter_->StoreAsync();
-	task<uint32_t>( ex ).wait();
+	create_task( ex ).get();
 }
 
-void Connection::Write( std::vector<uint8>& data )
+void Connection::Write( const std::vector<uint8>& data )
 {
 	Write( data.data(), data.size() );
 }
 
-void Connection::Write( std::vector<uint8>& data, const size_t length )
+void Connection::Write( const std::vector<uint8>& data, const size_t length )
 {
 	Write( data.data(), length );
 }
