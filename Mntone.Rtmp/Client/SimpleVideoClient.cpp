@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "SimpleVideoClient.h"
 
+using namespace Windows::Media::Core;
+using namespace Windows::Media::MediaProperties;
 using namespace Mntone::Rtmp;
 using namespace Mntone::Rtmp::Client;
 namespace WF = Windows::Foundation;
@@ -12,10 +14,10 @@ SimpleVideoClient::SimpleVideoClient()
 
 SimpleVideoClient::~SimpleVideoClient()
 {
-	__Close();
+	CloseImpl();
 }
 
-void SimpleVideoClient::__Close()
+void SimpleVideoClient::CloseImpl()
 {
 	if( connection_ != nullptr )
 	{
@@ -30,6 +32,18 @@ void SimpleVideoClient::__Close()
 
 		Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
 	}
+}
+
+void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
+{
+	mediaStreamSource_ = ref new MediaStreamSource( descriptor );
+
+	WF::TimeSpan d;
+	d.Duration = INT64_MAX;
+	mediaStreamSource_->Duration = d;
+
+	mediaStreamSource_->Starting += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
+	mediaStreamSource_->SampleRequested += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
 }
 
 void SimpleVideoClient::Connect( WF::Uri^ uri )
@@ -56,10 +70,10 @@ void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, 
 		stream_->AudioReceived += ref new WF::TypedEventHandler<NetStream^, NetStreamAudioReceivedEventArgs^>( this, &SimpleVideoClient::OnAudioReceived );
 		stream_->VideoStarted += ref new WF::TypedEventHandler<NetStream^, NetStreamVideoStartedEventArgs^>( this, &SimpleVideoClient::OnVideoStarted );
 		stream_->VideoReceived += ref new WF::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>( this, &SimpleVideoClient::OnVideoReceived );
-		stream_->Attach( connection_ );
+		stream_->AttachAsync( connection_ );
 	}
 	else if( ( nsc & NetStatusCodeType::Level2Mask ) == NetStatusCodeType::NetConnection_Connect )
-		__Close();
+		CloseImpl();
 }
 
 void SimpleVideoClient::OnAttached( NetStream^ sender, NetStreamAttachedEventArgs^ args )
@@ -80,9 +94,6 @@ void SimpleVideoClient::OnAudioStarted( NetStream^ sender, NetStreamAudioStarted
 	using namespace Windows::UI::Core;
 	dispatcher_->RunAsync( CoreDispatcherPriority::Normal, ref new DispatchedHandler( [=]
 	{
-		using namespace Windows::Media::Core;
-		using namespace Windows::Media::MediaProperties;
-
 		const auto& info = args->Info;
 
 		AudioEncodingProperties^ prop;
@@ -96,22 +107,13 @@ void SimpleVideoClient::OnAudioStarted( NetStream^ sender, NetStreamAudioStarted
 		prop->BitsPerSample = info->BitsPerSample;
 		const auto des = ref new AudioStreamDescriptor( prop );
 
-		if( mediaStreamSource_ == nullptr )
-		{
-			mediaStreamSource_ = ref new MediaStreamSource( des );
-
-			WF::TimeSpan d;
-			d.Duration = INT64_MAX;
-			mediaStreamSource_->Duration = d;
-
-			mediaStreamSource_->Starting += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
-			mediaStreamSource_->SampleRequested += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
-		}
-		else
+		if( mediaStreamSource_ != nullptr )
 		{
 			mediaStreamSource_->AddStreamDescriptor( des );	
 			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
 		}
+		else
+			CreateMediaStream( des );
 	} ) );
 }
 
@@ -130,29 +132,17 @@ void SimpleVideoClient::OnVideoStarted( NetStream^ sender, NetStreamVideoStarted
 	using namespace Windows::UI::Core;
 	dispatcher_->RunAsync( CoreDispatcherPriority::Normal, ref new DispatchedHandler( [=]
 	{
-		using namespace Windows::Media::Core;
-		using namespace Windows::Media::MediaProperties;
-
 		auto prop = VideoEncodingProperties::CreateH264();
 		prop->ProfileId = H264ProfileIds::High;
 		auto des = ref new VideoStreamDescriptor( prop );
 
-		if( mediaStreamSource_ == nullptr )
+		if( mediaStreamSource_ != nullptr )
 		{
-			mediaStreamSource_ = ref new MediaStreamSource( des );
-
-			WF::TimeSpan d;
-			d.Duration = INT64_MAX;
-			mediaStreamSource_->Duration = d;
-
-			mediaStreamSource_->Starting += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
-			mediaStreamSource_->SampleRequested += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
-		}
-		else
-		{
-			mediaStreamSource_->AddStreamDescriptor( des );		
+			mediaStreamSource_->AddStreamDescriptor( des );
 			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
 		}
+		else
+			CreateMediaStream( des );
 	} ) );
 }
 

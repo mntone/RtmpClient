@@ -3,7 +3,7 @@
 
 using namespace Mntone::Rtmp;
 
-Mntone::Data::Amf::AmfArray^ RtmpHelper::ParseAmf0( std::vector<uint8> data )
+Mntone::Data::Amf::AmfArray^ RtmpHelper::ParseAmf( std::vector<uint8> data )
 {
 	using namespace Mntone::Data::Amf;
 
@@ -16,11 +16,6 @@ Mntone::Data::Amf::AmfArray^ RtmpHelper::ParseAmf0( std::vector<uint8> data )
 	if( !AmfArray::TryParse( buf, AmfEncodingType::Amf0, &amfArray ) )
 		amfArray = nullptr;
 	return std::move( amfArray );
-}
-
-Mntone::Data::Amf::AmfArray^ RtmpHelper::ParseAmf3( std::vector<uint8> data )
-{
-	throw ref new Platform::NotImplementedException();
 }
 
 NetStatusCodeType RtmpHelper::ParseNetConnectionConnectCode( const std::wstring code )

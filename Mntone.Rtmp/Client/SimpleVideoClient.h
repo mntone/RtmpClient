@@ -23,7 +23,8 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		[Windows::Foundation::Metadata::DefaultOverload] void Connect( RtmpUri^ uri );
 
 	private:
-		void __Close();
+		void CloseImpl();
+		void CreateMediaStream( Windows::Media::Core::IMediaStreamDescriptor^ descriptor );
 
 		// NetConnection
 		void OnNetConnectionStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args );

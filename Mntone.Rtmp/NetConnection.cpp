@@ -63,7 +63,7 @@ Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Co
 	} );
 }
 
-void NetConnection::AttachNetStream( NetStream^ stream )
+task<void> NetConnection::AttachNetStream( NetStream^ stream )
 {
 	using namespace Mntone::Data::Amf;
 
@@ -76,7 +76,7 @@ void NetConnection::AttachNetStream( NetStream^ stream )
 	cmd->Append( AmfValue::CreateStringValue( "createStream" ) );				// Command name
 	cmd->Append( AmfValue::CreateNumberValue( static_cast<float64>( tid ) ) );	// Transaction id
 	cmd->Append( ref new AmfValue() );											// Command object: set to null type when do not exist
-	SendActionAsync( cmd );
+	return SendActionAsync( cmd );
 }
 
 void NetConnection::UnattachNetStream( NetStream^ stream )
@@ -122,7 +122,7 @@ void NetConnection::ReceiveImpl()
 	auto ret = rxBakPackets_.find( chunkStreamId );
 	if( ret == rxBakPackets_.end() )
 	{
-		packet = std::make_shared<rtmp_packet>( );
+		packet = std::make_shared<rtmp_packet>();
 		packet->ChunkStreamId = chunkStreamId;
 		packet->Length = 0;
 		rxBakPackets_.emplace( chunkStreamId, packet );
@@ -235,8 +235,10 @@ void NetConnection::OnMessage( const rtmp_packet packet, std::vector<uint8> data
 
 	switch( packet.TypeId )
 	{
-	case type_id_type::tid_command_message_amf0: OnCommandMessageAmf0( std::move( packet ), std::move( data ) ); break;
-	case type_id_type::tid_command_message_amf3: OnCommandMessageAmf3( std::move( packet ), std::move( data ) ); break;
+	case type_id_type::tid_command_message_amf3:
+	case type_id_type::tid_command_message_amf0:
+		OnCommandMessage( std::move( packet ), std::move( data ) );
+		break;
 	}
 }
 
@@ -295,23 +297,9 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, std::vec
 	}
 }
 
-void NetConnection::OnCommandMessageAmf0( const rtmp_packet /*packet*/, std::vector<uint8> data )
+void NetConnection::OnCommandMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
-	OnCommandMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
-}
-
-void NetConnection::OnCommandMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
-{
-	Mntone::Data::Amf::AmfArray^ amf;
-	if( DefaultEncodingType_ == Mntone::Data::Amf::AmfEncodingType::Amf3 )
-	{ }
-	else
-		amf = RtmpHelper::ParseAmf0( std::move( data ) );
-	OnCommandMessage( std::move( amf ) );
-}
-
-void NetConnection::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
-{
+	const auto& amf = RtmpHelper::ParseAmf( std::move( data ) );
 	if( amf == nullptr ) return;
 	const auto& name = amf->GetStringAt( 0 );
 	const auto& tid = static_cast<uint32>( amf->GetNumberAt( 1 ) );

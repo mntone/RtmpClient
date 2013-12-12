@@ -21,7 +21,7 @@ namespace Mntone { namespace Rtmp {
 		NetStream();
 		virtual ~NetStream();
 
-		void Attach( NetConnection^ connection );
+		Windows::Foundation::IAsyncAction^ AttachAsync( NetConnection^ connection );
 
 		void Play( Platform::String^ streamName );
 		void Play( Platform::String^ streamName, int32 start );
@@ -37,12 +37,8 @@ namespace Mntone { namespace Rtmp {
 		void OnMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnAudioMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnVideoMessage( const rtmp_packet packet, std::vector<uint8> data );
-		void OnDataMessageAmf0( const rtmp_packet packet, std::vector<uint8> data );
-		void OnDataMessageAmf3( const rtmp_packet packet, std::vector<uint8> data );
-		void OnDataMessage( Mntone::Data::Amf::AmfArray^ amf );
-		void OnCommandMessageAmf0( const rtmp_packet packet, std::vector<uint8> data );
-		void OnCommandMessageAmf3( const rtmp_packet packet, std::vector<uint8> data );
-		void OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf );
+		void OnDataMessage( const rtmp_packet packet, std::vector<uint8> data );
+		void OnCommandMessage( const rtmp_packet packet, std::vector<uint8> data );
 
 	private:
 		Concurrency::task<void> SendActionAsync( Mntone::Data::Amf::AmfArray^ amf );

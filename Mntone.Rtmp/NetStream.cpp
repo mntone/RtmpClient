@@ -32,9 +32,12 @@ NetStream::~NetStream()
 	parent_->UnattachNetStream( this );
 }
 
-void NetStream::Attach( NetConnection^ connection )
+Windows::Foundation::IAsyncAction^ NetStream::AttachAsync( NetConnection^ connection )
 {
-	connection->AttachNetStream( this );
+	return create_async( [=]
+	{
+		return connection->AttachNetStream( this );
+	} );
 }
 
 void NetStream::AttachedImpl()
@@ -78,10 +81,20 @@ void NetStream::OnMessage( const rtmp_packet packet, std::vector<uint8> data )
 {
 	switch( packet.TypeId )
 	{
-	case type_id_type::tid_audio_message: OnAudioMessage( std::move( packet ), std::move( data ) ); break;
-	case type_id_type::tid_video_message: OnVideoMessage( std::move( packet ), std::move( data ) ); break;
-	case type_id_type::tidData__message_amf0: OnDataMessageAmf0( std::move( packet ), std::move( data ) ); break;
-	case type_id_type::tid_command_message_amf0: OnCommandMessageAmf0( std::move( packet ), std::move( data ) ); break;
+	case type_id_type::tid_audio_message:
+		OnAudioMessage( std::move( packet ), std::move( data ) );
+		break;
+	case type_id_type::tid_video_message:
+		OnVideoMessage( std::move( packet ), std::move( data ) );
+		break;
+	case type_id_type::tid_data_message_amf3:
+	case type_id_type::tid_data_message_amf0:
+		OnDataMessage( std::move( packet ), std::move( data ) );
+		break;
+	case type_id_type::tid_command_message_amf3:
+	case type_id_type::tid_command_message_amf0:
+		OnCommandMessage( std::move( packet ), std::move( data ) );
+		break;
 	}
 }
 
@@ -260,42 +273,14 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 	}
 }
 
-void NetStream::OnDataMessageAmf0( const rtmp_packet /*packet*/, std::vector<uint8> data )
+void NetStream::OnDataMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
-	OnDataMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
+	const auto& amf = RtmpHelper::ParseAmf( std::move( data ) );
 }
 
-void NetStream::OnDataMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
+void NetStream::OnCommandMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
-	Mntone::Data::Amf::AmfArray^ amf;
-	if( parent_->DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
-	{ }
-	else
-		amf = RtmpHelper::ParseAmf0( std::move( data ) );
-	OnDataMessage( std::move( amf ) );
-}
-
-void NetStream::OnDataMessage( Mntone::Data::Amf::AmfArray^ amf )
-{
-}
-
-void NetStream::OnCommandMessageAmf0( const rtmp_packet /*packet*/, std::vector<uint8> data )
-{
-	OnCommandMessage( std::move( RtmpHelper::ParseAmf0( std::move( data ) ) ) );
-}
-
-void NetStream::OnCommandMessageAmf3( const rtmp_packet /*packet*/, std::vector<uint8> data )
-{
-	Mntone::Data::Amf::AmfArray^ amf;
-	if( parent_->DefaultEncodingType == Mntone::Data::Amf::AmfEncodingType::Amf3 )
-	{ }
-	else
-		amf = RtmpHelper::ParseAmf0( std::move( data ) );
-	OnCommandMessage( std::move( amf ) );
-}
-
-void NetStream::OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf )
-{
+	const auto& amf = RtmpHelper::ParseAmf( std::move( data ) );
 	const auto& name = amf->GetStringAt( 0 );
 	const auto& information = amf->GetObjectAt( 3 );
 

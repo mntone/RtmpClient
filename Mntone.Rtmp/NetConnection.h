@@ -39,7 +39,7 @@ namespace Mntone { namespace Rtmp {
 		Concurrency::task<void> SendActionAsync( uint32 streamId, Mntone::Data::Amf::AmfArray^ amf );
 
 		// Utilites
-		void AttachNetStream( NetStream^ stream );
+		Concurrency::task<void> AttachNetStream( NetStream^ stream );
 		void UnattachNetStream( NetStream^ stream );
 
 	private:
@@ -49,9 +49,7 @@ namespace Mntone { namespace Rtmp {
 		void OnMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnNetworkMessage( const rtmp_packet packet, std::vector<uint8> data );
 		void OnUserControlMessage( const rtmp_packet packet, std::vector<uint8> data );
-		void OnCommandMessageAmf0( const rtmp_packet packet, std::vector<uint8> data );
-		void OnCommandMessageAmf3( const rtmp_packet packet, std::vector<uint8> data );
-		void OnCommandMessage( Mntone::Data::Amf::AmfArray^ amf );
+		void OnCommandMessage( const rtmp_packet packet, std::vector<uint8> data );
 
 		// Send
 		Concurrency::task<void> SetChunkSizeAsync( uint32 chunkSize );
