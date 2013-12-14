@@ -1,15 +1,15 @@
 #pragma once
 #include "type_id_type.h"
 
-namespace Mntone { namespace Rtmp {
+namespace mntone { namespace rtmp {
 
 	struct rtmp_packet
 	{
-		uint16 ChunkStreamId;
-		int64 Timestamp, TimestampDelta;
-		uint32 Length;
-		type_id_type TypeId;
-		uint32 StreamId;
+		uint16 chunk_stream_id_;
+		int64 timestamp_, timestamp_delta_;
+		uint32 length_;
+		type_id_type type_id_;
+		uint32 stream_id_;
 	};
 
 } }

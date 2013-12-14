@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Connection.h"
 
+using namespace Concurrency;
 using namespace Mntone::Rtmp;
 
 Connection::Connection()

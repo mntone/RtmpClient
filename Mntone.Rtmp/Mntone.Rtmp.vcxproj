@@ -65,7 +65,6 @@
       <WarningLevel>Level4</WarningLevel>
       <FloatingPointModel>Fast</FloatingPointModel>
       <SDLCheck>true</SDLCheck>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
       <PreprocessorDefinitions>WIN32;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -150,7 +149,7 @@
     <ClInclude Include="sound_type.h" />
     <ClInclude Include="UserControlMessageEventType.h" />
     <ClInclude Include="type_id_type.h" />
-    <ClInclude Include="Utilities.h" />
+    <ClInclude Include="utility.h" />
     <ClInclude Include="VideoFormat.h" />
     <ClInclude Include="VideoInfo.h" />
     <ClInclude Include="video_type.h" />
@@ -177,7 +176,7 @@
     <ClCompile Include="RtmpHelper.cpp" />
     <ClCompile Include="RtmpUri.cpp" />
     <ClCompile Include="Client\SimpleVideoClient.cpp" />
-    <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mntone.Data.Amf">

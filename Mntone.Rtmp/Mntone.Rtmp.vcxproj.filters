@@ -10,7 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Utilities.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="NetConnection.cpp" />
     <ClCompile Include="RtmpUri.cpp" />
@@ -37,10 +36,10 @@
     <ClCompile Include="NetStreamAudioStartedEventArgs.cpp" />
     <ClCompile Include="NetStreamVideoStartedEventArgs.cpp" />
     <ClCompile Include="Handshaker.cpp" />
+    <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Utilities.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="NetConnection.h" />
     <ClInclude Include="RtmpUri.h" />
@@ -107,5 +106,6 @@
     <ClInclude Include="VideoInfo.h" />
     <ClInclude Include="NetStatusCodeType.h" />
     <ClInclude Include="Handshaker.h" />
+    <ClInclude Include="utility.h" />
   </ItemGroup>
 </Project>

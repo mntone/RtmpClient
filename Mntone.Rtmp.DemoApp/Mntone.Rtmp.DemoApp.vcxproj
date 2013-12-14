@@ -67,7 +67,6 @@
       <WarningLevel>Level4</WarningLevel>
       <FloatingPointModel>Fast</FloatingPointModel>
       <SDLCheck>true</SDLCheck>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
       <PreprocessorDefinitions>WIN32;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453</DisableSpecificWarnings>

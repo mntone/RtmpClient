@@ -18,7 +18,5 @@
 #include <collection.h>
 #include <ppltasks.h>
 
-using namespace concurrency;
-
 // This Project Header Files:
-#include "Utilities.h"
+#include "utility.h"

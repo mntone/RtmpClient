@@ -4,7 +4,7 @@
 #include "sound_size.h"
 #include "sound_type.h"
 
-namespace Mntone { namespace Rtmp {
+namespace mntone { namespace rtmp {
 
 	struct sound_info
 	{

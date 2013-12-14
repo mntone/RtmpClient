@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Mntone { namespace Rtmp {
+namespace mntone { namespace rtmp {
 
 	enum video_type: uint8
 	{

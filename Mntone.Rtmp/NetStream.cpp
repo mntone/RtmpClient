@@ -7,6 +7,8 @@
 #include "NetConnection.h"
 #include "RtmpHelper.h"
 
+using namespace Concurrency;
+using namespace mntone::rtmp;
 using namespace Mntone::Rtmp;
 
 NetStream::NetStream()
@@ -79,7 +81,7 @@ void NetStream::Seek( uint32 /*offset*/ ) { }
 
 void NetStream::OnMessage( const rtmp_packet packet, std::vector<uint8> data )
 {
-	switch( packet.TypeId )
+	switch( packet.type_id_ )
 	{
 	case type_id_type::tid_audio_message:
 		OnAudioMessage( std::move( packet ), std::move( data ) );
@@ -108,7 +110,7 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 		{
 			auto args = ref new NetStreamAudioReceivedEventArgs();
 			args->Info = audioInfo_;
-			args->SetTimestamp( packet.Timestamp );
+			args->SetTimestamp( packet.timestamp_ );
 			args->SetData( std::move( data ), 2 );
 			AudioReceived( this, args );
 		}
@@ -133,7 +135,7 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 
 	auto args = ref new NetStreamAudioReceivedEventArgs();
 	args->Info = audioInfo_;
-	args->SetTimestamp( packet.Timestamp );
+	args->SetTimestamp( packet.timestamp_ );
 	args->SetData( std::move( data ), 1 );
 	AudioReceived( this, args );
 }
@@ -145,7 +147,7 @@ void NetStream::OnVideoMessage( const rtmp_packet packet, std::vector<uint8> dat
 
 	auto args = ref new NetStreamVideoReceivedEventArgs();
 	args->IsKeyframe = vt == video_type::vt_keyframe;
-	args->SetDecodeTimestamp( packet.Timestamp );
+	args->SetDecodeTimestamp( packet.timestamp_ );
 
 	if( vf == VideoFormat::Avc )
 	{
@@ -162,7 +164,7 @@ void NetStream::OnVideoMessage( const rtmp_packet packet, std::vector<uint8> dat
 	}
 
 	args->Info = videoInfo_;
-	args->SetPresentationTimestamp( packet.Timestamp );
+	args->SetPresentationTimestamp( packet.timestamp_ );
 	args->SetData( std::move( data ), 1 );
 	VideoReceived( this, args );
 }
@@ -175,26 +177,26 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 		args->Info = videoInfo_;
 
 		int64 compositionTimeOffset( 0 );
-		ConvertBigEndian( data.data() + 2, &compositionTimeOffset, 3 );
+		utility::convert_big_endian( data.data() + 2, 3, &compositionTimeOffset );
 		if( ( compositionTimeOffset & 0x800000 ) != 0 )
 			compositionTimeOffset |= 0xffffffffff000000;
-		args->SetPresentationTimestamp( packet.Timestamp + compositionTimeOffset );
+		args->SetPresentationTimestamp( packet.timestamp_ + compositionTimeOffset );
 
 		const uint8 startCode[3] = { 0x00, 0x00, 0x01 };
 		auto p = data.data() + 5;
 		const auto& ep = data.data() + data.size();
-		std::basic_stringstream<uint8> st;
+		std::basic_ostringstream<uint8> st;
 		do
 		{
 			uint32 length( 0 );
 			if( lengthSizeMinusOne_ == 0x03 )
 			{
-				ConvertBigEndian( p, &length, 4 );
+				utility::convert_big_endian( p, 4, &length );
 				p += 4;
 			}
 			else if( lengthSizeMinusOne_ == 0x01 )
 			{
-				ConvertBigEndian( p, &length, 2 );
+				utility::convert_big_endian( p, 2, &length );
 				p += 2;
 			}
 			else if( lengthSizeMinusOne_ == 0x00 )
@@ -215,7 +217,7 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 		return;
 	}
 
-	args->SetPresentationTimestamp( packet.Timestamp );
+	args->SetPresentationTimestamp( packet.timestamp_ );
 
 	// AVC sequence header (this is AVCDecoderConfigurationRecord)
 	if( data[1] == 0x00 )
@@ -230,12 +232,12 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 
 		const uint8 startCode[3] = { 0x00, 0x00, 0x01 };
 		auto p = data.data() + 10;
-		std::basic_stringstream<uint8> st;
+		std::basic_ostringstream<uint8> st;
 		const uint8 spsCount = *( p++ ) & 0x1f;
 		for( auto i = 0u; i < spsCount; ++i )
 		{
 			uint16 spsLength;
-			ConvertBigEndian( p, &spsLength, 2 );
+			utility::convert_big_endian( p, 2, &spsLength );
 			p += 2;
 
 			st.write( startCode, 3 );
@@ -247,7 +249,7 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 		for( auto i = 0u; i < ppsCount; ++i )
 		{
 			uint16 ppsLength;
-			ConvertBigEndian( p, &ppsLength, 2 );
+			utility::convert_big_endian( p, 2, &ppsLength );
 			p += 2;
 
 			st.write( startCode, 3 );

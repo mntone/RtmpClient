@@ -5,6 +5,9 @@
 #include "RtmpHelper.h"
 #include "Command/NetConnectionConnectCommand.h"
 
+using namespace std;
+using namespace Concurrency;
+using namespace mntone::rtmp;
 using namespace Mntone::Rtmp;
 
 const auto DEFAULT_WINDOW_SIZE = 2500000;
@@ -12,8 +15,7 @@ const auto DEFAULT_CHUNK_SIZE = 128;
 const auto DEFAULT_BUFFER_MILLSECONDS = 5000;
 
 NetConnection::NetConnection()
-	: DefaultEncodingType_( Mntone::Data::Amf::AmfEncodingType::Amf3 )
-	, connection_( ref new Connection() )
+	: connection_( ref new Connection() )
 	, latestTransactionId_( 2 )
 	, rxHeaderBuffer_( 11 )
 	, rxWindowSize_( DEFAULT_WINDOW_SIZE ), txWindowSize_( DEFAULT_WINDOW_SIZE )
@@ -50,7 +52,7 @@ Windows::Foundation::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Co
 {
 	return create_async( [=]
 	{
-		startTime_ = GetWindowsTime();
+		startTime_ = utility::get_windows_time();
 		Uri_ = uri;
 
 		auto task = connection_->ConnectAsync( Uri_->Host, Uri_->Port.ToString() );
@@ -102,7 +104,7 @@ void NetConnection::ReceiveImpl()
 	// Copes with Stack Overflow
 	while( connection_->TryRead( p, 1 ) == 0 );
 
-	const auto formatType = ( p[0] >> 6 ) & 0x03;
+	const uint8_t& formatType = ( p[0] >> 6 ) & 0x03;
 	uint16 chunkStreamId = p[0] & 0x3f;
 
 	if( chunkStreamId == 0 )
@@ -113,18 +115,18 @@ void NetConnection::ReceiveImpl()
 	else if( chunkStreamId == 1 )
 	{
 		connection_->Read( p, 2 );
-		ConvertBigEndian( p, &chunkStreamId, 2 );
+		utility::convert_big_endian( p, 2, &chunkStreamId );
 		chunkStreamId += 64;
 	}
 
 	// ---[ Get object ]----------
-	std::shared_ptr<rtmp_packet> packet;
+	shared_ptr<rtmp_packet> packet;
 	auto ret = rxBakPackets_.find( chunkStreamId );
 	if( ret == rxBakPackets_.end() )
 	{
-		packet = std::make_shared<rtmp_packet>();
-		packet->ChunkStreamId = chunkStreamId;
-		packet->Length = 0;
+		packet = make_shared<rtmp_packet>();
+		packet->chunk_stream_id_ = chunkStreamId;
+		packet->length_ = 0;
 		rxBakPackets_.emplace( chunkStreamId, packet );
 	}
 	else
@@ -136,35 +138,35 @@ void NetConnection::ReceiveImpl()
 	case 0:
 		connection_->Read( p, 11 );
 
-		packet->Timestamp = 0; // initialize
-		ConvertBigEndian( p, &packet->Timestamp, 3 );
-		ConvertBigEndian( p + 3, &packet->Length, 3 );
-		packet->TypeId = static_cast<type_id_type>( p[6] );
-		ConvertLittleEndian( p + 7, &packet->StreamId, 4 ); // LE
+		packet->timestamp_ = 0; // initialize
+		utility::convert_big_endian( p, 3, &packet->timestamp_ );
+		utility::convert_big_endian( p + 3, 3, &packet->length_ );
+		packet->type_id_ = static_cast<type_id_type>( p[6] );
+		utility::convert_little_endian( p + 7, 4, &packet->stream_id_ ); // LE
 
-		if( packet->Timestamp == 0xffffff )
+		if( packet->timestamp_ == 0xffffff )
 		{
 			connection_->Read( p, 4 );
-			ConvertBigEndian( p, &packet->Timestamp, 4 );
+			utility::convert_big_endian( p, 4, &packet->timestamp_ );
 		}
-		packet->TimestampDelta = packet->Timestamp;
+		packet->timestamp_delta_ = packet->timestamp_;
 		break;
 
 	case 1:
 		{
 			connection_->Read( p, 7 );
 
-			packet->TimestampDelta = 0;
-			ConvertBigEndian( p, &packet->TimestampDelta, 3 );
-			ConvertBigEndian( p + 3, &packet->Length, 3 );
-			packet->TypeId = static_cast<type_id_type>( p[6] );
+			packet->timestamp_delta_ = 0;
+			utility::convert_big_endian( p, 3, &packet->timestamp_delta_ );
+			utility::convert_big_endian( p + 3, 3, &packet->length_ );
+			packet->type_id_ = static_cast<type_id_type>( p[6] );
 
-			if( packet->TimestampDelta == 0xffffff )
+			if( packet->timestamp_delta_ == 0xffffff )
 			{
 				connection_->Read( p, 4 );
-				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
+				utility::convert_big_endian( p, 4, &packet->timestamp_delta_ );
 			}
-			packet->Timestamp += packet->TimestampDelta;
+			packet->timestamp_ += packet->timestamp_delta_;
 			break;
 		}
 
@@ -172,36 +174,36 @@ void NetConnection::ReceiveImpl()
 		{
 			connection_->Read( p, 3 );
 
-			packet->TimestampDelta = 0;
-			ConvertBigEndian( p, &packet->TimestampDelta, 3 );
+			packet->timestamp_delta_ = 0;
+			utility::convert_big_endian( p, 3, &packet->timestamp_delta_ );
 
-			if( packet->TimestampDelta == 0xffffff )
+			if( packet->timestamp_delta_ == 0xffffff )
 			{
 				connection_->Read( p, 4 );
-				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
+				utility::convert_big_endian( p, 4, &packet->timestamp_delta_ );
 			}
-			packet->Timestamp += packet->TimestampDelta;
+			packet->timestamp_ += packet->timestamp_delta_;
 			break;
 		}
 
 	case 3:
 		{
-			if( packet->TimestampDelta > 0xffffff )
+			if( packet->timestamp_delta_ > 0xffffff )
 			{
 				connection_->Read( p, 4 );
-				ConvertBigEndian( p, &packet->TimestampDelta, 4 );
+				utility::convert_big_endian( p, 4, &packet->timestamp_delta_ );
 			}
-			packet->Timestamp += packet->TimestampDelta;
+			packet->timestamp_ += packet->timestamp_delta_;
 			break;
 		}
 	}
 
 	// ---[ Read message body ]----------
-	if( packet->Length == 0 )
+	if( packet->length_ == 0 )
 		return;
 
-	const auto& length = packet->Length;
-	std::vector<uint8> data( length );
+	const auto& length = packet->length_;
+	vector<uint8> data( length );
 	{
 		auto dp = data.data();
 		for( auto i = 0u; i < length; i += rxChunkSize_, dp += rxChunkSize_ )
@@ -214,47 +216,60 @@ void NetConnection::ReceiveImpl()
 	}
 
 	// ---[ Callback ]----------
-	const auto& sid = packet->StreamId;
+	const auto& sid = packet->stream_id_;
 	if( sid == 0 )
-		OnMessage( *packet.get(), std::move( data ) );
+		OnMessage( *packet.get(), move( data ) );
 	else
 	{
 		const auto ret = bindingNetStream_.find( sid );
 		if( ret != bindingNetStream_.end() )
-			ret->second->OnMessage( *packet.get(), std::move( data ) );
+			ret->second->OnMessage( *packet.get(), move( data ) );
 	}
 }
 
-void NetConnection::OnMessage( const rtmp_packet packet, std::vector<uint8> data )
+void NetConnection::OnMessage( const rtmp_packet packet, vector<uint8> data )
 {
-	if( packet.ChunkStreamId == 2 )
+	if( packet.chunk_stream_id_ == 2 )
 	{
-		OnNetworkMessage( std::move( packet ), std::move( data ) );
+		OnNetworkMessage( move( packet ), move( data ) );
 		return;
 	}
 
-	switch( packet.TypeId )
+	switch( packet.type_id_ )
 	{
 	case type_id_type::tid_command_message_amf3:
 	case type_id_type::tid_command_message_amf0:
-		OnCommandMessage( std::move( packet ), std::move( data ) );
+		OnCommandMessage( move( packet ), move( data ) );
 		break;
 	}
 }
 
-void NetConnection::OnNetworkMessage( const rtmp_packet packet, std::vector<uint8> data )
+void NetConnection::OnNetworkMessage( const rtmp_packet packet, vector<uint8> data )
 {
-	switch( packet.TypeId )
+	switch( packet.type_id_ )
 	{
-	case type_id_type::tid_set_chunk_size: ConvertBigEndian( data.data(), &rxChunkSize_, 4 ); break;
-	case type_id_type::tid_abort_message: break;
-	case type_id_type::tid_acknowledgement: break;
-	case type_id_type::tid_user_control_message: OnUserControlMessage( std::move( packet ), std::move( data ) ); break;
-	case type_id_type::tid_window_acknowledgement_size: ConvertBigEndian( data.data(), &rxWindowSize_, 4 ); break;
+	case type_id_type::tid_set_chunk_size:
+		utility::convert_big_endian( data.data(), 4, &rxChunkSize_ );
+		break;
+
+	case type_id_type::tid_abort_message:
+		break;
+
+	case type_id_type::tid_acknowledgement:
+		break;
+
+	case type_id_type::tid_user_control_message:
+		OnUserControlMessage( move( packet ), move( data ) );
+		break;
+
+	case type_id_type::tid_window_acknowledgement_size:
+		utility::convert_big_endian( data.data(), 4, &rxWindowSize_ );
+		break;
+
 	case type_id_type::tid_set_peer_bandwidth:
 		{
 			uint32 buf;
-			ConvertBigEndian( data.data(), &buf, 4 );
+			utility::convert_big_endian( data.data(), 4, &buf );
 			//const auto limitType = static_cast<limit_type>( data[4] );
 			WindowAcknowledgementSizeAsync( buf );
 			break;
@@ -262,10 +277,10 @@ void NetConnection::OnNetworkMessage( const rtmp_packet packet, std::vector<uint
 	}
 }
 
-void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
+void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, vector<uint8> data )
 {
 	uint16 buf;
-	ConvertBigEndian( data.data(), &buf, 2 );
+	utility::convert_big_endian( data.data(), 2, &buf );
 
 	const auto& messageType = static_cast<UserControlMessageEventType>( buf );
 	switch( messageType )
@@ -273,7 +288,7 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, std::vec
 	case UserControlMessageEventType::StreamBegin:
 		{
 			uint32 streamId;
-			ConvertBigEndian( data.data() + 2, &streamId, 4 );
+			utility::convert_big_endian( data.data() + 2, 4, &streamId );
 			if( streamId == 0 )
 				SetBufferLengthAsync( 0, DEFAULT_BUFFER_MILLSECONDS );
 			break;
@@ -284,22 +299,22 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, std::vec
 	case UserControlMessageEventType::StreamIsRecorded:
 		{
 			//uint32 streamId;
-			//ConvertBigEndian( data.data() + 2, &streamId, 4 );
+			//utility::convert_big_endian( data.data() + 2, &streamId, 4 );
 			break;
 		}
 	case UserControlMessageEventType::PingRequest:
 		{
 			uint32 timestamp;
-			ConvertBigEndian( data.data() + 2, &timestamp, 4 );
+			utility::convert_big_endian( data.data() + 2, 4, &timestamp );
 			PingResponseAsync( timestamp );
 			break;
 		}
 	}
 }
 
-void NetConnection::OnCommandMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
+void NetConnection::OnCommandMessage( const rtmp_packet /*packet*/, vector<uint8> data )
 {
-	const auto& amf = RtmpHelper::ParseAmf( std::move( data ) );
+	const auto& amf = RtmpHelper::ParseAmf( move( data ) );
 	if( amf == nullptr ) return;
 	const auto& name = amf->GetStringAt( 0 );
 	const auto& tid = static_cast<uint32>( amf->GetNumberAt( 1 ) );
@@ -365,74 +380,74 @@ task<void> NetConnection::SetChunkSizeAsync( uint32 chunkSize )
 
 	txChunkSize_ = chunkSize;
 
-	std::vector<uint8> buf( 4 );
-	ConvertBigEndian( &chunkSize, buf.data(), 4 );
-	return SendNetworkAsync( type_id_type::tid_set_chunk_size, std::move( buf ) );
+	vector<uint8> buf( 4 );
+	utility::convert_big_endian( &chunkSize, 4, buf.data() );
+	return SendNetworkAsync( type_id_type::tid_set_chunk_size, move( buf ) );
 }
 
 task<void> NetConnection::AbortMessageAsync( uint32 chunkStreamId )
 {
-	std::vector<uint8> buf( 4 );
-	ConvertBigEndian( &chunkStreamId, buf.data(), 4 );
-	return SendNetworkAsync( type_id_type::tid_abort_message, std::move( buf ) );
+	vector<uint8> buf( 4 );
+	utility::convert_big_endian( &chunkStreamId, 4, buf.data() );
+	return SendNetworkAsync( type_id_type::tid_abort_message, move( buf ) );
 }
 
 task<void> NetConnection::AcknowledgementAsync( uint32 sequenceNumber )
 {
-	std::vector<uint8> buf( 4 );
-	ConvertBigEndian( &sequenceNumber, buf.data(), 4 );
-	return SendNetworkAsync( type_id_type::tid_acknowledgement, std::move( buf ) );
+	vector<uint8> buf( 4 );
+	utility::convert_big_endian( &sequenceNumber, 4, buf.data() );
+	return SendNetworkAsync( type_id_type::tid_acknowledgement, move( buf ) );
 }
 
 task<void> NetConnection::WindowAcknowledgementSizeAsync( uint32 acknowledgementWindowSize )
 {
 	txWindowSize_ = acknowledgementWindowSize;
 
-	std::vector<uint8> buf( 4 );
-	ConvertBigEndian( &acknowledgementWindowSize, buf.data(), 4 );
-	return SendNetworkAsync( type_id_type::tid_window_acknowledgement_size, std::move( buf ) );
+	vector<uint8> buf( 4 );
+	utility::convert_big_endian( &acknowledgementWindowSize, 4, buf.data() );
+	return SendNetworkAsync( type_id_type::tid_window_acknowledgement_size, move( buf ) );
 }
 
 task<void> NetConnection::SetPeerBandWidthAsync( uint32 windowSize, limit_type type )
 {
-	std::vector<uint8> buf( 5 );
-	ConvertBigEndian( &windowSize, buf.data(), 4 );
+	vector<uint8> buf( 5 );
+	utility::convert_big_endian( &windowSize, 4, buf.data() );
 	buf[4] = type;
-	return SendNetworkAsync( type_id_type::tid_set_peer_bandwidth, std::move( buf ) );
+	return SendNetworkAsync( type_id_type::tid_set_peer_bandwidth, move( buf ) );
 }
 
 task<void> NetConnection::SetBufferLengthAsync( const uint32 streamId, const uint32 bufferLength )
 {
-	std::vector<uint8> buf( 10 );
-	ConvertBigEndian( &streamId, buf.data() + 2, 4 );
-	ConvertBigEndian( &bufferLength, buf.data() + 6, 4 );
-	return UserControlMessageEventAsync( UserControlMessageEventType::SetBufferLength, std::move( buf ) );
+	vector<uint8> buf( 10 );
+	utility::convert_big_endian( &streamId, 4, buf.data() + 2 );
+	utility::convert_big_endian( &bufferLength, 4, buf.data() + 6 );
+	return UserControlMessageEventAsync( UserControlMessageEventType::SetBufferLength, move( buf ) );
 }
 
 task<void> NetConnection::PingResponseAsync( const uint32 timestamp )
 {
-	std::vector<uint8> buf( 6 );
-	ConvertBigEndian( &timestamp, buf.data() + 2, 4 );
-	return UserControlMessageEventAsync( UserControlMessageEventType::PingResponse, std::move( buf ) );
+	vector<uint8> buf( 6 );
+	utility::convert_big_endian( &timestamp, 4, buf.data() + 2 );
+	return UserControlMessageEventAsync( UserControlMessageEventType::PingResponse, move( buf ) );
 }
 
-task<void> NetConnection::UserControlMessageEventAsync( UserControlMessageEventType type, std::vector<uint8> data )
+task<void> NetConnection::UserControlMessageEventAsync( UserControlMessageEventType type, vector<uint8> data )
 {
-	const uint16 cType = static_cast<uint16>( type );
-	ConvertBigEndian( &cType, data.data(), 2 );
-	return SendNetworkAsync( type_id_type::tid_user_control_message, std::move( data ) );
+	const auto& cType = static_cast<uint16>( type );
+	utility::convert_big_endian( &cType, 2, data.data() );
+	return SendNetworkAsync( type_id_type::tid_user_control_message, move( data ) );
 }
 
-task<void> NetConnection::SendNetworkAsync( const type_id_type type, const std::vector<uint8> data )
+task<void> NetConnection::SendNetworkAsync( const type_id_type type, const vector<uint8> data )
 {
 	rtmp_packet packet;
-	packet.ChunkStreamId = 2; // for Network (2)
-	packet.Timestamp = GetWindowsTime() - startTime_;
-	packet.Length = static_cast<uint32>( data.size() );
-	packet.TypeId = type;
-	packet.StreamId = 0;
+	packet.chunk_stream_id_ = 2; // for Network (2)
+	packet.timestamp_ = utility::get_windows_time() - startTime_;
+	packet.length_ = static_cast<uint32>( data.size() );
+	packet.type_id_ = type;
+	packet.stream_id_ = 0;
 
-	return SendAsync( std::move( packet ), std::move( data ), true );
+	return SendAsync( move( packet ), move( data ), true );
 }
 
 task<void> NetConnection::SendActionAsync( Mntone::Data::Amf::AmfArray^ amf )
@@ -446,60 +461,59 @@ task<void> NetConnection::SendActionAsync( uint32 streamId, Mntone::Data::Amf::A
 	const auto& length = amfData->Length - 5;
 
 	rtmp_packet packet;
-	packet.ChunkStreamId = 3; // for Action (3)
-	packet.Timestamp = GetWindowsTime() - startTime_;
-	packet.Length = length;
-	packet.TypeId = type_id_type::tid_command_message_amf0;
-	packet.StreamId = streamId;
+	packet.chunk_stream_id_ = 3; // for Action (3)
+	packet.timestamp_ = utility::get_windows_time() - startTime_;
+	packet.length_ = length;
+	packet.type_id_ = type_id_type::tid_command_message_amf0;
+	packet.stream_id_ = streamId;
 
-	std::vector<uint8> buf( length );
+	vector<uint8> buf( length );
 	memcpy( buf.data(), amfData->Data + 5, length );
-	return SendAsync( std::move( packet ), std::move( buf ) );
+	return SendAsync( move( packet ), move( buf ) );
 }
 
-task<void> NetConnection::SendAsync( const rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero )
+task<void> NetConnection::SendAsync( rtmp_packet packet, const vector<uint8> data, const bool isFormatTypeZero )
 {
-	return create_task( [=] { SendImpl( packet, std::move( data ), isFormatTypeZero ); } );
+	return create_task( [=] { SendImpl( move( packet ), move( data ), isFormatTypeZero ); } );
 }
 
-void NetConnection::SendImpl( rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero )
+void NetConnection::SendImpl( rtmp_packet packet, const vector<uint8> data, const bool isFormatTypeZero )
 {
-	auto inPtr = data.data();
-	const auto inLen = packet.Length;
-	const auto chunkSize = txChunkSize_;
+	auto in_itr = cbegin( data );
+	const auto chunk_size = txChunkSize_;
+	const auto in_len = packet.length_;
+	const auto in_end_before = cend( data ) - in_len % chunk_size;
+	const auto in_end = cend( data );
 
 	// ---[ Header ]----------
-	const auto header = CreateHeader( std::move( packet ), isFormatTypeZero );
-	const auto headerLength = static_cast<uint32>( header.size() );
+	auto buf = CreateHeader( move( packet ), isFormatTypeZero );
+	const auto header_size = buf.size();
 
-	std::vector<uint8> buf( headerLength + inLen + ( inLen - 1 ) / chunkSize );
-	memcpy( buf.data(), header.data(), headerLength );
-
-	auto outPtr = buf.data() + headerLength;
+	buf.resize( header_size + in_len + ( in_len - 1 ) / chunk_size );
+	auto out_itr = begin( buf ) + header_size;
 
 	// ---[ Data ]----------
 	bool odd = true;
-	for( auto i = 0u; i < inLen - inLen % chunkSize; i += chunkSize, inPtr += chunkSize, odd != odd )
+	for( ; in_itr != in_end_before; in_itr += chunk_size, odd != odd )
 	{
-		memcpy( outPtr, inPtr, chunkSize );
-		outPtr += chunkSize;
-		*( outPtr++ ) = odd ? 0xc3 : 0xc4;
+		copy_n( in_itr, chunk_size, out_itr );
+		out_itr += chunk_size;
+		*out_itr++ = odd ? 0xc3 : 0xc4;
 	}
-	memcpy( outPtr, inPtr, inLen % chunkSize );
+	copy_n( in_itr, in_len % chunk_size, out_itr );
 
 	// ---[ Send ]----------
 	connection_->Write( buf );
 }
 
-std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isFormatTypeZero )
+vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isFormatTypeZero )
 {
-	std::vector<uint8> data( 18 );
-	size_t length( 0 );
+	vector<uint8> data( 18 );
 	auto ptr = data.data();
 
 	// ---[ Get object ]----------
-	std::shared_ptr<rtmp_packet> bakPacket;
-	auto ret = txBakPackets_.find( packet.ChunkStreamId );
+	shared_ptr<rtmp_packet> bakPacket;
+	auto ret = txBakPackets_.find( packet.chunk_stream_id_ );
 	if( ret == txBakPackets_.end() )
 		isFormatTypeZero = true;
 	else
@@ -509,16 +523,16 @@ std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isForma
 	uint8 formatType;
 	if( isFormatTypeZero )
 		formatType = 0;
-	else if( packet.StreamId == bakPacket->StreamId )
+	else if( packet.stream_id_ == bakPacket->stream_id_ )
 	{
-		if( packet.TypeId == bakPacket->TypeId && packet.Length == bakPacket->Length )
+		if( packet.type_id_ == bakPacket->type_id_ && packet.length_ == bakPacket->length_ )
 		{
-			if( packet.Timestamp == bakPacket->Timestamp + 2 * bakPacket->TimestampDelta )
+			if( packet.timestamp_ == bakPacket->timestamp_ + 2 * bakPacket->timestamp_delta_ )
 			{
 				formatType = 3;
-				packet.TimestampDelta = bakPacket->TimestampDelta;
+				packet.timestamp_delta_ = bakPacket->timestamp_delta_;
 			}
-			else if( packet.Timestamp < bakPacket->Timestamp )
+			else if( packet.timestamp_ < bakPacket->timestamp_ )
 				formatType = 0;
 			else
 				formatType = 2;
@@ -531,28 +545,21 @@ std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isForma
 
 	// ---[ Chunk basic header ]----------
 	ptr[0] = formatType << 6;
-	if( packet.ChunkStreamId < 64 )
+	if( packet.chunk_stream_id_ < 64 )
 	{
-		ptr[0] |= packet.ChunkStreamId; //& 0x3f;
-
-		length += 1;
-		ptr += 1;
+		*ptr++ |= packet.chunk_stream_id_; //& 0x3f;
 	}
-	else if( packet.ChunkStreamId < 320 )
+	else if( packet.chunk_stream_id_ < 320 )
 	{
-		ptr[1] = static_cast<uint8>( packet.ChunkStreamId - 64 );
-
-		length += 2;
+		ptr[1] = static_cast<uint8>( packet.chunk_stream_id_ - 64 );
 		ptr += 2;
 	}
-	else if( packet.ChunkStreamId < 65600 )
+	else if( packet.chunk_stream_id_ < 65600 )
 	{
-		ptr[0] |= 1;
-		uint16 buf = packet.ChunkStreamId - 64;
-		ConvertBigEndian( &buf, ptr + 1, 2 );
-
-		length += 3;
-		ptr += 3;
+		*ptr++ |= 1;
+		uint16 buf = packet.chunk_stream_id_ - 64;
+		utility::convert_big_endian( &buf, 2, ptr );
+		ptr += 2;
 	}
 	else
 		throw ref new Platform::InvalidArgumentException();
@@ -561,67 +568,73 @@ std::vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isForma
 	switch( formatType )
 	{
 	case 0:
-		ConvertBigEndian( &packet.Length, ptr + 3, 3 );
-		ptr[6] = static_cast<uint8>( packet.TypeId );
-		ConvertLittleEndian( &packet.StreamId, ptr + 7, 4 ); // LE
-		if( packet.Timestamp >= 0xffffff )
+		utility::convert_big_endian( &packet.length_, 3, ptr + 3 );
+		ptr[6] = static_cast<uint8>( packet.type_id_ );
+		utility::convert_little_endian( &packet.stream_id_, 4, ptr + 7 ); // LE
+		if( packet.timestamp_ >= 0xffffff )
 		{
 			ptr[0] = ptr[1] = ptr[2] = 0xff;
-			ConvertBigEndian( &packet.Timestamp, ptr + 11, 4 );
-			length += 15;
+			ptr += 11;
+
+			utility::convert_big_endian( &packet.timestamp_, 4, ptr );
+			ptr += 4;
 		}
 		else
 		{
-			ConvertBigEndian( &packet.Timestamp, ptr, 3 );
-			length += 11;
+			utility::convert_big_endian( &packet.timestamp_, 3, ptr );
+			ptr += 11;
 		}
 		break;
 	case 1:
 		{
-			packet.TimestampDelta = packet.Timestamp - bakPacket->Timestamp;
-			ConvertBigEndian( &packet.Length, ptr + 3, 3 );
-			ptr[6] = static_cast<uint8>( packet.TypeId );
-			if( packet.TimestampDelta >= 0xffffff )
+			packet.timestamp_delta_ = packet.timestamp_ - bakPacket->timestamp_;
+			utility::convert_big_endian( &packet.length_, 3, ptr + 3 );
+			ptr[6] = static_cast<uint8>( packet.type_id_ );
+			if( packet.timestamp_delta_ >= 0xffffff )
 			{
 				ptr[0] = ptr[1] = ptr[2] = 0xff;
-				ConvertBigEndian( &packet.TimestampDelta, ptr + 7, 4 );
-				length += 11;
+				ptr += 7;
+
+				utility::convert_big_endian( &packet.timestamp_delta_, 4, ptr );
+				ptr += 4;
 			}
 			else
 			{
-				ConvertBigEndian( &packet.TimestampDelta, ptr, 3 );
-				length += 7;
+				utility::convert_big_endian( &packet.timestamp_delta_, 3, ptr );
+				ptr += 7;
 			}
 			break;
 		}
 	case 2:
 		{
-			packet.TimestampDelta = packet.Timestamp - bakPacket->Timestamp;
-			if( packet.TimestampDelta >= 0xffffff )
+			packet.timestamp_delta_ = packet.timestamp_ - bakPacket->timestamp_;
+			if( packet.timestamp_delta_ >= 0xffffff )
 			{
 				ptr[0] = ptr[1] = ptr[2] = 0xff;
-				ConvertBigEndian( &packet.TimestampDelta, ptr + 3, 4 );
-				length += 7;
+				ptr += 3;
+
+				utility::convert_big_endian( &packet.timestamp_delta_, 4, ptr );
+				ptr += 4;
 			}
 			else
 			{
-				ConvertBigEndian( &packet.TimestampDelta, ptr, 3 );
-				length += 3;
+				utility::convert_big_endian( &packet.timestamp_delta_, 3, ptr );
+				ptr += 3;
 			}
 			break;
 		}
 	case 3:		
-		if( packet.TimestampDelta >= 0xffffff )
+		if( packet.timestamp_delta_ >= 0xffffff )
 		{
-			ConvertBigEndian( &packet.TimestampDelta, ptr + 3, 4 );
-			length += 4;
+			utility::convert_big_endian( &packet.timestamp_delta_, 4, ptr );
+			ptr += 4;
 		}
 		break;
 	}
 
-	data.resize( length );
-	txBakPackets_.emplace( packet.ChunkStreamId, std::make_shared<rtmp_packet>( std::move( packet ) ) );
-	return std::move( data );
+	data.resize( ptr - data.data() );
+	txBakPackets_.emplace( packet.chunk_stream_id_, make_shared<rtmp_packet>( move( packet ) ) );
+	return move( data );
 }
 
 #pragma endregion

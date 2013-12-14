@@ -5,6 +5,7 @@
 #include "Connection.h"
 #include "Handshaker.h"
 
+using namespace mntone::rtmp;
 using namespace Mntone::Rtmp;
 
 const auto hs0Size = 1u;
@@ -22,8 +23,8 @@ void Handshaker::Handshake( NetConnection^ connection )
 
 	// C1 --- time: uint32, zero: uint32, randomData: 1528 bytes
 	// [time]
-	auto time = HundredNanoToMilli( GetWindowsTime() - connection->startTime_ );
-	ConvertBigEndian( &time, sendData.data() + 1, 4 );
+	auto time = utility::hundred_nano_to_milli( utility::get_windows_time() - connection->startTime_ ) + 1;
+	utility::convert_big_endian( &time, 4, sendData.data() + 1 );
 
 	// [zero]
 	memset( sendData.data() + 5, 0x00, 4 );
@@ -35,7 +36,7 @@ void Handshaker::Handshake( NetConnection^ connection )
 	std::mt19937 engine;
 	std::uniform_int_distribution<uint64_t> distribution( 0x0000000000000000, 0xffffffffffffffff );
 	auto sptr = reinterpret_cast<uint64_t*>( sendData.data() + 9 );
-	auto eptr = reinterpret_cast<uint64_t*>( sendData.data() + 9 + hsrSize );
+	const auto eptr = sptr + hsrSize / 8u;
 	for( auto ptr = sptr; ptr != eptr; ++ptr )
 		*ptr = distribution( engine );
 #endif
@@ -56,9 +57,9 @@ void Handshaker::Handshake( NetConnection^ connection )
 
 	// Create C2 data
 	std::vector<uint8> cs2( hs2Size );
-	memcpy( cs2.data() + 0, rptr + 1, 4 );			// time
-	ConvertBigEndian( &time, cs2.data() + 4, 4 );	// time2
-	memcpy( cs2.data() + 8, rptr + 9, hsrSize );	// randomData
+	memcpy( cs2.data() + 0, rptr + 1, 4 );						// time
+	utility::convert_big_endian( &time, 4, cs2.data() + 4 );	// time2
+	memcpy( cs2.data() + 8, rptr + 9, hsrSize );				// randomData
 
 	connection->connection_->Write( cs2 );
 	// ---[ Sent C2 packet ]----------
@@ -67,8 +68,8 @@ void Handshaker::Handshake( NetConnection^ connection )
 	// ---[ Received S2 packet ]----------
 
 	// S2 --- time: uint32, time2: uint32, randomEcho: 1528 bytes
-	uint32 serverSendClientTime;
-	ConvertBigEndian( cs2.data(), &serverSendClientTime, 4 );
+	uint32 serverSendClientTime( 0 );
+	utility::convert_big_endian( cs2.data(), 4, &serverSendClientTime );
 
 	// check time and randomEcho
 	if( time != serverSendClientTime

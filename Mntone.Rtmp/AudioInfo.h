@@ -10,8 +10,10 @@ namespace Mntone { namespace Rtmp {
 	internal:
 		AudioInfo() { }
 
-		void SetInfo( sound_info soundInfo )
+		void SetInfo( mntone::rtmp::sound_info soundInfo )
 		{
+			using namespace mntone::rtmp;
+
 			switch( soundInfo.rate )
 			{
 			case sound_rate::sr_5_5khz: SampleRate_ = 5513; break;

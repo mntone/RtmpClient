@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Mntone { namespace Rtmp {
+namespace mntone { namespace rtmp {
 
 	enum type_id_type: uint8
 	{

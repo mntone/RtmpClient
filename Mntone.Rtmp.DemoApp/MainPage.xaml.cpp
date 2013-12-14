@@ -20,7 +20,7 @@ void MainPage::OnButtonClicked( Platform::Object^ sender, WUIX::RoutedEventArgs^
 {
 	auto uri = Uri->Text;
 
-	client_ = ref new Mntone::Rtmp::Client::SimpleVideoClient();
+	client_ = ref new SimpleVideoClient();
 	client_->Started += ref new Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>( this, &MainPage::OnStarted );
 	client_->Connect( ref new Windows::Foundation::Uri( uri ) );
 }

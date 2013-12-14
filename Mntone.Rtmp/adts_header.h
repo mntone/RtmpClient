@@ -4,7 +4,7 @@
 #include "aac_profile.h"
 #include "aac_sampling_frequency.h"
 
-namespace Mntone { namespace Rtmp {
+namespace mntone { namespace rtmp {
 
 	_declspec( align( 1 ) )
 	class adts_header
@@ -80,15 +80,15 @@ namespace Mntone { namespace Rtmp {
 
 	private: unsigned sync1 : 8;
 
-	public: aac_protection_absent protection_absent : 1;
+	public: mntone::rtmp::aac_protection_absent protection_absent : 1;
 	private: unsigned layer : 2;
-	public: aac_id id : 1;
+	public: mntone::rtmp::aac_id id : 1;
 	private: unsigned sync2 : 4;
 
 	private: unsigned channel_configuration1 : 1;
 	public: unsigned private_bit : 1;
-	public: aac_sampling_frequency sampling_frequency_index : 4;
-	public: aac_profile profile : 2;
+	public: mntone::rtmp::aac_sampling_frequency sampling_frequency_index : 4;
+	public: mntone::rtmp::aac_profile profile : 2;
 
 	private: unsigned frame_length1 : 2;
 	public: unsigned copyright_identification_start : 1;

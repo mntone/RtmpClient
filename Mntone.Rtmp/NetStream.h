@@ -34,16 +34,16 @@ namespace Mntone { namespace Rtmp {
 	internal:
 		void AttachedImpl();
 
-		void OnMessage( const rtmp_packet packet, std::vector<uint8> data );
-		void OnAudioMessage( const rtmp_packet packet, std::vector<uint8> data );
-		void OnVideoMessage( const rtmp_packet packet, std::vector<uint8> data );
-		void OnDataMessage( const rtmp_packet packet, std::vector<uint8> data );
-		void OnCommandMessage( const rtmp_packet packet, std::vector<uint8> data );
+		void OnMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
+		void OnAudioMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
+		void OnVideoMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
+		void OnDataMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
+		void OnCommandMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 
 	private:
 		Concurrency::task<void> SendActionAsync( Mntone::Data::Amf::AmfArray^ amf );
 
-		void AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, NetStreamVideoReceivedEventArgs^& args );
+		void AnalysisAvc( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data, NetStreamVideoReceivedEventArgs^& args );
 			
 	public:
 		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>^ Attached;
