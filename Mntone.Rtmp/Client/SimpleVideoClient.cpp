@@ -39,7 +39,7 @@ void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
 	mediaStreamSource_ = ref new MediaStreamSource( descriptor );
 
 	WF::TimeSpan d;
-	d.Duration = INT64_MAX;
+	d.Duration = std::numeric_limits<uint64>::max();
 	mediaStreamSource_->Duration = d;
 
 	mediaStreamSource_->Starting += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );

@@ -94,12 +94,12 @@ namespace Mntone { namespace Rtmp {
 		Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ Client_;
 
 		uint32 latestTransactionId_;
-		std::map<uint32, NetStream^> netStreamTemporary_;
+		std::unordered_map<uint32, NetStream^> netStreamTemporary_;
 
-		std::map<uint32, NetStream^> bindingNetStream_;
+		std::unordered_map<uint32, NetStream^> bindingNetStream_;
 
 		std::vector<uint8> rxHeaderBuffer_;
-		std::map<uint16, std::shared_ptr<mntone::rtmp::rtmp_packet>> rxBakPackets_, txBakPackets_;
+		std::unordered_map<uint16, std::shared_ptr<mntone::rtmp::rtmp_packet>> rxBakPackets_, txBakPackets_;
 		uint32 rxWindowSize_, txWindowSize_;
 		uint32 rxChunkSize_, txChunkSize_;
 	};

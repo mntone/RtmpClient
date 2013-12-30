@@ -121,16 +121,18 @@ void NetConnection::ReceiveImpl()
 
 	// ---[ Get object ]----------
 	shared_ptr<rtmp_packet> packet;
-	auto ret = rxBakPackets_.find( chunkStreamId );
-	if( ret == rxBakPackets_.end() )
+	const auto& itr = rxBakPackets_.lower_bound( chunkStreamId );
+	if( itr != rxBakPackets_.end() && itr->first == chunkStreamId )
+	{
+		packet = itr->second;
+	}
+	else
 	{
 		packet = make_shared<rtmp_packet>();
 		packet->chunk_stream_id_ = chunkStreamId;
 		packet->length_ = 0;
-		rxBakPackets_.emplace( chunkStreamId, packet );
+		rxBakPackets_.emplace_hint( itr, chunkStreamId, packet );
 	}
-	else
-		packet = ret->second;
 
 	// ---[ Read header body ]----------
 	switch( formatType )
@@ -218,12 +220,14 @@ void NetConnection::ReceiveImpl()
 	// ---[ Callback ]----------
 	const auto& sid = packet->stream_id_;
 	if( sid == 0 )
+	{
 		OnMessage( *packet.get(), move( data ) );
+	}
 	else
 	{
-		const auto ret = bindingNetStream_.find( sid );
-		if( ret != bindingNetStream_.end() )
-			ret->second->OnMessage( *packet.get(), move( data ) );
+		const auto& itr = bindingNetStream_.lower_bound( sid );
+		if( itr != bindingNetStream_.cend() && itr->first == sid )
+			itr->second->OnMessage( *packet.get(), move( data ) );
 	}
 }
 
@@ -339,8 +343,8 @@ void NetConnection::OnCommandMessage( const rtmp_packet /*packet*/, vector<uint8
 
 	// for createStream result
 	{
-		const auto ret = netStreamTemporary_.find( tid );
-		if( ret != netStreamTemporary_.end() )
+		const auto& itr = netStreamTemporary_.lower_bound( tid );
+		if( itr != netStreamTemporary_.cend() && itr->first == tid )
 		{
 			if( name == "_result" )
 			{
@@ -349,13 +353,13 @@ void NetConnection::OnCommandMessage( const rtmp_packet /*packet*/, vector<uint8
 				//	const auto command = commandBuf->GetObject();
 				const auto& sid = static_cast<uint32>( amf->GetNumberAt( 3 ) );
 
-				auto stream = ret->second;
+				auto stream = itr->second;
 				stream->streamId_ = sid;
 				bindingNetStream_.emplace( sid, stream );
 				stream->AttachedImpl();
 				SetBufferLengthAsync( sid, DEFAULT_BUFFER_MILLSECONDS );
 			}
-			netStreamTemporary_.erase( ret );
+			netStreamTemporary_.erase( itr );
 			return;
 		}
 	}
@@ -468,7 +472,7 @@ task<void> NetConnection::SendActionAsync( uint32 streamId, Mntone::Data::Amf::A
 	packet.stream_id_ = streamId;
 
 	vector<uint8> buf( length );
-	memcpy( buf.data(), amfData->Data + 5, length );
+	copy_n( amfData->begin() + 5, length, begin( buf ) );
 	return SendAsync( move( packet ), move( buf ) );
 }
 
@@ -479,18 +483,18 @@ task<void> NetConnection::SendAsync( rtmp_packet packet, const vector<uint8> dat
 
 void NetConnection::SendImpl( rtmp_packet packet, const vector<uint8> data, const bool isFormatTypeZero )
 {
-	auto in_itr = cbegin( data );
+	auto in_itr = data.cbegin();
 	const auto chunk_size = txChunkSize_;
 	const auto in_len = packet.length_;
-	const auto in_end_before = cend( data ) - in_len % chunk_size;
-	const auto in_end = cend( data );
+	const auto in_end_before = data.cend() - in_len % chunk_size;
+	const auto in_end = data.cend();
 
 	// ---[ Header ]----------
 	auto buf = CreateHeader( move( packet ), isFormatTypeZero );
 	const auto header_size = buf.size();
 
 	buf.resize( header_size + in_len + ( in_len - 1 ) / chunk_size );
-	auto out_itr = begin( buf ) + header_size;
+	auto out_itr = buf.begin() + header_size;
 
 	// ---[ Data ]----------
 	bool odd = true;
@@ -513,11 +517,11 @@ vector<uint8> NetConnection::CreateHeader( rtmp_packet packet, bool isFormatType
 
 	// ---[ Get object ]----------
 	shared_ptr<rtmp_packet> bakPacket;
-	auto ret = txBakPackets_.find( packet.chunk_stream_id_ );
-	if( ret == txBakPackets_.end() )
-		isFormatTypeZero = true;
+	const auto& itr = txBakPackets_.lower_bound( packet.chunk_stream_id_ );
+	if( itr != txBakPackets_.end() && itr->first == packet.chunk_stream_id_ )
+		bakPacket = itr->second;
 	else
-		bakPacket = ret->second;
+		isFormatTypeZero = true;
 
 	// ---[ Decide formatType ]----------
 	uint8 formatType;

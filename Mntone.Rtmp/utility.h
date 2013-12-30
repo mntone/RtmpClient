@@ -1,5 +1,4 @@
 #pragma once
-#include <iterator>
 
 namespace mntone { namespace rtmp { namespace utility {
 
