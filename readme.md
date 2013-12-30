@@ -1,7 +1,7 @@
 # RtmpClient for Windows Runtime (Mntone::Rtmp, Windows 8.1)
 
 ## License
-This component and demoapp is “3-clause BSD license.”
+This component and demoapp is “2-clause BSD license.”
 You must check “[license.en-US.md](./license.en-US.md).”
 
 ## API reference for RtmpClient.
