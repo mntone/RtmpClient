@@ -35,8 +35,12 @@
     <ClCompile Include="RtmpHelper.cpp" />
     <ClCompile Include="NetStreamAudioStartedEventArgs.cpp" />
     <ClCompile Include="NetStreamVideoStartedEventArgs.cpp" />
-    <ClCompile Include="Handshaker.cpp" />
     <ClCompile Include="utility.cpp" />
+    <ClCompile Include="NetConnectionCallbackEventArgs.cpp" />
+    <ClCompile Include="Command\NetConnectionCallCommand.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="handshake.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -65,9 +69,6 @@
     <ClInclude Include="UserControlMessageEventType.h" />
     <ClInclude Include="NetStreamAttachedEventArgs.h" />
     <ClInclude Include="Command\NetConnectionCommandType.h">
-      <Filter>Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Command\NetConnectionConnectCommand.h">
       <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="Command\NetStreamCommandType.h">
@@ -105,7 +106,14 @@
     <ClInclude Include="NetStreamVideoStartedEventArgs.h" />
     <ClInclude Include="VideoInfo.h" />
     <ClInclude Include="NetStatusCodeType.h" />
-    <ClInclude Include="Handshaker.h" />
     <ClInclude Include="utility.h" />
+    <ClInclude Include="Command\NetConnectionConnectCommand.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="NetConnectionCallbackEventArgs.h" />
+    <ClInclude Include="Command\NetConnectionCallCommand.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="handshake.h" />
   </ItemGroup>
 </Project>

@@ -23,16 +23,18 @@ namespace Mntone { namespace Rtmp {
 
 		Windows::Foundation::IAsyncAction^ AttachAsync( NetConnection^ connection );
 
-		void Play( Platform::String^ streamName );
-		void Play( Platform::String^ streamName, int32 start );
-		void Play( Platform::String^ streamName, int32 start, int32 duration );
+		Windows::Foundation::IAsyncAction^ PlayAsync( Platform::String^ streamName );
+		Windows::Foundation::IAsyncAction^ PlayAsync( Platform::String^ streamName, float64 start );
+		Windows::Foundation::IAsyncAction^ PlayAsync( Platform::String^ streamName, float64 start, float64 duration );
+		Windows::Foundation::IAsyncAction^ PlayAsync( Platform::String^ streamName, float64 start, float64 duration, int16 reset );
 
-		void Pause();
-		void Resume();
-		void Seek( uint32 offset );
+		Windows::Foundation::IAsyncAction^  PauseAsync( float64 position );
+		Windows::Foundation::IAsyncAction^  ResumeAsync( float64 position );
+		Windows::Foundation::IAsyncAction^ SeekAsync( float64 offset );
 
 	internal:
 		void AttachedImpl();
+		void UnattachedImpl();
 
 		void OnMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 		void OnAudioMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );

@@ -6,7 +6,6 @@
 
 namespace mntone { namespace rtmp {
 
-	_declspec( align( 1 ) )
 	class adts_header
 	{
 	public:

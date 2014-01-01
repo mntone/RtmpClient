@@ -20,7 +20,7 @@ void NetStreamAudioReceivedEventArgs::SetData( std::vector<uint8> data, const si
 
 Windows::Media::Core::MediaStreamSample^ NetStreamAudioReceivedEventArgs::CreateSample()
 {
-	const auto& sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( Data_, Timestamp_ );
+	const auto sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( Data_, Timestamp_ );
 	sample->KeyFrame = true;
-	return std::move( sample );
+	return sample;
 }

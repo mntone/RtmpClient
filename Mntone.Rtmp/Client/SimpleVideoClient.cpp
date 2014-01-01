@@ -2,14 +2,16 @@
 #include "SimpleVideoClient.h"
 
 using namespace Windows::Media::Core;
-using namespace Windows::Media::MediaProperties;
 using namespace Mntone::Rtmp;
 using namespace Mntone::Rtmp::Client;
+namespace WMM = Windows::Media::MediaProperties;
 namespace WF = Windows::Foundation;
+namespace WUIC = Windows::UI::Core;
 
 SimpleVideoClient::SimpleVideoClient()
-	: dispatcher_( Windows::UI::Core::CoreWindow::GetForCurrentThread()->Dispatcher )
+	: dispatcher_( WUIC::CoreWindow::GetForCurrentThread()->Dispatcher )
 	, mediaStreamSource_( nullptr )
+	, isEnable_( true )
 { }
 
 SimpleVideoClient::~SimpleVideoClient()
@@ -21,14 +23,14 @@ void SimpleVideoClient::CloseImpl()
 {
 	if( connection_ != nullptr )
 	{
-		delete connection_;
-		connection_ = nullptr;
-
 		if( stream_ != nullptr )
 		{
 			delete stream_;
 			stream_ = nullptr;
 		}
+
+		delete connection_;
+		connection_ = nullptr;
 
 		Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
 	}
@@ -61,7 +63,7 @@ void SimpleVideoClient::Connect( RtmpUri^ uri )
 void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args )
 {
 	auto nsc = args->NetStatusCode;
-	if( nsc == NetStatusCodeType::NetConnection_Connect_Success )
+	if( nsc == NetStatusCodeType::NetConnectionConnectSuccess )
 	{
 		stream_ = ref new NetStream();
 		stream_->Attached += ref new WF::TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
@@ -72,20 +74,33 @@ void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, 
 		stream_->VideoReceived += ref new WF::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>( this, &SimpleVideoClient::OnVideoReceived );
 		stream_->AttachAsync( connection_ );
 	}
-	else if( ( nsc & NetStatusCodeType::Level2Mask ) == NetStatusCodeType::NetConnection_Connect )
+	else if( ( nsc & NetStatusCodeType::Level2Mask ) == NetStatusCodeType::NetConnectionConnect )
 		CloseImpl();
 }
 
 void SimpleVideoClient::OnAttached( NetStream^ sender, NetStreamAttachedEventArgs^ args )
 {
-	stream_->Play( connection_->Uri->Instance );
+	stream_->PlayAsync( connection_->Uri->Instance );
 }
 
 void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args )
 {
-	const auto& nsc = args->NetStatusCode;
-	if( nsc == NetStatusCodeType::NetStream_Play_Start )
+	const auto nsc = args->NetStatusCode;
+	if( nsc == NetStatusCodeType::NetStreamPlayStop )
 	{
+		{
+			std::unique_lock<std::mutex> lock_audio( audioMutex_, std::defer_lock );
+			std::unique_lock<std::mutex> lock_video( videoMutex_, std::defer_lock );
+			std::lock( lock_audio, lock_video );
+			isEnable_ = false;
+			audioConditionVariable_.notify_all();
+			videoConditionVariable_.notify_all();
+		}
+
+		dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [=]
+		{
+			Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
+		} ) );
 	}
 }
 
@@ -94,13 +109,13 @@ void SimpleVideoClient::OnAudioStarted( NetStream^ sender, NetStreamAudioStarted
 	using namespace Windows::UI::Core;
 	dispatcher_->RunAsync( CoreDispatcherPriority::Normal, ref new DispatchedHandler( [=]
 	{
-		const auto& info = args->Info;
+		const auto info = args->Info;
 
-		AudioEncodingProperties^ prop;
+		WMM::AudioEncodingProperties^ prop;
 		if( info->Format == AudioFormat::Mp3 )
-			prop = AudioEncodingProperties::CreateMp3( info->SampleRate, info->ChannelCount, info->Bitrate );
+			prop = WMM::AudioEncodingProperties::CreateMp3( info->SampleRate, info->ChannelCount, info->Bitrate );
 		else if( info->Format == AudioFormat::Aac )
-			prop = AudioEncodingProperties::CreateAac( info->SampleRate, info->ChannelCount, info->Bitrate );
+			prop = WMM::AudioEncodingProperties::CreateAac( info->SampleRate, info->ChannelCount, info->Bitrate );
 		else
 			return;
 
@@ -129,12 +144,11 @@ void SimpleVideoClient::OnVideoStarted( NetStream^ sender, NetStreamVideoStarted
 	if( args->Info->Format != VideoFormat::Avc )
 		return;
 
-	using namespace Windows::UI::Core;
-	dispatcher_->RunAsync( CoreDispatcherPriority::Normal, ref new DispatchedHandler( [=]
+	dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [=]
 	{
-		auto prop = VideoEncodingProperties::CreateH264();
-		prop->ProfileId = H264ProfileIds::High;
-		auto des = ref new VideoStreamDescriptor( prop );
+		auto prop = WMM::VideoEncodingProperties::CreateH264();
+		prop->ProfileId = WMM::H264ProfileIds::High;
+		const auto des = ref new VideoStreamDescriptor( prop );
 
 		if( mediaStreamSource_ != nullptr )
 		{
@@ -153,7 +167,7 @@ void SimpleVideoClient::OnVideoReceived( NetStream^ sender, NetStreamVideoReceiv
 	videoConditionVariable_.notify_one();
 }
 
-void SimpleVideoClient::OnStarting( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceStartingEventArgs^ args )
+void SimpleVideoClient::OnStarting( MediaStreamSource^ sender, MediaStreamSourceStartingEventArgs^ args )
 {
 	auto request = args->Request;
 	WF::TimeSpan ts;
@@ -161,18 +175,23 @@ void SimpleVideoClient::OnStarting( Windows::Media::Core::MediaStreamSource^ sen
 	request->SetActualStartPosition( ts );
 }
 
-void SimpleVideoClient::OnSampleRequested( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceSampleRequestedEventArgs^ args )
+void SimpleVideoClient::OnSampleRequested( MediaStreamSource^ sender, MediaStreamSourceSampleRequestedEventArgs^ args )
 {
-	const auto& request = args->Request;
+	const auto request = args->Request;
 	auto deferral = request->GetDeferral();
 
-	if( request->StreamDescriptor->GetType()->FullName == Windows::Media::Core::AudioStreamDescriptor::typeid->FullName )
+	if( request->StreamDescriptor->GetType()->FullName == AudioStreamDescriptor::typeid->FullName )
 	{
 		NetStreamAudioReceivedEventArgs^ data;
 		{
 			std::unique_lock<std::mutex> lock( audioMutex_ );
-			while( audioBuffer_.empty() )
-				audioConditionVariable_.wait( lock );
+			audioConditionVariable_.wait( lock, [&] { return !isEnable_ || !audioBuffer_.empty(); } );
+			if( !isEnable_ )
+			{
+				deferral->Complete();
+				return;
+			}
+
 			data = audioBuffer_.front();
 			audioBuffer_.pop();
 		}
@@ -183,8 +202,13 @@ void SimpleVideoClient::OnSampleRequested( Windows::Media::Core::MediaStreamSour
 		NetStreamVideoReceivedEventArgs^ data;
 		{
 			std::unique_lock<std::mutex> lock( videoMutex_ );
-			while( videoBuffer_.empty() )
-				videoConditionVariable_.wait( lock );
+			videoConditionVariable_.wait( lock, [&] { return !isEnable_ || !videoBuffer_.empty(); } );
+			if( !isEnable_ )
+			{
+				deferral->Complete();
+				return;
+			}
+
 			data = videoBuffer_.front();
 			videoBuffer_.pop();
 		}

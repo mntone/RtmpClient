@@ -1,7 +1,4 @@
 #pragma once
-#include <queue>
-#include <mutex>
-#include <condition_variable>
 #include "NetConnection.h"
 #include "NetStream.h"
 #include "SimpleVideoClientStartedEventArgs.h"
@@ -43,11 +40,12 @@ namespace Mntone { namespace Rtmp { namespace Client {
 
 	public:
 		event Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>^ Started;
-		event Windows::Foundation::TypedEventHandler<SimpleVideoClient^, SimpleVideoClientStoppedEventArgs^>^ Stopped;
+		event Windows::Foundation::EventHandler<SimpleVideoClientStoppedEventArgs^>^ Stopped;
 
 	private:
 		Windows::UI::Core::CoreDispatcher^ dispatcher_;
 
+		bool isEnable_;
 		NetConnection^ connection_;
 		NetStream^ stream_;
 		Windows::Media::Core::MediaStreamSource^ mediaStreamSource_;

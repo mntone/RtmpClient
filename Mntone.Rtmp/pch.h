@@ -10,6 +10,9 @@
 #include <string>
 #include <unordered_map>
 #include <limits>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
 
 // Windows Headers:
 #define WIN32_LEAN_AND_MEAN

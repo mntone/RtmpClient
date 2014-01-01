@@ -18,17 +18,31 @@ void MainPage::OnPageUnloaded( Platform::Object^ sender, WUIX::RoutedEventArgs^ 
 
 void MainPage::OnButtonClicked( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
 {
+	if( client_ != nullptr )
+		delete client_;
+
 	auto uri = Uri->Text;
 
 	client_ = ref new SimpleVideoClient();
 	client_->Started += ref new Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>( this, &MainPage::OnStarted );
+	client_->Stopped += ref new Windows::Foundation::EventHandler<SimpleVideoClientStoppedEventArgs^>( this, &MainPage::OnStopped );
 	client_->Connect( ref new Windows::Foundation::Uri( uri ) );
 }
 
 void MainPage::OnStarted( Platform::Object^ sender, SimpleVideoClientStartedEventArgs^ args )
 {
 	mediaElement->SetMediaStreamSource( args->MediaStreamSource );
+	mediaElement->MediaEnded += ref new WUIX::RoutedEventHandler( this, &MainPage::OnMediaEnded );
 	mediaElement->Play();
+}
+
+void MainPage::OnStopped( Platform::Object^ sender, SimpleVideoClientStoppedEventArgs^ args )
+{
+}
+
+void MainPage::OnMediaEnded( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
+{
+	foregroundElement->Visibility = WUIX::Visibility::Visible;
 }
 
 // // for backgrounding test

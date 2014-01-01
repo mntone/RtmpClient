@@ -1,11 +1,13 @@
 #pragma once
-#include "Command/IRtmpCommand.h"
+#include "Command/NetConnectionConnectCommand.h"
+#include "Command/NetConnectionCallCommand.h"
 #include "limit_type.h"
 #include "rtmp_packet.h"
 #include "RtmpUri.h"
 #include "Connection.h"
 #include "NetStatusUpdatedEventArgs.h"
 #include "NetConnectionClosedEventArgs.h"
+#include "NetConnectionCallbackEventArgs.h"
 #include "UserControlMessageEventType.h"
 
 namespace Mntone { namespace Rtmp {
@@ -27,19 +29,19 @@ namespace Mntone { namespace Rtmp {
 
 		// Connect
 		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri );
-		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri, Command::IRtmpCommand^ connectCommand );
+		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri, Command::NetConnectionConnectCommand^ command );
 		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri );
-		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri, Command::IRtmpCommand^ connectCommand );
+		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri, Command::NetConnectionConnectCommand^ connectCommand );
 
-		// This method is not supported.
-		//void Call();
+		// Call
+		Windows::Foundation::IAsyncAction^ CallAsync( Command::NetConnectionCallCommand^ command );
 
 	internal:
 		// Send
 		Concurrency::task<void> SendActionAsync( uint32 streamId, Mntone::Data::Amf::AmfArray^ amf );
 
 		// Utilites
-		Concurrency::task<void> AttachNetStream( NetStream^ stream );
+		Concurrency::task<void> AttachNetStreamAsync( NetStream^ stream );
 		void UnattachNetStream( NetStream^ stream );
 
 	private:
@@ -52,11 +54,11 @@ namespace Mntone { namespace Rtmp {
 		void OnCommandMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 
 		// Send
-		Concurrency::task<void> SetChunkSizeAsync( uint32 chunkSize );
-		Concurrency::task<void> AbortMessageAsync( uint32 chunkStreamId );
-		Concurrency::task<void> AcknowledgementAsync( uint32 sequenceNumber );
-		Concurrency::task<void> WindowAcknowledgementSizeAsync( uint32 acknowledgementWindowSize );
-		Concurrency::task<void> SetPeerBandWidthAsync( uint32 windowSize, mntone::rtmp::limit_type type );
+		Concurrency::task<void> SetChunkSizeAsync( const uint32 chunkSize );
+		Concurrency::task<void> AbortMessageAsync( const uint32 chunkStreamId );
+		Concurrency::task<void> AcknowledgementAsync( const uint32 sequenceNumber );
+		Concurrency::task<void> WindowAcknowledgementSizeAsync( const uint32 acknowledgementWindowSize );
+		Concurrency::task<void> SetPeerBandWidthAsync( const uint32 windowSize, const mntone::rtmp::limit_type type );
 
 		Concurrency::task<void> SetBufferLengthAsync( const uint32 streamId, const uint32 bufferLength );
 		Concurrency::task<void> PingResponseAsync( const uint32 timestamp );
@@ -72,16 +74,12 @@ namespace Mntone { namespace Rtmp {
 	public:
 		event Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>^ StatusUpdated;
 		event Windows::Foundation::TypedEventHandler<NetConnection^, NetConnectionClosedEventArgs^>^ Closed;
+		event Windows::Foundation::TypedEventHandler<NetConnection^, NetConnectionCallbackEventArgs^>^ Callback;
 
 	public:
 		property RtmpUri^ Uri
 		{
 			RtmpUri^ get() { return Uri_; }
-		}
-		property Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ Client
-		{
-			Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ get() { return Client_; }
-			void set( Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ value ) { Client_ = value; }
 		}
 
 	internal:
@@ -90,8 +88,6 @@ namespace Mntone { namespace Rtmp {
 
 	private:
 		RtmpUri^ Uri_;
-		Command::IRtmpCommand^ connectCommand_;
-		Windows::Foundation::Collections::IMapView<Platform::String^, RtmpDynamicHandler^>^ Client_;
 
 		uint32 latestTransactionId_;
 		std::unordered_map<uint32, NetStream^> netStreamTemporary_;

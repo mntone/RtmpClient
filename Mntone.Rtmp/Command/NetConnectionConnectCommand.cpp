@@ -18,9 +18,10 @@ NetConnectionConnectCommand::NetConnectionConnectCommand( Platform::String^ app 
 Mntone::Data::Amf::AmfArray^ NetConnectionConnectCommand::Commandify()
 {
 	using namespace Mntone::Data::Amf;
-	auto a = ref new AmfArray();
-	a->Append( AmfValue::CreateStringValue( "connect" ) );	// Command name
-	a->Append( AmfValue::CreateNumberValue( 1.0 ) );			// Transaction id: always set to 1.
+
+	auto ary = ref new AmfArray();
+	ary->Append( AmfValue::CreateStringValue( "connect" ) );	// Command name
+	ary->Append( AmfValue::CreateNumberValue( 1.0 ) );			// Transaction id: always set to 1.
 
 	auto obj = ref new AmfObject();
 	obj->Insert( "app", AmfValue::CreateStringValue( App_ ) );
@@ -33,14 +34,11 @@ Mntone::Data::Amf::AmfArray^ NetConnectionConnectCommand::Commandify()
 	obj->Insert( "videoFunction", AmfValue::CreateNumberValue( static_cast<float64>( VideoFunction_ ) ) );
 	obj->Insert( "pageUrl", AmfValue::CreateStringValue( PageUrl_ ) );
 	obj->Insert( "objectEncoding", AmfValue::CreateNumberValue( static_cast<float64>( ObjectEncoding_ ) ) );
-	a->Append( obj );
+	ary->Append( obj );
 
-	if( OptionalUserArguments_ != nullptr )
-		a->Append( OptionalUserArguments_ );
-	else
-		a->Append( ref new AmfValue() );
+	ary->Append( OptionalUserArguments_ != nullptr ? OptionalUserArguments_ : ref new AmfValue() );
 
-	return a;
+	return ary;
 }
 
 Platform::String^ NetConnectionConnectCommand::ToString()

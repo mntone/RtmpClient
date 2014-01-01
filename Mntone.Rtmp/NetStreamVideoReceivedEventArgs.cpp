@@ -25,8 +25,8 @@ void NetStreamVideoReceivedEventArgs::SetData( std::vector<uint8> data, const si
 
 Windows::Media::Core::MediaStreamSample^ NetStreamVideoReceivedEventArgs::CreateSample()
 {
-	const auto& sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( Data_, PresentationTimestamp_ );
+	const auto sample = Windows::Media::Core::MediaStreamSample::CreateFromBuffer( Data_, PresentationTimestamp_ );
 	sample->DecodeTimestamp = DecodeTimestamp_;
 	sample->KeyFrame = IsKeyframe_;
-	return std::move( sample );
+	return sample;
 }

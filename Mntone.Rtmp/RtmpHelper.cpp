@@ -24,19 +24,19 @@ NetStatusCodeType RtmpHelper::ParseNetConnectionConnectCode( const std::wstring 
 
 	const auto lastPhrase = code.substr( 22 /* NetConnection.Connect. */ );
 	if( lastPhrase == L"Success" )
-		nsc = NetStatusCodeType::NetConnection_Connect_Success;
+		nsc = NetStatusCodeType::NetConnectionConnectSuccess;
 	else if( lastPhrase == L"Closed" )
-		nsc = NetStatusCodeType::NetConnection_Connect_Closed;
+		nsc = NetStatusCodeType::NetConnectionConnectClosed;
 	else if( lastPhrase == L"Failed" )
-		nsc = NetStatusCodeType::NetConnection_Connect_Failed;
+		nsc = NetStatusCodeType::NetConnectionConnectFailed;
 	else if( lastPhrase == L"Rejected" )
-		nsc = NetStatusCodeType::NetConnection_Connect_Rejected;
+		nsc = NetStatusCodeType::NetConnectionConnectRejected;
 	else if( lastPhrase == L"InvalidApp" )
-		nsc = NetStatusCodeType::NetConnection_Connect_InvalidApp;
+		nsc = NetStatusCodeType::NetConnectionConnectInvalidApp;
 	else if( lastPhrase == L"AppShutdown" )
-		nsc = NetStatusCodeType::NetConnection_ConnectApp_Shutdown;
+		nsc = NetStatusCodeType::NetConnectionConnectAppShutdown;
 	else
-		nsc = NetStatusCodeType::NetConnection_Connect_Other;
+		nsc = NetStatusCodeType::NetConnectionConnectOther;
 
 	return nsc;
 }
@@ -50,9 +50,9 @@ NetStatusCodeType RtmpHelper::ParseNetStreamCode( const std::wstring code )
 	{
 		const auto secondPhrase = code.substr( 10 );
 		if( secondPhrase == L"Failed" )
-			nsc = NetStatusCodeType::NetStream_Failed;
+			nsc = NetStatusCodeType::NetStreamFailed;
 		else
-			nsc = NetStatusCodeType::NetStream_Other;
+			nsc = NetStatusCodeType::NetStreamOther;
 	}
 	else
 	{
@@ -61,122 +61,122 @@ NetStatusCodeType RtmpHelper::ParseNetStreamCode( const std::wstring code )
 		{
 			const auto lastPhrase = code.substr( 15 /* NetStream.Play. */ );
 			if( lastPhrase == L"Start" )
-				nsc = NetStatusCodeType::NetStream_Play_Start;
+				nsc = NetStatusCodeType::NetStreamPlayStart;
 			else if( lastPhrase == L"Stop" )
-				nsc = NetStatusCodeType::NetStream_Play_Stop;
+				nsc = NetStatusCodeType::NetStreamPlayStop;
 			else if( lastPhrase == L"Reset" )
-				nsc = NetStatusCodeType::NetStream_Play_Reset;
+				nsc = NetStatusCodeType::NetStreamPlayReset;
 			else if( lastPhrase == L"PublishNotify" )
-				nsc = NetStatusCodeType::NetStream_Play_PublishNotify;
+				nsc = NetStatusCodeType::NetStreamPlayPublishNotify;
 			else if( lastPhrase == L"UnpublishNotify" )
-				nsc = NetStatusCodeType::NetStream_Play_UnpublishNotify;
+				nsc = NetStatusCodeType::NetStreamPlayUnpublishNotify;
 			else if( lastPhrase == L"Transition" )
-				nsc = NetStatusCodeType::NetStream_Play_Transition;
+				nsc = NetStatusCodeType::NetStreamPlayTransition;
 			else if( lastPhrase == L"Switch" )
-				nsc = NetStatusCodeType::NetStream_Play_Switch;
+				nsc = NetStatusCodeType::NetStreamPlaySwitch;
 			else if( lastPhrase == L"Complete" )
-				nsc = NetStatusCodeType::NetStream_Play_Complete;
+				nsc = NetStatusCodeType::NetStreamPlayComplete;
 			else if( lastPhrase == L"TransitionComplete" )
-				nsc = NetStatusCodeType::NetStream_Play_TransitionComplete;
+				nsc = NetStatusCodeType::NetStreamPlayTransitionComplete;
 			else if( lastPhrase == L"InsufficientBw" )
-				nsc = NetStatusCodeType::NetStream_Play_InsufficientBandwidth;
+				nsc = NetStatusCodeType::NetStreamPlayInsufficientBandwidth;
 			else if( lastPhrase == L"Failed" )
-				nsc = NetStatusCodeType::NetStream_Play_Failed;
+				nsc = NetStatusCodeType::NetStreamPlayFailed;
 			else if( lastPhrase == L"StreamNotFound" )
-				nsc = NetStatusCodeType::NetStream_Playstream_NotFound;
+				nsc = NetStatusCodeType::NetStreamPlayStreamNotFound;
 			else if( lastPhrase == L"FileStructureInvalid" )
-				nsc = NetStatusCodeType::NetStream_Play_FileStructureInvalid;
+				nsc = NetStatusCodeType::NetStreamPlayFileStructureInvalid;
 			else if( lastPhrase == L"NoSupportedTrackFound" )
-				nsc = NetStatusCodeType::NetStream_Play_NoSupportedTrackFound;
+				nsc = NetStatusCodeType::NetStreamPlayNoSupportedTrackFound;
 			else
-				nsc = NetStatusCodeType::NetStream_Play_Other;
+				nsc = NetStatusCodeType::NetStreamPlayOther;
 		}
 		else if( secondPhrase == L"Pause" )
 		{
 			const auto lastPhrase = code.substr( 16 /* NetStream.Pause. */ );
 			if( lastPhrase == L"Notify" )
-				nsc = NetStatusCodeType::NetStream_Pause_Notify;
+				nsc = NetStatusCodeType::NetStreamPauseNotify;
 			else
-				nsc = NetStatusCodeType::NetStream_Pause_Other;
+				nsc = NetStatusCodeType::NetStreamPauseOther;
 		}
 		else if( secondPhrase == L"Unpause" )
 		{
 			const auto lastPhrase = code.substr( 18 /* NetStream.Unpause. */ );
 			if( lastPhrase == L"Notify" )
-				nsc = NetStatusCodeType::NetStream_Unpause_Notify;
+				nsc = NetStatusCodeType::NetStreamUnpauseNotify;
 			else
-				nsc = NetStatusCodeType::NetStream_Unpause_Other;
+				nsc = NetStatusCodeType::NetStreamUnpauseOther;
 		}
 		else if( secondPhrase == L"Seek" )
 		{
 			const auto lastPhrase = code.substr( 15 /* NetStream.Seek. */ );
 			if( lastPhrase == L"Notify" )
-				nsc = NetStatusCodeType::NetStream_Seek_Notify;
+				nsc = NetStatusCodeType::NetStreamSeekNotify;
 			else if( lastPhrase == L"Failed" )
-				nsc = NetStatusCodeType::NetStream_Seek_Failed;
+				nsc = NetStatusCodeType::NetStreamSeekFailed;
 			else if( lastPhrase == L"InvalidTime" )
-				nsc = NetStatusCodeType::NetStream_Seek_InvalidTime;
+				nsc = NetStatusCodeType::NetStreamSeekInvalidTime;
 			else
-				nsc = NetStatusCodeType::NetStream_Seek_Other;
+				nsc = NetStatusCodeType::NetStreamSeekOther;
 		}
 		else if( secondPhrase == L"Publish" )
 		{
 			const auto lastPhrase = code.substr( 18 /* NetStream.Publish. */ );
 			if( lastPhrase == L"Start" )
-				nsc = NetStatusCodeType::NetStream_Publish_Start;
+				nsc = NetStatusCodeType::NetStreamPublishStart;
 			else if( lastPhrase == L"Idle" )
-				nsc = NetStatusCodeType::NetStream_Publish_Idle;
+				nsc = NetStatusCodeType::NetStreamPublishIdle;
 			else if( lastPhrase == L"BadName" )
-				nsc = NetStatusCodeType::NetStream_Publish_BadName;
+				nsc = NetStatusCodeType::NetStreamPublishBadName;
 			else
-				nsc = NetStatusCodeType::NetStream_Publish_Other;
+				nsc = NetStatusCodeType::NetStreamPublishOther;
 		}
 		else if( secondPhrase == L"Unpublish" )
 		{
 			const auto lastPhrase = code.substr( 20 /* NetStream.Unpublish. */ );
 			if( lastPhrase == L"Success" )
-				nsc = NetStatusCodeType::NetStream_Unpublish_Success;
+				nsc = NetStatusCodeType::NetStreamUnpublishSuccess;
 			else
-				nsc = NetStatusCodeType::NetStream_Unpublish_Other;
+				nsc = NetStatusCodeType::NetStreamUnpublishOther;
 		}
 		else if( secondPhrase == L"Record" )
 		{
 			const auto lastPhrase = code.substr( 17 /* NetStream.Record. */ );
 			if( lastPhrase == L"Start" )
-				nsc = NetStatusCodeType::NetStream_Record_Start;
+				nsc = NetStatusCodeType::NetStreamRecordStart;
 			else if( lastPhrase == L"Stop" )
-				nsc = NetStatusCodeType::NetStream_Record_Stop;
+				nsc = NetStatusCodeType::NetStreamRecordStop;
 			else if( lastPhrase == L"NoAccess" )
-				nsc = NetStatusCodeType::NetStream_Record_NoAccess;
+				nsc = NetStatusCodeType::NetStreamRecordNoAccess;
 			else if( lastPhrase == L"Failed" )
-				nsc = NetStatusCodeType::NetStream_Record_Failed;
+				nsc = NetStatusCodeType::NetStreamRecordFailed;
 			else if( lastPhrase == L"DiskQuotaExceeded" )
-				nsc = NetStatusCodeType::NetStream_Record_DiskQuotaExceeded;
+				nsc = NetStatusCodeType::NetStreamRecordDiskQuotaExceeded;
 			else
-				nsc = NetStatusCodeType::NetStream_Record_Other;
+				nsc = NetStatusCodeType::NetStreamRecordOther;
 		}
 		else if( secondPhrase == L"Buffer" )
 		{
 			const auto lastPhrase = code.substr( 17 /* NetStream.Buffer. */ );
 			if( lastPhrase == L"Empty" )
-				nsc = NetStatusCodeType::NetStream_Buffer_Empty;
+				nsc = NetStatusCodeType::NetStreamBufferEmpty;
 			else if( lastPhrase == L"Full" )
-				nsc = NetStatusCodeType::NetStream_Buffer_Full;
+				nsc = NetStatusCodeType::NetStreamBufferFull;
 			else if( lastPhrase == L"Flush" )
-				nsc = NetStatusCodeType::NetStream_Buffer_Flush;
+				nsc = NetStatusCodeType::NetStreamBufferFlush;
 			else
-				nsc = NetStatusCodeType::NetStream_Buffer_Other;
+				nsc = NetStatusCodeType::NetStreamBufferOther;
 		}
 		else if( secondPhrase == L"MulticastStream" )
 		{
 			const auto lastPhrase = code.substr( 26 /* NetStream.MulticastStream. */ );
 			if( lastPhrase == L"Reset" )
-				nsc = NetStatusCodeType::NetStream_MulticastStream_Reset;
+				nsc = NetStatusCodeType::NetStreamMulticastStreamReset;
 			else
-				nsc = NetStatusCodeType::NetStream_MulticastStream_Other;
+				nsc = NetStatusCodeType::NetStreamMulticastStreamOther;
 		}
 		else
-			nsc = NetStatusCodeType::NetStream_Other;
+			nsc = NetStatusCodeType::NetStreamOther;
 	}
 
 	return nsc;
