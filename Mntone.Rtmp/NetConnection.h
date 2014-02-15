@@ -12,9 +12,6 @@
 
 namespace Mntone { namespace Rtmp {
 
-	[Windows::Foundation::Metadata::WebHostHidden]
-	public delegate void RtmpDynamicHandler( Mntone::Data::Amf::AmfArray^ data );
-
 	ref class NetStream;
 
 	[Windows::Foundation::Metadata::DualApiPartition( version = NTDDI_WIN8 )]

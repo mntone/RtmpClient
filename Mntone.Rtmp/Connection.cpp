@@ -10,9 +10,21 @@ Connection::Connection()
 
 Connection::~Connection()
 {
-	delete dataReader_;
-	delete dataWriter_;
-	delete streamSocket_;
+	if( dataReader_ != nullptr )
+	{
+		delete dataReader_;
+		dataReader_ = nullptr;
+	}
+	if( dataWriter_ != nullptr )
+	{
+		delete dataWriter_;
+		dataWriter_ = nullptr;
+	}
+	if( streamSocket_ != nullptr )
+	{
+		delete streamSocket_;
+		streamSocket_ = nullptr;
+	}
 }
 
 task<void> Connection::ConnectAsync( Platform::String^ host, Platform::String^ port )

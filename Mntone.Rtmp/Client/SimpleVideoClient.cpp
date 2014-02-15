@@ -40,9 +40,9 @@ void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
 {
 	mediaStreamSource_ = ref new MediaStreamSource( descriptor );
 
-	WF::TimeSpan d;
-	d.Duration = std::numeric_limits<uint64>::max();
-	mediaStreamSource_->Duration = d;
+	WF::TimeSpan duration;
+	duration.Duration = std::numeric_limits<uint64>::max();
+	mediaStreamSource_->Duration = duration;
 
 	mediaStreamSource_->Starting += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
 	mediaStreamSource_->SampleRequested += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
@@ -97,10 +97,7 @@ void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetS
 			videoConditionVariable_.notify_all();
 		}
 
-		dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [=]
-		{
-			Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
-		} ) );
+		Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
 	}
 }
 

@@ -68,6 +68,9 @@ namespace Mntone { namespace Rtmp {
 
 		// for Avc
 		uint8 lengthSizeMinusOne_;
+
+		// for AAC
+		uint32 samplingRate_;
 	};
 
 } }

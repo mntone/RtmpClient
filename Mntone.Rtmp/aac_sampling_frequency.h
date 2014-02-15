@@ -16,6 +16,7 @@ namespace mntone { namespace rtmp {
 		asf_12000 = 9,
 		asf_11025 = 10,
 		asf_8000 = 11,
+		asf_7350 = 12,
 	};
 
 } }

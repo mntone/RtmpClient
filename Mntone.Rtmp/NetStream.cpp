@@ -19,6 +19,7 @@ NetStream::NetStream()
 	, videoInfoEnabled_( false )
 	, videoInfo_( ref new VideoInfo() )
 	, lengthSizeMinusOne_( 0 )
+	, samplingRate_( 0 )
 { }
 
 NetStream::~NetStream()
@@ -184,7 +185,7 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 		{
 			const auto& adts = *reinterpret_cast<adts_header*>( data.data() );
 			audioInfo_->Format = AudioFormat::Aac;
-			audioInfo_->SampleRate = adts.sampling_frequency_as_uint();
+			audioInfo_->SampleRate = samplingRate_ != 0 ? samplingRate_ : adts.sampling_frequency();
 			audioInfo_->ChannelCount = adts.channel_configuration();
 			audioInfo_->BitsPerSample = si.size == sound_size::ss_16bit ? 16 : 8;
 			AudioStarted( this, ref new NetStreamAudioStartedEventArgs( audioInfo_ ) );
@@ -347,17 +348,23 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 void NetStream::OnDataMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
 	const auto& amf = RtmpHelper::ParseAmf( std::move( data ) );
+	const auto& name = amf->GetStringAt( 0 );
+	if( name != "onMetaData" )
+		return;
+
+	const auto& object = amf->GetObjectAt( 1 );
+	if( object->HasKey( "audiosamplerate" ) )
+		samplingRate_ = static_cast<uint32>( object->GetNamedNumber( "audiosamplerate" ) );
 }
 
 void NetStream::OnCommandMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
 {
 	const auto& amf = RtmpHelper::ParseAmf( std::move( data ) );
 	const auto& name = amf->GetStringAt( 0 );
-	const auto& information = amf->GetObjectAt( 3 );
-
 	if( name != "onStatus" )
 		return;
 
+	const auto& information = amf->GetObjectAt( 3 );
 	const auto& code = information->GetNamedString( "code" );
 	const auto& nsc = RtmpHelper::ParseNetStreamCode( code->Data() );
 	StatusUpdated( this, ref new NetStatusUpdatedEventArgs( nsc ) );

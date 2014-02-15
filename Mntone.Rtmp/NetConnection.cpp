@@ -304,19 +304,19 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, vector<u
 	{
 	case UserControlMessageEventType::StreamBegin:
 		{
-			uint32 streamId;
-			utility::convert_big_endian( &data[2], 4, &streamId );
-			if( streamId == 0 )
+			uint32 stream_id;
+			utility::convert_big_endian( &data[2], 4, &stream_id );
+			if( stream_id == 0 )
 				SetBufferLengthAsync( 0, DEFAULT_BUFFER_MILLSECONDS );
 			break;
 		}
 
 	case UserControlMessageEventType::StreamEof:
 		{
-			uint32 streamId;
-			utility::convert_big_endian( &data[2], 4, &streamId );
-			auto itr = bindingNetStream_.lower_bound( streamId );
-			if( itr != bindingNetStream_.cend() && itr->first == streamId )
+			uint32 stream_id;
+			utility::convert_big_endian( &data[2], 4, &stream_id );
+			auto itr = bindingNetStream_.lower_bound( stream_id );
+			if( itr != bindingNetStream_.cend() && itr->first == stream_id )
 			{
 				itr->second->UnattachedImpl();
 				bindingNetStream_.erase( itr );
@@ -327,8 +327,8 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, vector<u
 	case UserControlMessageEventType::StreamDry:
 	case UserControlMessageEventType::StreamIsRecorded:
 		{
-			//uint32 streamId;
-			//utility::convert_big_endian( &data[2], 4, &streamId );
+			//uint32 stream_id;
+			//utility::convert_big_endian( &data[2], 4, &stream_id );
 			break;
 		}
 
