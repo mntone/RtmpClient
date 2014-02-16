@@ -12,6 +12,8 @@
 
 namespace Mntone { namespace Rtmp {
 
+	delegate void HandshakeCallbackHandler();
+
 	ref class NetStream;
 
 	[Windows::Foundation::Metadata::DualApiPartition( version = NTDDI_WIN8 )]
@@ -22,7 +24,6 @@ namespace Mntone { namespace Rtmp {
 	{
 	public:
 		NetConnection();
-		virtual ~NetConnection();
 
 		// Connect
 		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri );
@@ -42,9 +43,21 @@ namespace Mntone { namespace Rtmp {
 		void UnattachNetStream( NetStream^ stream );
 
 	private:
+		// Close
+		void CloseImpl();
+
+		// Handshake
+		void Handshake( HandshakeCallbackHandler^ callbackFunction );
+
 		// Receive
+		void OnReadOperationChanged( Connection^ sender, Windows::Foundation::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^ operation );
 		void Receive();
-		void ReceiveImpl();
+		void ReceiveContinueImpl( Windows::Foundation::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^ operation );
+		void ReceiveHeader1Impl( const std::vector<uint8> result );
+		void ReceiveHeader2Impl( const uint8 format_type, const uint16 chunk_stream_id );
+		void ReceiveBodyImpl( const std::shared_ptr<mntone::rtmp::rtmp_packet> packet );
+		void ReceiveCallbackImpl( const std::shared_ptr<mntone::rtmp::rtmp_packet> packet, const std::vector<uint8> result );
+
 		void OnMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 		void OnNetworkMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 		void OnUserControlMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
@@ -65,7 +78,6 @@ namespace Mntone { namespace Rtmp {
 		Concurrency::task<void> SendActionAsync( Mntone::Data::Amf::AmfArray^ amf );
 
 		Concurrency::task<void> SendAsync( mntone::rtmp::rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero = false );
-		void SendImpl( mntone::rtmp::rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero = false );
 		std::vector<uint8> CreateHeader( mntone::rtmp::rtmp_packet packet, bool isFormatTypeZero );
 
 	public:
@@ -79,16 +91,14 @@ namespace Mntone { namespace Rtmp {
 			RtmpUri^ get() { return Uri_; }
 		}
 
-	internal:
-		int64 startTime_;
-		Connection^ connection_;
-
 	private:
+		int64 startTime_;
 		RtmpUri^ Uri_;
+		Connection^ connection_;
+		Windows::Foundation::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^ receiveOperation_;
 
 		uint32 latestTransactionId_;
 		std::unordered_map<uint32, NetStream^> netStreamTemporary_;
-
 		std::unordered_map<uint32, NetStream^> bindingNetStream_;
 
 		std::vector<uint8> rxHeaderBuffer_;

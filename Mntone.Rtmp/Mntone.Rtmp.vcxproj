@@ -126,7 +126,6 @@
     <ClInclude Include="Command\SupportVideoFunctionType.h" />
     <ClInclude Include="Command\SupportVideoType.h" />
     <ClInclude Include="Connection.h" />
-    <ClInclude Include="handshake.h" />
     <ClInclude Include="limit_type.h" />
     <ClInclude Include="NetConnection.h" />
     <ClInclude Include="Command\NetConnectionCommandType.h" />
@@ -165,7 +164,7 @@
     <ClCompile Include="NetStatusUpdatedEventArgs.cpp" />
     <ClCompile Include="Command\RawRtmpCommand.cpp" />
     <ClCompile Include="Connection.cpp" />
-    <ClCompile Include="handshake.cpp" />
+    <ClCompile Include="Handshake.cpp" />
     <ClCompile Include="NetConnection.cpp" />
     <ClCompile Include="NetConnectionClosedEventArgs.cpp" />
     <ClCompile Include="NetStream.cpp" />

@@ -19,7 +19,6 @@ namespace Mntone { namespace Rtmp {
 	{
 	public:
 		NetStream();
-		virtual ~NetStream();
 
 		Windows::Foundation::IAsyncAction^ AttachAsync( NetConnection^ connection );
 
@@ -28,8 +27,8 @@ namespace Mntone { namespace Rtmp {
 		Windows::Foundation::IAsyncAction^ PlayAsync( Platform::String^ streamName, float64 start, float64 duration );
 		Windows::Foundation::IAsyncAction^ PlayAsync( Platform::String^ streamName, float64 start, float64 duration, int16 reset );
 
-		Windows::Foundation::IAsyncAction^  PauseAsync( float64 position );
-		Windows::Foundation::IAsyncAction^  ResumeAsync( float64 position );
+		Windows::Foundation::IAsyncAction^ PauseAsync( float64 position );
+		Windows::Foundation::IAsyncAction^ ResumeAsync( float64 position );
 		Windows::Foundation::IAsyncAction^ SeekAsync( float64 offset );
 
 	internal:

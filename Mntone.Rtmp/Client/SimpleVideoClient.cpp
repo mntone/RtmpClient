@@ -14,26 +14,9 @@ SimpleVideoClient::SimpleVideoClient()
 	, isEnable_( true )
 { }
 
-SimpleVideoClient::~SimpleVideoClient()
-{
-	CloseImpl();
-}
-
 void SimpleVideoClient::CloseImpl()
 {
-	if( connection_ != nullptr )
-	{
-		if( stream_ != nullptr )
-		{
-			delete stream_;
-			stream_ = nullptr;
-		}
-
-		delete connection_;
-		connection_ = nullptr;
-
-		Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
-	}
+	Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
 }
 
 void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
@@ -48,16 +31,16 @@ void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
 	mediaStreamSource_->SampleRequested += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
 }
 
-void SimpleVideoClient::Connect( WF::Uri^ uri )
+WF::IAsyncAction^ SimpleVideoClient::ConnectAsync( WF::Uri^ uri )
 {
-	Connect( ref new RtmpUri( uri ) );
+	return ConnectAsync( ref new RtmpUri( uri ) );
 }
 
-void SimpleVideoClient::Connect( RtmpUri^ uri )
+WF::IAsyncAction^ SimpleVideoClient::ConnectAsync( RtmpUri^ uri )
 {
 	connection_ = ref new NetConnection();
 	connection_->StatusUpdated += ref new WF::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
-	connection_->ConnectAsync( uri );
+	return connection_->ConnectAsync( uri );
 }
 
 void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args )
@@ -97,7 +80,7 @@ void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetS
 			videoConditionVariable_.notify_all();
 		}
 
-		Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
+		CloseImpl();
 	}
 }
 

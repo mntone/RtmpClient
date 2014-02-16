@@ -12,21 +12,27 @@ MainPage::MainPage()
 
 void MainPage::OnPageUnloaded( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
 {
-	if( client_ != nullptr )
-		delete client_;
+	CloseClient();
 }
 
 void MainPage::OnButtonClicked( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
 {
-	if( client_ != nullptr )
-		delete client_;
+	CloseClient();
 
 	auto uri = Uri->Text;
 
 	client_ = ref new SimpleVideoClient();
 	client_->Started += ref new Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>( this, &MainPage::OnStarted );
 	client_->Stopped += ref new Windows::Foundation::EventHandler<SimpleVideoClientStoppedEventArgs^>( this, &MainPage::OnStopped );
-	client_->Connect( ref new Windows::Foundation::Uri( uri ) );
+	client_->ConnectAsync( ref new Windows::Foundation::Uri( uri ) );
+
+	auto smtc = Windows::Media::SystemMediaTransportControls::GetForCurrentView();
+	smtc->ButtonPressed += ref new Windows::Foundation::TypedEventHandler<Windows::Media::SystemMediaTransportControls^, Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs^>( this, &MainPage::OnMediaButtonPressed );
+	smtc->IsEnabled = true;
+	smtc->IsPlayEnabled = true;
+	smtc->IsPauseEnabled = true;
+	smtc->IsStopEnabled = true;
+	smtc->PlaybackStatus = Windows::Media::MediaPlaybackStatus::Playing;
 }
 
 void MainPage::OnStarted( Platform::Object^ sender, SimpleVideoClientStartedEventArgs^ args )
@@ -43,23 +49,29 @@ void MainPage::OnStopped( Platform::Object^ sender, SimpleVideoClientStoppedEven
 void MainPage::OnMediaEnded( Platform::Object^ sender, WUIX::RoutedEventArgs^ e )
 {
 	foregroundElement->Visibility = WUIX::Visibility::Visible;
+	CloseClient();
 }
 
-// // for backgrounding test
-//void MainPage::OnButtonPressed( Windows::Media::SystemMediaTransportControls^ sender, Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs^ e )
-//{
-//	if( e->Button == Windows::Media::SystemMediaTransportControlsButton::Pause || e->Button == Windows::Media::SystemMediaTransportControlsButton::Stop )
-//		Dispatcher->RunAsync( Windows::UI::Core::CoreDispatcherPriority::Low, ref new Windows::UI::Core::DispatchedHandler( [] { } ) );
-//}
-//
-//	Dispatcher->RunAsync( Windows::UI::Core::CoreDispatcherPriority::High, ref new Windows::UI::Core::DispatchedHandler( [this]()
-//	{
-//
-//		auto smtc = Windows::Media::SystemMediaTransportControls::GetForCurrentView();
-//		smtc->ButtonPressed += ref new Windows::Foundation::TypedEventHandler<Windows::Media::SystemMediaTransportControls^, Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs^>( this, &MainPage::OnButtonPressed );
-//		smtc->IsEnabled = true;
-//		smtc->IsPlayEnabled = true;
-//		smtc->IsStopEnabled = true;
-//		smtc->PlaybackStatus = Windows::Media::MediaPlaybackStatus::Playing;
-//
-//	} ) );
+void MainPage::OnMediaButtonPressed( Windows::Media::SystemMediaTransportControls^ sender, Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs^ e )
+{
+	if( e->Button == Windows::Media::SystemMediaTransportControlsButton::Pause
+		|| e->Button == Windows::Media::SystemMediaTransportControlsButton::Stop )
+	{
+		Dispatcher->RunAsync( Windows::UI::Core::CoreDispatcherPriority::Low, ref new Windows::UI::Core::DispatchedHandler( [this]
+		{
+			mediaElement->Source = nullptr;
+
+			auto smtc = Windows::Media::SystemMediaTransportControls::GetForCurrentView();
+			smtc->PlaybackStatus = Windows::Media::MediaPlaybackStatus::Closed;
+		} ) );
+	}
+}
+
+void MainPage::CloseClient()
+{
+	if( client_ != nullptr )
+	{
+		delete client_;
+		client_ = nullptr;
+	}
+}

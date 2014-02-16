@@ -13,7 +13,7 @@
 		</Grid.RowDefinitions>
 
 		<Grid Grid.Row="1">
-			<MediaElement x:Name="mediaElement" AudioDeviceType="Multimedia" AudioCategory="BackgroundCapableMedia"/>
+			<MediaElement x:Name="mediaElement" AudioDeviceType="Multimedia"/>
 			<Border x:Name="foregroundElement" Background="Black" Opacity=".4" Visibility="Collapsed"/>
 		</Grid>
 		

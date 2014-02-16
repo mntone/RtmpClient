@@ -31,7 +31,6 @@
     <ClCompile Include="Client\SimpleVideoClientStartedEventArgs.cpp">
       <Filter>Client</Filter>
     </ClCompile>
-    <ClCompile Include="Client\SimpleVideoClientStoppedEventArgs.cpp" />
     <ClCompile Include="RtmpHelper.cpp" />
     <ClCompile Include="NetStreamAudioStartedEventArgs.cpp" />
     <ClCompile Include="NetStreamVideoStartedEventArgs.cpp" />
@@ -40,7 +39,10 @@
     <ClCompile Include="Command\NetConnectionCallCommand.cpp">
       <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="handshake.cpp" />
+    <ClCompile Include="Handshake.cpp" />
+    <ClCompile Include="Client\SimpleVideoClientStoppedEventArgs.cpp">
+      <Filter>Client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -93,7 +95,6 @@
     <ClInclude Include="Client\SimpleVideoClientStartedEventArgs.h">
       <Filter>Client</Filter>
     </ClInclude>
-    <ClInclude Include="Client\SimpleVideoClientStoppedEventArgs.h" />
     <ClInclude Include="RtmpHelper.h" />
     <ClInclude Include="AudioInfo.h" />
     <ClInclude Include="AudioFormat.h" />
@@ -114,6 +115,8 @@
     <ClInclude Include="Command\NetConnectionCallCommand.h">
       <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="handshake.h" />
+    <ClInclude Include="Client\SimpleVideoClientStoppedEventArgs.h">
+      <Filter>Client</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -36,7 +36,7 @@ namespace mntone { namespace rtmp {
 		mntone::rtmp::aac_sampling_frequency sampling_frequency_index() const noexcept { return sampling_frequency_index_; }
 		void set_sampling_frequency_index( mntone::rtmp::aac_sampling_frequency value ) noexcept { sampling_frequency_index_ = std::move( value ); }
 
-		uint32 sampling_frequency() const noexcept
+		uint32 sampling_frequency() const
 		{
 			uint32 sampling_frequency;
 			switch( sampling_frequency_index_ )
@@ -58,7 +58,7 @@ namespace mntone { namespace rtmp {
 			}
 			return sampling_frequency;
 		}
-		void set_sampling_frequency( uint32 sampling_frequency ) noexcept
+		void set_sampling_frequency( uint32 sampling_frequency )
 		{
 			switch( sampling_frequency )
 			{

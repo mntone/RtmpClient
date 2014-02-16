@@ -14,10 +14,9 @@ namespace Mntone { namespace Rtmp { namespace Client {
 	{
 	public:
 		SimpleVideoClient();
-		virtual ~SimpleVideoClient();
 
-		void Connect( Windows::Foundation::Uri^ uri );
-		[Windows::Foundation::Metadata::DefaultOverload] void Connect( RtmpUri^ uri );
+		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri );
+		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri );
 
 	private:
 		void CloseImpl();

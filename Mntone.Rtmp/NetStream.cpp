@@ -22,23 +22,6 @@ NetStream::NetStream()
 	, samplingRate_( 0 )
 { }
 
-NetStream::~NetStream()
-{
-	if( parent_ != nullptr )
-	{
-		using namespace Mntone::Data::Amf;
-
-		auto cmd = ref new AmfArray();
-		cmd->Append( AmfValue::CreateStringValue( "closeStream" ) );	// Command name
-		cmd->Append( AmfValue::CreateNumberValue( 0.0 ) );				// Transaction id
-		cmd->Append( ref new AmfValue() );								// Command object: set to null type
-		cmd->Append( AmfValue::CreateNumberValue( streamId_ ) );
-		SendActionAsync( cmd );
-
-		parent_->UnattachNetStream( this );
-	}
-}
-
 WF::IAsyncAction^ NetStream::AttachAsync( NetConnection^ connection )
 {
 	return create_async( [=]
@@ -54,7 +37,20 @@ void NetStream::AttachedImpl()
 
 void NetStream::UnattachedImpl()
 {
-	parent_ = nullptr;
+	if( parent_ != nullptr )
+	{
+		using namespace Mntone::Data::Amf;
+
+		auto cmd = ref new AmfArray();
+		cmd->Append( AmfValue::CreateStringValue( "closeStream" ) );	// Command name
+		cmd->Append( AmfValue::CreateNumberValue( 0.0 ) );				// Transaction id
+		cmd->Append( ref new AmfValue() );								// Command object: set to null type
+		cmd->Append( AmfValue::CreateNumberValue( streamId_ ) );
+		SendActionAsync( cmd );
+
+		parent_->UnattachNetStream( this );
+		parent_ = nullptr;
+	}
 }
 
 WF::IAsyncAction^ NetStream::PlayAsync( Platform::String^ streamName )

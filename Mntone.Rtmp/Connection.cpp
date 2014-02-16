@@ -2,36 +2,18 @@
 #include "Connection.h"
 
 using namespace Concurrency;
+using namespace Windows::Foundation;
+using namespace Windows::Storage::Streams;
 using namespace Mntone::Rtmp;
 
 Connection::Connection()
 	: IsInitialized_( false )
 { }
 
-Connection::~Connection()
-{
-	if( dataReader_ != nullptr )
-	{
-		delete dataReader_;
-		dataReader_ = nullptr;
-	}
-	if( dataWriter_ != nullptr )
-	{
-		delete dataWriter_;
-		dataWriter_ = nullptr;
-	}
-	if( streamSocket_ != nullptr )
-	{
-		delete streamSocket_;
-		streamSocket_ = nullptr;
-	}
-}
-
 task<void> Connection::ConnectAsync( Platform::String^ host, Platform::String^ port )
 {
 	using namespace Windows::Networking;
 	using namespace Windows::Networking::Sockets;
-	using namespace Windows::Storage::Streams;
 
 	streamSocket_ = ref new StreamSocket();
 	auto task = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
@@ -45,49 +27,88 @@ task<void> Connection::ConnectAsync( Platform::String^ host, Platform::String^ p
 	} );
 }
 
-uint32 Connection::TryRead( uint8* const data, const size_t length )
+void Connection::Read( const uint32 length, ConnectionCallbackHandler^ callbackFunction )
 {
-	auto ex = dataReader_->LoadAsync( static_cast<uint32>( length ) );
-	auto actualLength = create_task( ex ).get();
-	if( actualLength != 0 )
-		dataReader_->ReadBytes( Platform::ArrayReference<uint8>( data, actualLength ) );
-	return actualLength;
+	auto buffer = ref new Buffer( length );
+	auto read_operation = streamSocket_->InputStream->ReadAsync( buffer, length, InputStreamOptions::Partial );
+	read_operation->Completed = ref new AsyncOperationWithProgressCompletedHandler<IBuffer^, uint32>(
+	[this, length, callbackFunction]( IAsyncOperationWithProgress<IBuffer^, uint32>^ operation, AsyncStatus status )
+	{
+		if( status == AsyncStatus::Completed )
+		{
+			auto buffer = operation->GetResults();
+			auto reader = DataReader::FromBuffer( buffer );
+			const auto& actual_length = reader->UnconsumedBufferLength;
+			if( actual_length != 0 )
+			{
+				std::vector<uint8> data( actual_length );
+				reader->ReadBytes( Platform::ArrayReference<uint8>( &data[0], actual_length ) );
+				if( length == actual_length )
+				{
+					callbackFunction( std::move( data ) );
+				}
+				else
+				{
+					ContinuousRead( std::move( data ), actual_length, length - actual_length, callbackFunction );
+				}
+			}
+		}
+	} );
+	ReadOperationChanged( this, read_operation );
 }
 
-void Connection::Read( uint8* const data, const size_t length )
+void Connection::ContinuousRead( std::vector<uint8> data, const uint32 offset, const uint32 length, ConnectionCallbackHandler^ callbackFunction )
 {
-	auto ex = dataReader_->LoadAsync( static_cast<uint32>( length ) );
-	auto actualLength = create_task( ex ).get();
-	if( actualLength != 0 )
-		dataReader_->ReadBytes( Platform::ArrayReference<uint8>( data, actualLength ) );
-
-	if( actualLength < length )
-		Read( data + actualLength, length - actualLength );
+	auto buffer = ref new Buffer( length );
+	auto read_operation = streamSocket_->InputStream->ReadAsync( buffer, length, InputStreamOptions::Partial );
+	read_operation->Completed = ref new AsyncOperationWithProgressCompletedHandler<IBuffer^, uint32>(
+	[=]( IAsyncOperationWithProgress<IBuffer^, uint32>^ operation, AsyncStatus status )
+	{
+		if( status == AsyncStatus::Completed )
+		{
+			auto buffer = operation->GetResults();
+			auto reader = DataReader::FromBuffer( buffer );
+			const auto& actual_length = reader->UnconsumedBufferLength;
+			if( actual_length != 0 )
+			{
+				std::vector<uint8> new_data( offset + length );
+				std::copy_n( data.cbegin(), offset, new_data.begin() );
+				reader->ReadBytes( Platform::ArrayReference<uint8>( &new_data[offset], actual_length ) );
+				if( length == actual_length )
+				{
+					callbackFunction( std::move( new_data ) );
+				}
+				else
+				{
+					ContinuousRead( std::move( new_data ), offset + actual_length, length - actual_length, callbackFunction );
+				}
+			}
+		}
+	} );
+	ReadOperationChanged( this, read_operation );
 }
 
-void Connection::Read( std::vector<uint8>& data )
-{
-	Read( data.data(), data.size() );
-}
-
-void Connection::Read( std::vector<uint8>& data, const size_t length )
-{
-	Read( data.data(), length );
-}
-
-void Connection::Write( const uint8* const data, const size_t length )
+Concurrency::task<void> Connection::Write( const uint8* const data, const size_t length )
 {
 	dataWriter_->WriteBytes( Platform::ArrayReference<uint8>( const_cast<uint8_t*>( data ), static_cast<uint32>( length ) ) );
-	auto ex = dataWriter_->StoreAsync();
-	create_task( ex ).get();
+	return Concurrency::create_task( dataWriter_->StoreAsync() ).then( [] ( const uint32 ) { } );
 }
 
-void Connection::Write( const std::vector<uint8>& data )
+Concurrency::task<void> Connection::Write( const std::vector<uint8>& data )
 {
-	Write( data.data(), data.size() );
+	return Write( data.data(), data.size() );
 }
 
-void Connection::Write( const std::vector<uint8>& data, const size_t length )
+void Connection::CloseImpl()
 {
-	Write( data.data(), length );
+	if( dataWriter_ != nullptr )
+	{
+		delete dataWriter_;
+		dataWriter_ = nullptr;
+	}
+	if( streamSocket_ != nullptr )
+	{
+		delete streamSocket_;
+		streamSocket_ = nullptr;
+	}
 }

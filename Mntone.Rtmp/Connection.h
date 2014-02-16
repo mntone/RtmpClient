@@ -2,26 +2,26 @@
 
 namespace Mntone { namespace Rtmp {
 
+	delegate void ConnectionCallbackHandler( std::vector<uint8> result );
+
 	ref class Connection sealed
 	{
 	internal:
 		Connection();
 
-	public:
-		virtual ~Connection();
-
-	internal:
 		Concurrency::task<void> ConnectAsync( Platform::String^ host, Platform::String^ port );
 
-		uint32 TryRead( uint8* const data, const size_t length );
+		void Read( const uint32 length, ConnectionCallbackHandler^ callbackFunction );
 
-		void Read( uint8* const data, const size_t length );
-		void Read( std::vector<uint8>& data );
-		void Read( std::vector<uint8>& data, const size_t length );
+		Concurrency::task<void> Write( const uint8* const data, const size_t length );
+		Concurrency::task<void> Write( const std::vector<uint8>& data );
 
-		void Write( const uint8* const data, const size_t length );
-		void Write( const std::vector<uint8>& data );
-		void Write( const std::vector<uint8>& data, const size_t length );
+	private:
+		void CloseImpl();
+		void ContinuousRead( std::vector<uint8> data, const uint32 offset, const uint32 length, ConnectionCallbackHandler^ callbackFunction );
+
+	internal:
+		event Windows::Foundation::TypedEventHandler<Connection^, Windows::Foundation::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^>^ ReadOperationChanged;
 
 	internal:
 		property bool IsInitialized
@@ -34,6 +34,7 @@ namespace Mntone { namespace Rtmp {
 		Windows::Networking::Sockets::StreamSocket^ streamSocket_;
 		Windows::Storage::Streams::DataReader^ dataReader_;
 		Windows::Storage::Streams::DataWriter^ dataWriter_;
+		Windows::Networking::Sockets::ControlChannelTrigger^ _controllChannelTrigger_;
 	};
 
 } }
