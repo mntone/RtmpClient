@@ -32,11 +32,7 @@ void NetConnection::CloseImpl()
 		receiveOperation_->Cancel();
 		receiveOperation_ = nullptr;
 	}
-	if( connection_ != nullptr )
-	{
-		delete connection_;
-		connection_ = nullptr;
-	}
+	connection_ = nullptr;
 	Closed( this, ref new NetConnectionClosedEventArgs() );
 }
 	

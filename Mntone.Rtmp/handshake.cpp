@@ -33,7 +33,7 @@ void NetConnection::Handshake( HandshakeCallbackHandler^ callbackFunction )
 	std::mt19937 engine;
 	std::uniform_int_distribution<uint64_t> distribution( 0x0000000000000000, 0xffffffffffffffff );
 	auto sptr = reinterpret_cast<uint64_t*>( &send_data[9] );
-	const auto eptr = sptr + hsrSize / 8u;
+	const auto eptr = sptr + hsr_size / 8u;
 	for( auto ptr = sptr; ptr != eptr; ++ptr )
 		*ptr = distribution( engine );
 #endif

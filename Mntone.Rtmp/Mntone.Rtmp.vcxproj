@@ -90,11 +90,6 @@
       <PreprocessorDefinitions>ARM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
-    <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
       <Optimization>Full</Optimization>
@@ -183,12 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Mntone.Data.Amf">
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\Mntone.Data.Amf\bin\Win32-Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\Mntone.Data.Amf\bin\Win32-Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\Mntone.Data.Amf\bin\x64-Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\Mntone.Data.Amf\bin\x64-Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">..\..\Mntone.Data.Amf\bin\ARM-Debug\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
-      <HintPath Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">..\..\Mntone.Data.Amf\bin\ARM-Release\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
+      <HintPath>..\..\Mntone.Data.Amf\bin\$(Platform)-$(Configuration)\Mntone.Data.Amf\Mntone.Data.Amf.winmd</HintPath>
       <IsWinMDFile>true</IsWinMDFile>
     </Reference>
   </ItemGroup>
