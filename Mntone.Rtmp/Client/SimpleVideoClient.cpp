@@ -1,17 +1,18 @@
 #include "pch.h"
 #include "SimpleVideoClient.h"
 
+using namespace Concurrency;
+using namespace Windows::Foundation;
 using namespace Windows::Media::Core;
 using namespace Mntone::Rtmp;
 using namespace Mntone::Rtmp::Client;
 namespace WMM = Windows::Media::MediaProperties;
-namespace WF = Windows::Foundation;
 namespace WUIC = Windows::UI::Core;
 
 SimpleVideoClient::SimpleVideoClient()
 	: dispatcher_( WUIC::CoreWindow::GetForCurrentThread()->Dispatcher )
 	, mediaStreamSource_( nullptr )
-	, isEnable_( true )
+	, bufferingHelper_( nullptr )
 { }
 
 void SimpleVideoClient::CloseImpl()
@@ -23,23 +24,23 @@ void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
 {
 	mediaStreamSource_ = ref new MediaStreamSource( descriptor );
 
-	WF::TimeSpan duration;
+	TimeSpan duration;
 	duration.Duration = std::numeric_limits<uint64>::max();
 	mediaStreamSource_->Duration = duration;
 
-	mediaStreamSource_->Starting += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
-	mediaStreamSource_->SampleRequested += ref new WF::TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
+	mediaStreamSource_->Starting += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
+	mediaStreamSource_->SampleRequested += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
 }
 
-WF::IAsyncAction^ SimpleVideoClient::ConnectAsync( WF::Uri^ uri )
+IAsyncAction^ SimpleVideoClient::ConnectAsync( Uri^ uri )
 {
 	return ConnectAsync( ref new RtmpUri( uri ) );
 }
 
-WF::IAsyncAction^ SimpleVideoClient::ConnectAsync( RtmpUri^ uri )
+IAsyncAction^ SimpleVideoClient::ConnectAsync( RtmpUri^ uri )
 {
 	connection_ = ref new NetConnection();
-	connection_->StatusUpdated += ref new WF::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
+	connection_->StatusUpdated += ref new EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
 	return connection_->ConnectAsync( uri );
 }
 
@@ -49,16 +50,17 @@ void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, 
 	if( nsc == NetStatusCodeType::NetConnectionConnectSuccess )
 	{
 		stream_ = ref new NetStream();
-		stream_->Attached += ref new WF::TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
-		stream_->StatusUpdated += ref new WF::EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetStreamStatusUpdated );
-		stream_->AudioStarted += ref new WF::TypedEventHandler<NetStream^, NetStreamAudioStartedEventArgs^>( this, &SimpleVideoClient::OnAudioStarted );
-		stream_->AudioReceived += ref new WF::TypedEventHandler<NetStream^, NetStreamAudioReceivedEventArgs^>( this, &SimpleVideoClient::OnAudioReceived );
-		stream_->VideoStarted += ref new WF::TypedEventHandler<NetStream^, NetStreamVideoStartedEventArgs^>( this, &SimpleVideoClient::OnVideoStarted );
-		stream_->VideoReceived += ref new WF::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>( this, &SimpleVideoClient::OnVideoReceived );
+		stream_->Attached += ref new TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
+		stream_->StatusUpdated += ref new EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetStreamStatusUpdated );
+		stream_->AudioStarted += ref new TypedEventHandler<NetStream^, NetStreamAudioStartedEventArgs^>( this, &SimpleVideoClient::OnAudioStarted );
+		stream_->VideoStarted += ref new TypedEventHandler<NetStream^, NetStreamVideoStartedEventArgs^>( this, &SimpleVideoClient::OnVideoStarted );
+		bufferingHelper_ = ref new BufferingHelper( stream_ );
 		stream_->AttachAsync( connection_ );
 	}
 	else if( ( nsc & NetStatusCodeType::Level2Mask ) == NetStatusCodeType::NetConnectionConnect )
+	{
 		CloseImpl();
+	}
 }
 
 void SimpleVideoClient::OnAttached( NetStream^ sender, NetStreamAttachedEventArgs^ args )
@@ -71,15 +73,7 @@ void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetS
 	const auto nsc = args->NetStatusCode;
 	if( nsc == NetStatusCodeType::NetStreamPlayStop )
 	{
-		{
-			std::unique_lock<std::mutex> lock_audio( audioMutex_, std::defer_lock );
-			std::unique_lock<std::mutex> lock_video( videoMutex_, std::defer_lock );
-			std::lock( lock_audio, lock_video );
-			isEnable_ = false;
-			audioConditionVariable_.notify_all();
-			videoConditionVariable_.notify_all();
-		}
-
+		bufferingHelper_->Stop();
 		CloseImpl();
 	}
 }
@@ -87,36 +81,38 @@ void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetS
 void SimpleVideoClient::OnAudioStarted( NetStream^ sender, NetStreamAudioStartedEventArgs^ args )
 {
 	using namespace Windows::UI::Core;
-	dispatcher_->RunAsync( CoreDispatcherPriority::Normal, ref new DispatchedHandler( [=]
+
+	const auto info = args->Info;
+
+	WMM::AudioEncodingProperties^ prop;
+	if( info->Format == AudioFormat::Mp3 )
 	{
-		const auto info = args->Info;
+		prop = WMM::AudioEncodingProperties::CreateMp3( info->SampleRate, info->ChannelCount, info->Bitrate );
+	}
+	else if( info->Format == AudioFormat::Aac )
+	{
+		prop = WMM::AudioEncodingProperties::CreateAac( info->SampleRate, info->ChannelCount, info->Bitrate );
+	}
+	else
+	{
+		return;
+	}
 
-		WMM::AudioEncodingProperties^ prop;
-		if( info->Format == AudioFormat::Mp3 )
-			prop = WMM::AudioEncodingProperties::CreateMp3( info->SampleRate, info->ChannelCount, info->Bitrate );
-		else if( info->Format == AudioFormat::Aac )
-			prop = WMM::AudioEncodingProperties::CreateAac( info->SampleRate, info->ChannelCount, info->Bitrate );
-		else
-			return;
+	prop->BitsPerSample = info->BitsPerSample;
+	const auto des = ref new AudioStreamDescriptor( prop );
 
-		prop->BitsPerSample = info->BitsPerSample;
-		const auto des = ref new AudioStreamDescriptor( prop );
-
-		if( mediaStreamSource_ != nullptr )
+	if( mediaStreamSource_ != nullptr )
+	{
+		mediaStreamSource_->AddStreamDescriptor( des );	
+		dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [this]
 		{
-			mediaStreamSource_->AddStreamDescriptor( des );	
 			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
-		}
-		else
-			CreateMediaStream( des );
-	} ) );
-}
-
-void SimpleVideoClient::OnAudioReceived( NetStream^ sender, NetStreamAudioReceivedEventArgs^ args )
-{
-	std::lock_guard<std::mutex> lock( audioMutex_ );
-	audioBuffer_.emplace( args );
-	audioConditionVariable_.notify_one();
+		} ) );
+	}
+	else
+	{
+		CreateMediaStream( des );
+	}
 }
 
 void SimpleVideoClient::OnVideoStarted( NetStream^ sender, NetStreamVideoStartedEventArgs^ args )
@@ -124,33 +120,28 @@ void SimpleVideoClient::OnVideoStarted( NetStream^ sender, NetStreamVideoStarted
 	if( args->Info->Format != VideoFormat::Avc )
 		return;
 
-	dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [=]
+	auto prop = WMM::VideoEncodingProperties::CreateH264();
+	prop->ProfileId = WMM::H264ProfileIds::High;
+	const auto des = ref new VideoStreamDescriptor( prop );
+
+	if( mediaStreamSource_ != nullptr )
 	{
-		auto prop = WMM::VideoEncodingProperties::CreateH264();
-		prop->ProfileId = WMM::H264ProfileIds::High;
-		const auto des = ref new VideoStreamDescriptor( prop );
-
-		if( mediaStreamSource_ != nullptr )
+		mediaStreamSource_->AddStreamDescriptor( des );
+		dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [this]
 		{
-			mediaStreamSource_->AddStreamDescriptor( des );
 			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
-		}
-		else
-			CreateMediaStream( des );
-	} ) );
-}
-
-void SimpleVideoClient::OnVideoReceived( NetStream^ sender, NetStreamVideoReceivedEventArgs^ args )
-{
-	std::lock_guard<std::mutex> lock( videoMutex_ );
-	videoBuffer_.emplace( args );
-	videoConditionVariable_.notify_one();
+		} ) );
+	}
+	else
+	{
+		CreateMediaStream( des );
+	}
 }
 
 void SimpleVideoClient::OnStarting( MediaStreamSource^ sender, MediaStreamSourceStartingEventArgs^ args )
 {
 	auto request = args->Request;
-	WF::TimeSpan ts;
+	TimeSpan ts;
 	ts.Duration = 0;
 	request->SetActualStartPosition( ts );
 }
@@ -162,37 +153,18 @@ void SimpleVideoClient::OnSampleRequested( MediaStreamSource^ sender, MediaStrea
 
 	if( request->StreamDescriptor->GetType()->FullName == AudioStreamDescriptor::typeid->FullName )
 	{
-		NetStreamAudioReceivedEventArgs^ data;
+		create_task( bufferingHelper_->GetAudioAsync() ).then( [=]( Windows::Media::Core::MediaStreamSample^ sample )
 		{
-			std::unique_lock<std::mutex> lock( audioMutex_ );
-			audioConditionVariable_.wait( lock, [&] { return !isEnable_ || !audioBuffer_.empty(); } );
-			if( !isEnable_ )
-			{
-				deferral->Complete();
-				return;
-			}
-
-			data = audioBuffer_.front();
-			audioBuffer_.pop();
-		}
-		request->Sample = data->CreateSample();
+			request->Sample = sample;
+			deferral->Complete();
+		} );
 	}
 	else
 	{
-		NetStreamVideoReceivedEventArgs^ data;
+		create_task( bufferingHelper_->GetVideoAsync() ).then( [=]( Windows::Media::Core::MediaStreamSample^ sample )
 		{
-			std::unique_lock<std::mutex> lock( videoMutex_ );
-			videoConditionVariable_.wait( lock, [&] { return !isEnable_ || !videoBuffer_.empty(); } );
-			if( !isEnable_ )
-			{
-				deferral->Complete();
-				return;
-			}
-
-			data = videoBuffer_.front();
-			videoBuffer_.pop();
-		}
-		request->Sample = data->CreateSample();
+			request->Sample = sample;
+			deferral->Complete();
+		} );
 	}
-	deferral->Complete();
 }

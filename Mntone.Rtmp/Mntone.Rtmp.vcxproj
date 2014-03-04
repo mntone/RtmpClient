@@ -138,6 +138,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="rtmp_packet.h" />
     <ClInclude Include="Client\SimpleVideoClient.h" />
+    <ClInclude Include="Client\BufferingHelper.h" />
     <ClInclude Include="sound_format.h" />
     <ClInclude Include="sound_info.h" />
     <ClInclude Include="sound_rate.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="RtmpHelper.cpp" />
     <ClCompile Include="RtmpUri.cpp" />
     <ClCompile Include="Client\SimpleVideoClient.cpp" />
+    <ClCompile Include="Client\BufferingHelper.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>

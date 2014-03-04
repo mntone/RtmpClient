@@ -3,6 +3,7 @@
 
 using namespace Mntone::Rtmp::DemoApp;
 using namespace Mntone::Rtmp::Client;
+namespace WF = Windows::Foundation;
 namespace WUIX = Windows::UI::Xaml;
 
 MainPage::MainPage()
@@ -22,12 +23,12 @@ void MainPage::OnButtonClicked( Platform::Object^ sender, WUIX::RoutedEventArgs^
 	auto uri = Uri->Text;
 
 	client_ = ref new SimpleVideoClient();
-	client_->Started += ref new Windows::Foundation::EventHandler<SimpleVideoClientStartedEventArgs^>( this, &MainPage::OnStarted );
-	client_->Stopped += ref new Windows::Foundation::EventHandler<SimpleVideoClientStoppedEventArgs^>( this, &MainPage::OnStopped );
-	client_->ConnectAsync( ref new Windows::Foundation::Uri( uri ) );
+	client_->Started += ref new WF::EventHandler<SimpleVideoClientStartedEventArgs^>( this, &MainPage::OnStarted );
+	client_->Stopped += ref new WF::EventHandler<SimpleVideoClientStoppedEventArgs^>( this, &MainPage::OnStopped );
+	client_->ConnectAsync( ref new WF::Uri( uri ) );
 
 	auto smtc = Windows::Media::SystemMediaTransportControls::GetForCurrentView();
-	smtc->ButtonPressed += ref new Windows::Foundation::TypedEventHandler<Windows::Media::SystemMediaTransportControls^, Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs^>( this, &MainPage::OnMediaButtonPressed );
+	smtc->ButtonPressed += ref new WF::TypedEventHandler<Windows::Media::SystemMediaTransportControls^, Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs^>( this, &MainPage::OnMediaButtonPressed );
 	smtc->IsEnabled = true;
 	smtc->IsPlayEnabled = true;
 	smtc->IsPauseEnabled = true;

@@ -3,6 +3,7 @@
 #include "NetStream.h"
 #include "SimpleVideoClientStartedEventArgs.h"
 #include "SimpleVideoClientStoppedEventArgs.h"
+#include "BufferingHelper.h"
 
 namespace Mntone { namespace Rtmp { namespace Client {
 
@@ -29,9 +30,7 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		void OnAttached( NetStream^ sender, NetStreamAttachedEventArgs^ args );
 		void OnNetStreamStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args );
 		void OnAudioStarted( NetStream^ sender, NetStreamAudioStartedEventArgs^ args );
-		void OnAudioReceived( NetStream^ sender, NetStreamAudioReceivedEventArgs^ args );
 		void OnVideoStarted( NetStream^ sender, NetStreamVideoStartedEventArgs^ args );
-		void OnVideoReceived( NetStream^ sender, NetStreamVideoReceivedEventArgs^ args );
 
 		// MediaStreamSource
 		void OnStarting( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceStartingEventArgs^ args );
@@ -44,16 +43,11 @@ namespace Mntone { namespace Rtmp { namespace Client {
 	private:
 		Windows::UI::Core::CoreDispatcher^ dispatcher_;
 
-		bool isEnable_;
 		NetConnection^ connection_;
 		NetStream^ stream_;
 		Windows::Media::Core::MediaStreamSource^ mediaStreamSource_;
 
-		// Buffer
-		mutable std::mutex audioMutex_, videoMutex_;
-		std::condition_variable audioConditionVariable_, videoConditionVariable_;
-		std::queue<NetStreamAudioReceivedEventArgs^> audioBuffer_;
-		std::queue<NetStreamVideoReceivedEventArgs^> videoBuffer_;
+		BufferingHelper^ bufferingHelper_;
 	};
 
 } } }

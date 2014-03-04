@@ -43,6 +43,9 @@
     <ClCompile Include="Client\SimpleVideoClientStoppedEventArgs.cpp">
       <Filter>Client</Filter>
     </ClCompile>
+    <ClCompile Include="Client\BufferingHelper.cpp">
+      <Filter>Client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -116,6 +119,9 @@
       <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="Client\SimpleVideoClientStoppedEventArgs.h">
+      <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="Client\BufferingHelper.h">
       <Filter>Client</Filter>
     </ClInclude>
   </ItemGroup>
