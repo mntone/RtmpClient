@@ -40,6 +40,7 @@ namespace Mntone { namespace Rtmp {
 		void OnVideoMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 		void OnDataMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 		void OnCommandMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
+		void OnAggregateMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 
 	private:
 		Concurrency::task<void> SendActionAsync( Mntone::Data::Amf::AmfArray^ amf );
@@ -47,12 +48,12 @@ namespace Mntone { namespace Rtmp {
 		void AnalysisAvc( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data, NetStreamVideoReceivedEventArgs^& args );
 			
 	public:
-		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>^ Attached;
+		event Windows::Foundation::EventHandler<NetStreamAttachedEventArgs^>^ Attached;
 		event Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>^ StatusUpdated;
-		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAudioStartedEventArgs^>^ AudioStarted;
-		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamAudioReceivedEventArgs^>^ AudioReceived;
-		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamVideoStartedEventArgs^>^ VideoStarted;
-		event Windows::Foundation::TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>^ VideoReceived;
+		event Windows::Foundation::EventHandler<NetStreamAudioStartedEventArgs^>^ AudioStarted;
+		event Windows::Foundation::EventHandler<NetStreamAudioReceivedEventArgs^>^ AudioReceived;
+		event Windows::Foundation::EventHandler<NetStreamVideoStartedEventArgs^>^ VideoStarted;
+		event Windows::Foundation::EventHandler<NetStreamVideoReceivedEventArgs^>^ VideoReceived;
 		
 	internal:
 		NetConnection^ parent_;

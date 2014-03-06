@@ -82,8 +82,8 @@ namespace Mntone { namespace Rtmp {
 
 	public:
 		event Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>^ StatusUpdated;
-		event Windows::Foundation::TypedEventHandler<NetConnection^, NetConnectionClosedEventArgs^>^ Closed;
-		event Windows::Foundation::TypedEventHandler<NetConnection^, NetConnectionCallbackEventArgs^>^ Callback;
+		event Windows::Foundation::EventHandler<NetConnectionClosedEventArgs^>^ Closed;
+		event Windows::Foundation::EventHandler<NetConnectionCallbackEventArgs^>^ Callback;
 
 	public:
 		property RtmpUri^ Uri

@@ -2,23 +2,23 @@
 
 namespace mntone { namespace rtmp {
 
-	enum type_id_type: uint8
+	enum class type_id_type: uint8
 	{
-		tid_set_chunk_size = 1,
-		tid_abort_message = 2,
-		tid_acknowledgement = 3,
-		tid_user_control_message = 4,
-		tid_window_acknowledgement_size = 5,
-		tid_set_peer_bandwidth = 6,
-		tid_audio_message = 8,
-		tid_video_message = 9,
-		tid_data_message_amf3 = 15,	// 0x0f
-		tid_shared_object_message_amf3 = 16, // 0x10
-		tid_command_message_amf3 = 17, // 0x11
-		tid_data_message_amf0 = 18, // 0x12
-		tid_shared_object_message_amf0 = 19, // 0x13
-		tid_command_message_amf0 = 20, // 0x14
-		tid_aggregate_message = 22, // 0x16
+		set_chunk_size = 1,
+		abort_message = 2,
+		acknowledgement = 3,
+		user_control_message = 4,
+		window_acknowledgement_size = 5,
+		set_peer_bandwidth = 6,
+		audio_message = 8,
+		video_message = 9,
+		data_message_amf3 = 15,	// 0x0f
+		shared_object_message_amf3 = 16, // 0x10
+		command_message_amf3 = 17, // 0x11
+		data_message_amf0 = 18, // 0x12
+		shared_object_message_amf0 = 19, // 0x13
+		command_message_amf0 = 20, // 0x14
+		aggregate_message = 22, // 0x16
 	};
 
 } }

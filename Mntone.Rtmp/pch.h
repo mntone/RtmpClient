@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#define WIN32_LEAN_AND_MEAN
-
 // STL Headers:
 #include <memory>
 #include <queue>
@@ -21,11 +19,6 @@
 #define NOIME
 #define NOMINMAX
 #include <windows.h>
-#undef WIN32_LEAN_AND_MEAN
-#undef NOSERVICE
-#undef NOMCX
-#undef NOIME
-#undef NOMINMAX
 #include <collection.h>
 #include <ppltasks.h>
 

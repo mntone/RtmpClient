@@ -3,6 +3,9 @@
 
 using namespace Mntone::Rtmp;
 
+RtmpUri::RtmpUri()
+{ }
+
 RtmpUri::RtmpUri( Platform::String^ uri )
 {
 	RtmpUri( ref new Windows::Foundation::Uri( uri ) );
@@ -70,13 +73,17 @@ void RtmpUri::ParsePath( Platform::String^ path )
 
 Platform::String^ RtmpUri::ToString()
 {
-	std::wstringstream buf;
+	std::wostringstream buf;
 
 	auto scheme = Scheme_.ToString();
 	buf.write( scheme->Data(), scheme->Length() );
 
 	buf.write( L"://", 3 );
 
+	buf.write( Host_->Data(), Host_->Length() );
+
+	buf.put( ':' );
+	
 	auto port = Port_.ToString();
 	buf.write( port->Data(), port->Length() );
 

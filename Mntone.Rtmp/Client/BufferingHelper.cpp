@@ -13,8 +13,8 @@ using namespace Mntone::Rtmp::Client;
 BufferingHelper::BufferingHelper( NetStream^ stream )
 	: isEnable_( true )
 {
-	stream->AudioReceived += ref new TypedEventHandler<NetStream^, NetStreamAudioReceivedEventArgs^>( this, &BufferingHelper::OnAudioReceived );
-	stream->VideoReceived += ref new TypedEventHandler<NetStream^, NetStreamVideoReceivedEventArgs^>( this, &BufferingHelper::OnVideoReceived );
+	stream->AudioReceived += ref new EventHandler<NetStreamAudioReceivedEventArgs^>( this, &BufferingHelper::OnAudioReceived );
+	stream->VideoReceived += ref new EventHandler<NetStreamVideoReceivedEventArgs^>( this, &BufferingHelper::OnVideoReceived );
 }
 
 void BufferingHelper::Stop()
@@ -61,14 +61,14 @@ IAsyncOperation<MediaStreamSample^>^ BufferingHelper::GetVideoAsync()
 	} );
 }
 
-void BufferingHelper::OnAudioReceived( NetStream^ sender, NetStreamAudioReceivedEventArgs^ args )
+void BufferingHelper::OnAudioReceived( Platform::Object^ sender, NetStreamAudioReceivedEventArgs^ args )
 {
 	std::lock_guard<std::mutex> lock( audioMutex_ );
 	audioBuffer_.emplace( args->CreateSample() );
 	audioConditionVariable_.notify_one();
 }
 
-void BufferingHelper::OnVideoReceived( NetStream^ sender, NetStreamVideoReceivedEventArgs^ args )
+void BufferingHelper::OnVideoReceived( Platform::Object^ sender, NetStreamVideoReceivedEventArgs^ args )
 {
 	std::lock_guard<std::mutex> lock( videoMutex_ );
 	videoBuffer_.emplace( args->CreateSample() );

@@ -27,10 +27,10 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		void OnNetConnectionStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args );
 
 		// NetStream
-		void OnAttached( NetStream^ sender, NetStreamAttachedEventArgs^ args );
+		void OnAttached( Platform::Object^ sender, NetStreamAttachedEventArgs^ args );
 		void OnNetStreamStatusUpdated( Platform::Object^ sender, NetStatusUpdatedEventArgs^ args );
-		void OnAudioStarted( NetStream^ sender, NetStreamAudioStartedEventArgs^ args );
-		void OnVideoStarted( NetStream^ sender, NetStreamVideoStartedEventArgs^ args );
+		void OnAudioStarted( Platform::Object^ sender, NetStreamAudioStartedEventArgs^ args );
+		void OnVideoStarted( Platform::Object^ sender, NetStreamVideoStartedEventArgs^ args );
 
 		// MediaStreamSource
 		void OnStarting( Windows::Media::Core::MediaStreamSource^ sender, Windows::Media::Core::MediaStreamSourceStartingEventArgs^ args );

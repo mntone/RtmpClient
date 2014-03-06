@@ -6,6 +6,7 @@ namespace Mntone { namespace Rtmp {
 	public ref class RtmpUri sealed
 	{
 	public:
+		RtmpUri();
 		RtmpUri( Platform::String^ uri );
 		[Windows::Foundation::Metadata::DefaultOverload]
 		RtmpUri( Windows::Foundation::Uri^ uri );
@@ -22,22 +23,27 @@ namespace Mntone { namespace Rtmp {
 		property RtmpScheme Scheme
 		{
 			RtmpScheme get() { return Scheme_; }
+			void set( RtmpScheme value ) { Scheme_ = value; }
 		}
 		property Platform::String^ Host
 		{
 			Platform::String^ get() { return Host_; }
+			void set( Platform::String^ value ) { Host_ = value; }
 		}
 		property int32 Port
 		{
 			int32 get() { return Port_; }
+			void set( int32 value ) { Port_ = value; }
 		}
 		property Platform::String^ App
 		{
 			Platform::String^ get() { return App_; }
+			void set( Platform::String^ value ) { App_ = value; }
 		}
 		property Platform::String^ Instance
 		{
 			Platform::String^ get() { return Instance_; }
+			void set( Platform::String^ value ) { Instance_ = value; }
 		}
 
 	private:

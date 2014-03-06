@@ -146,18 +146,18 @@ void NetStream::OnMessage( const rtmp_packet packet, std::vector<uint8> data )
 {
 	switch( packet.type_id_ )
 	{
-	case type_id_type::tid_audio_message:
+	case type_id_type::audio_message:
 		OnAudioMessage( std::move( packet ), std::move( data ) );
 		break;
-	case type_id_type::tid_video_message:
+	case type_id_type::video_message:
 		OnVideoMessage( std::move( packet ), std::move( data ) );
 		break;
-	case type_id_type::tid_data_message_amf3:
-	case type_id_type::tid_data_message_amf0:
+	case type_id_type::data_message_amf3:
+	case type_id_type::data_message_amf0:
 		OnDataMessage( std::move( packet ), std::move( data ) );
 		break;
-	case type_id_type::tid_command_message_amf3:
-	case type_id_type::tid_command_message_amf0:
+	case type_id_type::command_message_amf3:
+	case type_id_type::command_message_amf0:
 		OnCommandMessage( std::move( packet ), std::move( data ) );
 		break;
 	}
@@ -285,6 +285,11 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 	// AVC sequence header (this is AVCDecoderConfigurationRecord)
 	if( data[1] == 0x00 )
 	{
+		if( data.size() < 3 )
+		{
+			return;
+		}
+
 		const auto& dcr = *reinterpret_cast<avc_decoder_configuration_record*>( &data[5] );
 		lengthSizeMinusOne_ = dcr.length_size_minus_one;
 		videoInfo_->Format = VideoFormat::Avc;

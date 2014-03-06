@@ -25,7 +25,7 @@ void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
 	mediaStreamSource_ = ref new MediaStreamSource( descriptor );
 
 	TimeSpan duration;
-	duration.Duration = std::numeric_limits<uint64>::max();
+	duration.Duration = std::numeric_limits<int64>::max();
 	mediaStreamSource_->Duration = duration;
 
 	mediaStreamSource_->Starting += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
@@ -50,20 +50,21 @@ void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, 
 	if( nsc == NetStatusCodeType::NetConnectionConnectSuccess )
 	{
 		stream_ = ref new NetStream();
-		stream_->Attached += ref new TypedEventHandler<NetStream^, NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
+		stream_->Attached += ref new EventHandler<NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
 		stream_->StatusUpdated += ref new EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetStreamStatusUpdated );
-		stream_->AudioStarted += ref new TypedEventHandler<NetStream^, NetStreamAudioStartedEventArgs^>( this, &SimpleVideoClient::OnAudioStarted );
-		stream_->VideoStarted += ref new TypedEventHandler<NetStream^, NetStreamVideoStartedEventArgs^>( this, &SimpleVideoClient::OnVideoStarted );
+		stream_->AudioStarted += ref new EventHandler<NetStreamAudioStartedEventArgs^>( this, &SimpleVideoClient::OnAudioStarted );
+		stream_->VideoStarted += ref new EventHandler<NetStreamVideoStartedEventArgs^>( this, &SimpleVideoClient::OnVideoStarted );
 		bufferingHelper_ = ref new BufferingHelper( stream_ );
 		stream_->AttachAsync( connection_ );
 	}
 	else if( ( nsc & NetStatusCodeType::Level2Mask ) == NetStatusCodeType::NetConnectionConnect )
 	{
+		connection_ = nullptr;
 		CloseImpl();
 	}
 }
 
-void SimpleVideoClient::OnAttached( NetStream^ sender, NetStreamAttachedEventArgs^ args )
+void SimpleVideoClient::OnAttached( Platform::Object^ sender, NetStreamAttachedEventArgs^ args )
 {
 	stream_->PlayAsync( connection_->Uri->Instance );
 }
@@ -78,7 +79,7 @@ void SimpleVideoClient::OnNetStreamStatusUpdated( Platform::Object^ sender, NetS
 	}
 }
 
-void SimpleVideoClient::OnAudioStarted( NetStream^ sender, NetStreamAudioStartedEventArgs^ args )
+void SimpleVideoClient::OnAudioStarted( Platform::Object^ sender, NetStreamAudioStartedEventArgs^ args )
 {
 	using namespace Windows::UI::Core;
 
@@ -115,7 +116,7 @@ void SimpleVideoClient::OnAudioStarted( NetStream^ sender, NetStreamAudioStarted
 	}
 }
 
-void SimpleVideoClient::OnVideoStarted( NetStream^ sender, NetStreamVideoStartedEventArgs^ args )
+void SimpleVideoClient::OnVideoStarted( Platform::Object^ sender, NetStreamVideoStartedEventArgs^ args )
 {
 	if( args->Info->Format != VideoFormat::Avc )
 		return;

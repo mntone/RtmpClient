@@ -311,8 +311,8 @@ void NetConnection::OnMessage( const rtmp_packet packet, vector<uint8> data )
 
 	switch( packet.type_id_ )
 	{
-	case type_id_type::tid_command_message_amf3:
-	case type_id_type::tid_command_message_amf0:
+	case type_id_type::command_message_amf3:
+	case type_id_type::command_message_amf0:
 		OnCommandMessage( move( packet ), move( data ) );
 		break;
 	}
@@ -322,25 +322,25 @@ void NetConnection::OnNetworkMessage( const rtmp_packet packet, vector<uint8> da
 {
 	switch( packet.type_id_ )
 	{
-	case type_id_type::tid_set_chunk_size:
+	case type_id_type::set_chunk_size:
 		utility::convert_big_endian( &data[0], 4, &rxChunkSize_ );
 		break;
 
-	case type_id_type::tid_abort_message:
+	case type_id_type::abort_message:
 		break;
 
-	case type_id_type::tid_acknowledgement:
+	case type_id_type::acknowledgement:
 		break;
 
-	case type_id_type::tid_user_control_message:
+	case type_id_type::user_control_message:
 		OnUserControlMessage( move( packet ), move( data ) );
 		break;
 
-	case type_id_type::tid_window_acknowledgement_size:
+	case type_id_type::window_acknowledgement_size:
 		utility::convert_big_endian( &data[0], 4, &rxWindowSize_ );
 		break;
 
-	case type_id_type::tid_set_peer_bandwidth:
+	case type_id_type::set_peer_bandwidth:
 		{
 			uint32 buf;
 			utility::convert_big_endian( &data[0], 4, &buf );
@@ -466,21 +466,21 @@ task<void> NetConnection::SetChunkSizeAsync( const uint32 chunkSize )
 
 	vector<uint8> buf( 4 );
 	utility::convert_big_endian( &chunkSize, 4, &buf[0] );
-	return SendNetworkAsync( type_id_type::tid_set_chunk_size, move( buf ) );
+	return SendNetworkAsync( type_id_type::set_chunk_size, move( buf ) );
 }
 
 task<void> NetConnection::AbortMessageAsync( const uint32 chunkStreamId )
 {
 	vector<uint8> buf( 4 );
 	utility::convert_big_endian( &chunkStreamId, 4, &buf[0] );
-	return SendNetworkAsync( type_id_type::tid_abort_message, move( buf ) );
+	return SendNetworkAsync( type_id_type::abort_message, move( buf ) );
 }
 
 task<void> NetConnection::AcknowledgementAsync( const uint32 sequenceNumber )
 {
 	vector<uint8> buf( 4 );
 	utility::convert_big_endian( &sequenceNumber, 4, &buf[0] );
-	return SendNetworkAsync( type_id_type::tid_acknowledgement, move( buf ) );
+	return SendNetworkAsync( type_id_type::acknowledgement, move( buf ) );
 }
 
 task<void> NetConnection::WindowAcknowledgementSizeAsync( const uint32 acknowledgementWindowSize )
@@ -489,7 +489,7 @@ task<void> NetConnection::WindowAcknowledgementSizeAsync( const uint32 acknowled
 
 	vector<uint8> buf( 4 );
 	utility::convert_big_endian( &acknowledgementWindowSize, 4, &buf[0] );
-	return SendNetworkAsync( type_id_type::tid_window_acknowledgement_size, move( buf ) );
+	return SendNetworkAsync( type_id_type::window_acknowledgement_size, move( buf ) );
 }
 
 task<void> NetConnection::SetPeerBandWidthAsync( const uint32 windowSize, const limit_type type )
@@ -497,7 +497,7 @@ task<void> NetConnection::SetPeerBandWidthAsync( const uint32 windowSize, const 
 	vector<uint8> buf( 5 );
 	utility::convert_big_endian( &windowSize, 4, &buf[0] );
 	buf[4] = type;
-	return SendNetworkAsync( type_id_type::tid_set_peer_bandwidth, move( buf ) );
+	return SendNetworkAsync( type_id_type::set_peer_bandwidth, move( buf ) );
 }
 
 task<void> NetConnection::SetBufferLengthAsync( const uint32 streamId, const uint32 bufferLength )
@@ -519,7 +519,7 @@ task<void> NetConnection::UserControlMessageEventAsync( UserControlMessageEventT
 {
 	const auto& c_type = static_cast<uint16>( type );
 	utility::convert_big_endian( &c_type, 2, &data[0] );
-	return SendNetworkAsync( type_id_type::tid_user_control_message, move( data ) );
+	return SendNetworkAsync( type_id_type::user_control_message, move( data ) );
 }
 
 task<void> NetConnection::SendNetworkAsync( const type_id_type type, const vector<uint8> data )
@@ -548,7 +548,7 @@ task<void> NetConnection::SendActionAsync( const uint32 streamId, Mntone::Data::
 	packet.chunk_stream_id_ = 3; // for Action (3)
 	packet.timestamp_ = utility::get_windows_time() - startTime_;
 	packet.length_ = length;
-	packet.type_id_ = type_id_type::tid_command_message_amf0;
+	packet.type_id_ = type_id_type::command_message_amf0;
 	packet.stream_id_ = streamId;
 
 	vector<uint8> buf( length );
