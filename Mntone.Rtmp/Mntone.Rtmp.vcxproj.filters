@@ -7,6 +7,9 @@
     <Filter Include="Client">
       <UniqueIdentifier>{62734a82-29ae-4c67-aff3-dfa31fc6af94}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Media">
+      <UniqueIdentifier>{4657168b-faa9-4fd5-a2bd-6144b4afcb30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -46,6 +49,13 @@
     <ClCompile Include="Client\BufferingHelper.cpp">
       <Filter>Client</Filter>
     </ClCompile>
+    <ClCompile Include="AvcAnalyzer.cpp" />
+    <ClCompile Include="Media\AudioInfo.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
+    <ClCompile Include="Media\flv_tag.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -63,14 +73,6 @@
     <ClInclude Include="NetStreamVideoReceivedEventArgs.h" />
     <ClInclude Include="NetStreamAudioReceivedEventArgs.h" />
     <ClInclude Include="NetConnectionClosedEventArgs.h" />
-    <ClInclude Include="video_type.h" />
-    <ClInclude Include="VideoFormat.h" />
-    <ClInclude Include="avc_decoder_configuration_record.h" />
-    <ClInclude Include="sound_format.h" />
-    <ClInclude Include="sound_rate.h" />
-    <ClInclude Include="sound_size.h" />
-    <ClInclude Include="sound_type.h" />
-    <ClInclude Include="sound_info.h" />
     <ClInclude Include="UserControlMessageEventType.h" />
     <ClInclude Include="NetStreamAttachedEventArgs.h" />
     <ClInclude Include="Command\NetConnectionCommandType.h">
@@ -99,16 +101,8 @@
       <Filter>Client</Filter>
     </ClInclude>
     <ClInclude Include="RtmpHelper.h" />
-    <ClInclude Include="AudioInfo.h" />
-    <ClInclude Include="AudioFormat.h" />
-    <ClInclude Include="aac_id.h" />
-    <ClInclude Include="aac_protection_absent.h" />
-    <ClInclude Include="aac_profile.h" />
-    <ClInclude Include="aac_sampling_frequency.h" />
-    <ClInclude Include="adts_header.h" />
     <ClInclude Include="NetStreamAudioStartedEventArgs.h" />
     <ClInclude Include="NetStreamVideoStartedEventArgs.h" />
-    <ClInclude Include="VideoInfo.h" />
     <ClInclude Include="NetStatusCodeType.h" />
     <ClInclude Include="utility.h" />
     <ClInclude Include="Command\NetConnectionConnectCommand.h">
@@ -123,6 +117,63 @@
     </ClInclude>
     <ClInclude Include="Client\BufferingHelper.h">
       <Filter>Client</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\aac_id.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\aac_profile.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\aac_protection_absent.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\aac_sampling_frequency.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\adts_header.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\AudioFormat.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\AudioInfo.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\avc_decoder_configuration_record.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\sound_format.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\sound_info.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\sound_rate.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\sound_size.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\sound_type.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\video_type.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\VideoFormat.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\VideoInfo.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\flv_tag.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\flv_filter.h">
+      <Filter>Media</Filter>
+    </ClInclude>
+    <ClInclude Include="Media\flv_tag_type.h">
+      <Filter>Media</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

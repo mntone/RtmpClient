@@ -1,5 +1,5 @@
 #pragma once
-#include "AudioInfo.h"
+#include "Media/AudioInfo.h"
 
 namespace Mntone { namespace Rtmp {
 
@@ -15,11 +15,11 @@ namespace Mntone { namespace Rtmp {
 		Windows::Media::Core::MediaStreamSample^ CreateSample();
 
 	public:
-		property AudioInfo^ Info
+		property Media::AudioInfo^ Info
 		{
-			AudioInfo^ get() { return Info_; }
+			Media::AudioInfo^ get() { return Info_; }
 		internal:
-			void set( AudioInfo^ value ) { Info_ = value; }
+			void set( Media::AudioInfo^ value ) { Info_ = value; }
 		}
 		property Windows::Foundation::TimeSpan Timestamp
 		{
@@ -31,7 +31,7 @@ namespace Mntone { namespace Rtmp {
 		}
 
 	private:
-		AudioInfo^ Info_;
+		Media::AudioInfo^ Info_;
 		Windows::Foundation::TimeSpan Timestamp_;
 		Windows::Storage::Streams::IBuffer^ Data_;
 	};

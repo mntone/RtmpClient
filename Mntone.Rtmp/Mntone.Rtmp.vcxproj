@@ -100,14 +100,17 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="aac_id.h" />
-    <ClInclude Include="aac_profile.h" />
-    <ClInclude Include="aac_protection_absent.h" />
-    <ClInclude Include="aac_sampling_frequency.h" />
-    <ClInclude Include="adts_header.h" />
-    <ClInclude Include="AudioFormat.h" />
-    <ClInclude Include="AudioInfo.h" />
-    <ClInclude Include="avc_decoder_configuration_record.h" />
+    <ClInclude Include="Media\flv_filter.h" />
+    <ClInclude Include="Media\flv_tag_type.h" />
+    <ClInclude Include="Media\flv_tag.h" />
+    <ClInclude Include="Media\aac_id.h" />
+    <ClInclude Include="Media\aac_profile.h" />
+    <ClInclude Include="Media\aac_protection_absent.h" />
+    <ClInclude Include="Media\aac_sampling_frequency.h" />
+    <ClInclude Include="Media\adts_header.h" />
+    <ClInclude Include="Media\AudioFormat.h" />
+    <ClInclude Include="Media\AudioInfo.h" />
+    <ClInclude Include="Media\avc_decoder_configuration_record.h" />
     <ClInclude Include="Client\SimpleVideoClientStoppedEventArgs.h" />
     <ClInclude Include="Client\SimpleVideoClientStartedEventArgs.h" />
     <ClInclude Include="Command\IRtmpCommand.h" />
@@ -139,19 +142,22 @@
     <ClInclude Include="rtmp_packet.h" />
     <ClInclude Include="Client\SimpleVideoClient.h" />
     <ClInclude Include="Client\BufferingHelper.h" />
-    <ClInclude Include="sound_format.h" />
-    <ClInclude Include="sound_info.h" />
-    <ClInclude Include="sound_rate.h" />
-    <ClInclude Include="sound_size.h" />
-    <ClInclude Include="sound_type.h" />
+    <ClInclude Include="Media\sound_format.h" />
+    <ClInclude Include="Media\sound_info.h" />
+    <ClInclude Include="Media\sound_rate.h" />
+    <ClInclude Include="Media\sound_size.h" />
+    <ClInclude Include="Media\sound_type.h" />
     <ClInclude Include="UserControlMessageEventType.h" />
     <ClInclude Include="type_id_type.h" />
     <ClInclude Include="utility.h" />
-    <ClInclude Include="VideoFormat.h" />
-    <ClInclude Include="VideoInfo.h" />
-    <ClInclude Include="video_type.h" />
+    <ClInclude Include="Media\VideoFormat.h" />
+    <ClInclude Include="Media\VideoInfo.h" />
+    <ClInclude Include="Media\video_type.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Media\flv_tag.cpp" />
+    <ClCompile Include="Media\AudioInfo.cpp" />
+    <ClCompile Include="AvcAnalyzer.cpp" />
     <ClCompile Include="Client\SimpleVideoClientStoppedEventArgs.cpp" />
     <ClCompile Include="Client\SimpleVideoClientStartedEventArgs.cpp" />
     <ClCompile Include="Command\NetConnectionConnectCommand.cpp" />

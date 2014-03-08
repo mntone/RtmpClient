@@ -1,7 +1,7 @@
 #pragma once
 #include "VideoFormat.h"
 
-namespace Mntone { namespace Rtmp {
+namespace Mntone { namespace Rtmp { namespace Media {
 
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class VideoInfo sealed
@@ -21,4 +21,4 @@ namespace Mntone { namespace Rtmp {
 		VideoFormat Format_;
 	};
 
-} }
+} } }

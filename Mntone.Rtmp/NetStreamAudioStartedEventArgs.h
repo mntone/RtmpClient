@@ -1,5 +1,5 @@
 #pragma once
-#include "AudioInfo.h"
+#include "Media/AudioInfo.h"
 
 namespace Mntone { namespace Rtmp {
 
@@ -7,16 +7,16 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetStreamAudioStartedEventArgs sealed
 	{
 	internal:
-		NetStreamAudioStartedEventArgs( AudioInfo^ info );
+		NetStreamAudioStartedEventArgs( Media::AudioInfo^ info );
 
 	public:
-		property AudioInfo^ Info
+		property Media::AudioInfo^ Info
 		{
-			AudioInfo^ get() { return Info_; }
+			Media::AudioInfo^ get() { return Info_; }
 		}
 
 	private:
-		AudioInfo^ Info_;
+		Media::AudioInfo^ Info_;
 	};
 
 } }

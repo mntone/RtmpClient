@@ -1,6 +1,6 @@
 #pragma once
 
-namespace mntone { namespace rtmp {
+namespace mntone { namespace rtmp { namespace media {
 
 	struct avc_decoder_configuration_record
 	{
@@ -20,4 +20,4 @@ namespace mntone { namespace rtmp {
 	//   uint16 pictureParameterSetLength;
 	//   uint8 pictureParameterSetNalUnit[];
 
-} }
+} } }

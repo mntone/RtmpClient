@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Mntone { namespace Rtmp {
+namespace Mntone { namespace Rtmp { namespace Media {
 
 	public enum class VideoFormat
 	{
@@ -13,4 +13,4 @@ namespace Mntone { namespace Rtmp {
 		Avc = 7
 	};
 
-} }
+} } }

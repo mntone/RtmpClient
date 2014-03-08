@@ -7,7 +7,7 @@
 #include "NetStreamAudioReceivedEventArgs.h"
 #include "NetStreamVideoStartedEventArgs.h"
 #include "NetStreamVideoReceivedEventArgs.h"
-#include "avc_decoder_configuration_record.h"
+#include "Media/avc_decoder_configuration_record.h"
 
 namespace Mntone { namespace Rtmp {
 
@@ -61,10 +61,10 @@ namespace Mntone { namespace Rtmp {
 
 	private:
 		bool audioInfoEnabled_;
-		AudioInfo^ audioInfo_;
+		Media::AudioInfo^ audioInfo_;
 
 		bool videoInfoEnabled_;
-		VideoInfo^ videoInfo_;
+		Media::VideoInfo^ videoInfo_;
 
 		// for Avc
 		uint8 lengthSizeMinusOne_;

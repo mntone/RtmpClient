@@ -6,11 +6,12 @@
 
 using namespace std;
 using namespace Concurrency;
+using namespace Windows::Foundation;
 using namespace mntone::rtmp;
 using namespace Mntone::Rtmp;
-namespace WF = Windows::Foundation;
 
-const auto DEFAULT_WINDOW_SIZE = 2500000;
+const auto DEFAULT_WINDOW_SIZE = numeric_limits<uint32>::max();
+const auto DEFAULT_LIMIT_TYPE = limit_type::hard;
 const auto DEFAULT_CHUNK_SIZE = 128;
 const auto DEFAULT_BUFFER_MILLSECONDS = 5000;
 
@@ -20,9 +21,10 @@ NetConnection::NetConnection()
 	, receiveOperation_( nullptr )
 	, rxHeaderBuffer_( 11 )
 	, rxWindowSize_( DEFAULT_WINDOW_SIZE ), txWindowSize_( DEFAULT_WINDOW_SIZE )
+	, rxLimitType_( DEFAULT_LIMIT_TYPE ), txLimitType_( DEFAULT_LIMIT_TYPE )
 	, rxChunkSize_( DEFAULT_CHUNK_SIZE ), txChunkSize_( DEFAULT_CHUNK_SIZE )
 {
-	connection_->ReadOperationChanged += ref new WF::TypedEventHandler<Connection^, WF::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^>( this, &NetConnection::OnReadOperationChanged );
+	connection_->ReadOperationChanged += ref new TypedEventHandler<Connection^, IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^>( this, &NetConnection::OnReadOperationChanged );
 }
 
 void NetConnection::CloseImpl()
@@ -36,27 +38,29 @@ void NetConnection::CloseImpl()
 	Closed( this, ref new NetConnectionClosedEventArgs() );
 }
 	
-WF::IAsyncAction^ NetConnection::ConnectAsync( WF::Uri^ uri )
+IAsyncAction^ NetConnection::ConnectAsync( Windows::Foundation::Uri^ uri )
 {
 	return ConnectAsync( ref new RtmpUri( uri ) );
 }
 
-WF::IAsyncAction^ NetConnection::ConnectAsync( WF::Uri^ uri, Command::NetConnectionConnectCommand^ command )
+IAsyncAction^ NetConnection::ConnectAsync( Windows::Foundation::Uri^ uri, Command::NetConnectionConnectCommand^ command )
 {
 	if( command->Type != "connect" )
+	{
 		throw ref new Platform::InvalidArgumentException();
+	}
 
 	return ConnectAsync( ref new RtmpUri( uri ), command );
 }
 
-WF::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri )
+IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri )
 {
 	auto connect = ref new Command::NetConnectionConnectCommand( uri->App );
 	connect->TcUrl = uri->ToString();
 	return ConnectAsync( uri, connect );
 }
 
-WF::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Command::NetConnectionConnectCommand^ command )
+IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Command::NetConnectionConnectCommand^ command )
 {
 	startTime_ = utility::get_windows_time();
 	Uri_ = uri;
@@ -75,7 +79,7 @@ WF::IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Command::NetConnect
 	} );
 }
 
-WF::IAsyncAction^ NetConnection::CallAsync( Command::NetConnectionCallCommand^ command )
+IAsyncAction^ NetConnection::CallAsync( Command::NetConnectionCallCommand^ command )
 {
 	return create_async( [this, command]
 	{
@@ -110,7 +114,7 @@ void NetConnection::UnattachNetStream( NetStream^ stream )
 
 #pragma region Network operation (Server to Client)
 
-void NetConnection::OnReadOperationChanged( Connection^ sender, WF::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^ operation )
+void NetConnection::OnReadOperationChanged( Connection^ sender, IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^ operation )
 {
 	receiveOperation_ = operation;
 }
@@ -268,7 +272,7 @@ void NetConnection::ReceiveBodyImpl( const shared_ptr<rtmp_packet> packet )
 	{
 		const auto& length = result.size();
 
-		if( length > rxChunkSize_ )
+		if( length > static_cast<size_t>( rxChunkSize_ ) )
 		{
 			const auto chunk_size_plus_one = rxChunkSize_ + 1;
 			auto from_itr = result.cbegin() + chunk_size_plus_one;
@@ -296,7 +300,9 @@ void NetConnection::ReceiveCallbackImpl( const shared_ptr<rtmp_packet> packet, c
 	{
 		const auto& itr = bindingNetStream_.lower_bound( sid );
 		if( itr != bindingNetStream_.cend() && itr->first == sid )
+		{
 			itr->second->OnMessage( *packet.get(), move( result ) );
+		}
 	}
 	Receive();
 }
@@ -341,13 +347,8 @@ void NetConnection::OnNetworkMessage( const rtmp_packet packet, vector<uint8> da
 		break;
 
 	case type_id_type::set_peer_bandwidth:
-		{
-			uint32 buf;
-			utility::convert_big_endian( &data[0], 4, &buf );
-			//const auto limitType = static_cast<limit_type>( data[4] );
-			WindowAcknowledgementSizeAsync( buf );
-			break;
-		}
+		OnSetPeerBandwidthMessage( move( packet ), move( data ) );
+		break;
 	}
 }
 
@@ -364,7 +365,9 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, vector<u
 			uint32 stream_id;
 			utility::convert_big_endian( &data[2], 4, &stream_id );
 			if( stream_id == 0 )
+			{
 				SetBufferLengthAsync( 0, DEFAULT_BUFFER_MILLSECONDS );
+			}
 			break;
 		}
 
@@ -391,6 +394,38 @@ void NetConnection::OnUserControlMessage( const rtmp_packet /*packet*/, vector<u
 			break;
 		}
 	}
+}
+
+void NetConnection::OnSetPeerBandwidthMessage( const mntone::rtmp::rtmp_packet /*packet*/, std::vector<uint8> data )
+{
+	uint32 buf;
+	utility::convert_big_endian( &data[0], 4, &buf );
+
+	const auto& limit = static_cast<limit_type>( data[4] );
+	switch( limit )
+	{
+	case limit_type::hard:
+		txWindowSize_ = buf;
+		txLimitType_ = limit;
+		break;
+
+	case limit_type::soft:
+		txWindowSize_ = min( txWindowSize_, buf );
+		txLimitType_ = limit;
+		break;
+
+	case limit_type::dynamic:
+		if( txLimitType_ == limit_type::hard )
+		{
+			txWindowSize_ = buf;
+			txLimitType_ = limit;
+		}
+		break;
+
+	default:
+		return;
+	}
+	WindowAcknowledgementSizeAsync( buf );
 }
 
 void NetConnection::OnCommandMessage( const rtmp_packet /*packet*/, vector<uint8> data )
@@ -448,8 +483,15 @@ void NetConnection::OnCommandMessage( const rtmp_packet /*packet*/, vector<uint8
 		//const auto commandBuf = amf->GetAt( 2 );
 		//if( commandBuf->ValueType != Mntone::Data::Amf::AmfValueType::Object )
 		//	const auto command = commandBuf->GetObject();
-		const auto response = amf->GetAt( 3 );
-		Callback( this, ref new NetConnectionCallbackEventArgs( name, response ) );
+		if( amf->Size >= 4 )
+		{
+			const auto response = amf->GetAt( 3 );
+			Callback( this, ref new NetConnectionCallbackEventArgs( name, response ) );
+		}
+		else
+		{
+			Callback( this, ref new NetConnectionCallbackEventArgs( name, nullptr ) );
+		}
 	}
 }
 
@@ -457,16 +499,19 @@ void NetConnection::OnCommandMessage( const rtmp_packet /*packet*/, vector<uint8
 
 #pragma region Network operation (Client to Server)
 
-task<void> NetConnection::SetChunkSizeAsync( const uint32 chunkSize )
+task<void> NetConnection::SetChunkSizeAsync( const int32 chunkSize )
 {
-	if( chunkSize > 0x7fffffff )
+	if( chunkSize < 0 )
+	{
 		throw ref new Platform::InvalidArgumentException( "Invalid chunkSize. Valid chunkSize is 1 to 2147483647." );
-
-	txChunkSize_ = chunkSize;
+	}
 
 	vector<uint8> buf( 4 );
 	utility::convert_big_endian( &chunkSize, 4, &buf[0] );
-	return SendNetworkAsync( type_id_type::set_chunk_size, move( buf ) );
+	return SendNetworkAsync( type_id_type::set_chunk_size, move( buf ) ).then( [=]
+	{
+		txChunkSize_ = chunkSize;
+	} );
 }
 
 task<void> NetConnection::AbortMessageAsync( const uint32 chunkStreamId )
@@ -485,8 +530,6 @@ task<void> NetConnection::AcknowledgementAsync( const uint32 sequenceNumber )
 
 task<void> NetConnection::WindowAcknowledgementSizeAsync( const uint32 acknowledgementWindowSize )
 {
-	txWindowSize_ = acknowledgementWindowSize;
-
 	vector<uint8> buf( 4 );
 	utility::convert_big_endian( &acknowledgementWindowSize, 4, &buf[0] );
 	return SendNetworkAsync( type_id_type::window_acknowledgement_size, move( buf ) );
@@ -496,7 +539,7 @@ task<void> NetConnection::SetPeerBandWidthAsync( const uint32 windowSize, const 
 {
 	vector<uint8> buf( 5 );
 	utility::convert_big_endian( &windowSize, 4, &buf[0] );
-	buf[4] = type;
+	buf[4] = static_cast<uint8>( type );
 	return SendNetworkAsync( type_id_type::set_peer_bandwidth, move( buf ) );
 }
 

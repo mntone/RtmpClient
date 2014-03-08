@@ -86,11 +86,11 @@ void SimpleVideoClient::OnAudioStarted( Platform::Object^ sender, NetStreamAudio
 	const auto info = args->Info;
 
 	WMM::AudioEncodingProperties^ prop;
-	if( info->Format == AudioFormat::Mp3 )
+	if( info->Format == Media::AudioFormat::Mp3 )
 	{
 		prop = WMM::AudioEncodingProperties::CreateMp3( info->SampleRate, info->ChannelCount, info->Bitrate );
 	}
-	else if( info->Format == AudioFormat::Aac )
+	else if( info->Format == Media::AudioFormat::Aac )
 	{
 		prop = WMM::AudioEncodingProperties::CreateAac( info->SampleRate, info->ChannelCount, info->Bitrate );
 	}
@@ -104,7 +104,7 @@ void SimpleVideoClient::OnAudioStarted( Platform::Object^ sender, NetStreamAudio
 
 	if( mediaStreamSource_ != nullptr )
 	{
-		mediaStreamSource_->AddStreamDescriptor( des );	
+		mediaStreamSource_->AddStreamDescriptor( des );
 		dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [this]
 		{
 			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
@@ -118,7 +118,7 @@ void SimpleVideoClient::OnAudioStarted( Platform::Object^ sender, NetStreamAudio
 
 void SimpleVideoClient::OnVideoStarted( Platform::Object^ sender, NetStreamVideoStartedEventArgs^ args )
 {
-	if( args->Info->Format != VideoFormat::Avc )
+	if( args->Info->Format != Media::VideoFormat::Avc )
 		return;
 
 	auto prop = WMM::VideoEncodingProperties::CreateH264();

@@ -4,7 +4,7 @@
 #include "sound_size.h"
 #include "sound_type.h"
 
-namespace mntone { namespace rtmp {
+namespace mntone { namespace rtmp { namespace media {
 
 	struct sound_info
 	{
@@ -14,4 +14,4 @@ namespace mntone { namespace rtmp {
 		sound_format format : 4;
 	};
 
-} }
+} } }

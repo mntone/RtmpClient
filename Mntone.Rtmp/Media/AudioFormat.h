@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Mntone { namespace Rtmp {
+namespace Mntone { namespace Rtmp { namespace Media {
 
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public enum class AudioFormat
@@ -16,4 +16,4 @@ namespace Mntone { namespace Rtmp {
 		Speex,
 	};
 
-} }
+} } }

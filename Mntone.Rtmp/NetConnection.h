@@ -59,12 +59,15 @@ namespace Mntone { namespace Rtmp {
 		void ReceiveCallbackImpl( const std::shared_ptr<mntone::rtmp::rtmp_packet> packet, const std::vector<uint8> result );
 
 		void OnMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
+
 		void OnNetworkMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 		void OnUserControlMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
+		void OnSetPeerBandwidthMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
+
 		void OnCommandMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 
 		// Send
-		Concurrency::task<void> SetChunkSizeAsync( const uint32 chunkSize );
+		Concurrency::task<void> SetChunkSizeAsync( const int32 chunkSize );
 		Concurrency::task<void> AbortMessageAsync( const uint32 chunkStreamId );
 		Concurrency::task<void> AcknowledgementAsync( const uint32 sequenceNumber );
 		Concurrency::task<void> WindowAcknowledgementSizeAsync( const uint32 acknowledgementWindowSize );
@@ -103,8 +106,10 @@ namespace Mntone { namespace Rtmp {
 
 		std::vector<uint8> rxHeaderBuffer_;
 		std::unordered_map<uint16, std::shared_ptr<mntone::rtmp::rtmp_packet>> rxBakPackets_, txBakPackets_;
+
+		int32 rxChunkSize_, txChunkSize_;
 		uint32 rxWindowSize_, txWindowSize_;
-		uint32 rxChunkSize_, txChunkSize_;
+		mntone::rtmp::limit_type rxLimitType_, txLimitType_;
 	};
 
 } }

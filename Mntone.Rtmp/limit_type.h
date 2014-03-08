@@ -2,11 +2,11 @@
 
 namespace mntone { namespace rtmp {
 
-	enum limit_type: uint8
+	enum class limit_type: uint8
 	{
-		limit_hard = 0,
-		limit_soft = 1,
-		limit_dynamic = 2,
+		hard = 0,
+		soft = 1,
+		dynamic = 2,
 	};
 
 } }

@@ -1,5 +1,5 @@
 #pragma once
-#include "VideoInfo.h"
+#include "Media/VideoInfo.h"
 
 namespace Mntone { namespace Rtmp {
 
@@ -7,16 +7,16 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetStreamVideoStartedEventArgs sealed
 	{
 	internal:
-		NetStreamVideoStartedEventArgs( VideoInfo^ info );
+		NetStreamVideoStartedEventArgs( Media::VideoInfo^ info );
 
 	public:
-		property VideoInfo^ Info
+		property Media::VideoInfo^ Info
 		{
-			VideoInfo^ get() { return Info_; }
+			Media::VideoInfo^ get() { return Info_; }
 		}
 
 	private:
-		VideoInfo^ Info_;
+		Media::VideoInfo^ Info_;
 	};
 
 } }
