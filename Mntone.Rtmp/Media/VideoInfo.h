@@ -1,5 +1,6 @@
 #pragma once
 #include "VideoFormat.h"
+#include "AvcProfileIndication.h"
 
 namespace Mntone { namespace Rtmp { namespace Media {
 
@@ -16,6 +17,12 @@ namespace Mntone { namespace Rtmp { namespace Media {
 		internal:
 			void set( VideoFormat value ) { Format_ = value; }
 		}
+		property AvcProfileIndication ProfileIndication
+		{
+			AvcProfileIndication get() { return ProfileIndication_; }
+		internal:
+			void set( AvcProfileIndication value ) { ProfileIndication_ = value; }
+		}
 		property uint16 Bitrate
 		{
 			uint16 get() { return Bitrate_; }
@@ -25,6 +32,7 @@ namespace Mntone { namespace Rtmp { namespace Media {
 
 	private:
 		VideoFormat Format_;
+		AvcProfileIndication ProfileIndication_;
 		uint16 Bitrate_;
 	};
 

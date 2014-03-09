@@ -124,7 +124,7 @@ void SimpleVideoClient::OnVideoStarted( Platform::Object^ sender, NetStreamVideo
 	}
 
 	auto prop = WMM::VideoEncodingProperties::CreateH264();
-	prop->ProfileId = WMM::H264ProfileIds::High;
+	prop->ProfileId = static_cast<uint32>( args->Info->ProfileIndication );
 	prop->Bitrate = args->Info->Bitrate;
 	const auto des = ref new VideoStreamDescriptor( prop );
 

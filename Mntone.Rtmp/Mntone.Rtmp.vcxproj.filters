@@ -175,5 +175,8 @@
     <ClInclude Include="Media\flv_tag_type.h">
       <Filter>Media</Filter>
     </ClInclude>
+    <ClInclude Include="AvcProfileIndication.h">
+      <Filter>Media</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
