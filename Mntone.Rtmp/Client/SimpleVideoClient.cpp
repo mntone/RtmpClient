@@ -10,8 +10,7 @@ namespace WMM = Windows::Media::MediaProperties;
 namespace WUIC = Windows::UI::Core;
 
 SimpleVideoClient::SimpleVideoClient()
-	: dispatcher_( WUIC::CoreWindow::GetForCurrentThread()->Dispatcher )
-	, mediaStreamSource_( nullptr )
+	: mediaStreamSource_( nullptr )
 	, bufferingHelper_( nullptr )
 { }
 
@@ -105,37 +104,42 @@ void SimpleVideoClient::OnAudioStarted( Platform::Object^ sender, NetStreamAudio
 	if( mediaStreamSource_ != nullptr )
 	{
 		mediaStreamSource_->AddStreamDescriptor( des );
-		dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [this]
-		{
-			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
-		} ) );
+		Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
 	}
 	else
 	{
 		CreateMediaStream( des );
+		if( args->AudioOnly )
+		{
+			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
+		}
 	}
 }
 
 void SimpleVideoClient::OnVideoStarted( Platform::Object^ sender, NetStreamVideoStartedEventArgs^ args )
 {
 	if( args->Info->Format != Media::VideoFormat::Avc )
+	{
 		return;
+	}
 
 	auto prop = WMM::VideoEncodingProperties::CreateH264();
 	prop->ProfileId = WMM::H264ProfileIds::High;
+	prop->Bitrate = args->Info->Bitrate;
 	const auto des = ref new VideoStreamDescriptor( prop );
 
 	if( mediaStreamSource_ != nullptr )
 	{
 		mediaStreamSource_->AddStreamDescriptor( des );
-		dispatcher_->RunAsync( WUIC::CoreDispatcherPriority::Normal, ref new WUIC::DispatchedHandler( [this]
-		{
-			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
-		} ) );
+		Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
 	}
 	else
 	{
 		CreateMediaStream( des );
+		if( args->VideoOnly )
+		{
+			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
+		}
 	}
 }
 

@@ -78,7 +78,7 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 		lengthSizeMinusOne_ = dcr.length_size_minus_one;
 		videoInfo_->Format = VideoFormat::Avc;
 		videoInfoEnabled_ = true;
-		VideoStarted( this, ref new NetStreamVideoStartedEventArgs( videoInfo_ ) );
+		VideoStarted( this, ref new NetStreamVideoStartedEventArgs( !audioEnabled_, videoInfo_ ) );
 
 		args->Info = videoInfo_;
 

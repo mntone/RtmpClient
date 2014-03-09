@@ -7,15 +7,20 @@ namespace Mntone { namespace Rtmp {
 	public ref class NetStreamAudioStartedEventArgs sealed
 	{
 	internal:
-		NetStreamAudioStartedEventArgs( Media::AudioInfo^ info );
+		NetStreamAudioStartedEventArgs( bool audioOnly, Media::AudioInfo^ info );
 
 	public:
+		property bool AudioOnly
+		{
+			bool get() { return AudioOnly_; }
+		}
 		property Media::AudioInfo^ Info
 		{
 			Media::AudioInfo^ get() { return Info_; }
 		}
 
 	private:
+		bool AudioOnly_;
 		Media::AudioInfo^ Info_;
 	};
 

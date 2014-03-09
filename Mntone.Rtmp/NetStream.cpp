@@ -17,10 +17,8 @@ using namespace Mntone::Rtmp::Media;
 
 NetStream::NetStream()
 	: streamId_( 0 )
-	, audioInfoEnabled_( false )
-	, audioInfo_( ref new AudioInfo() )
-	, videoInfoEnabled_( false )
-	, videoInfo_( ref new VideoInfo() )
+	, audioEnabled_( true ), audioInfoEnabled_( false ), audioInfo_( ref new AudioInfo() )
+	, videoEnabled_( true ), videoInfoEnabled_( false ), videoInfo_( ref new VideoInfo() ), videoDataRate_( 0 )
 	, lengthSizeMinusOne_( 0 )
 	, samplingRate_( 0 )
 { }
@@ -194,7 +192,7 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 			audioInfo_->SampleRate = samplingRate_ != 0 ? samplingRate_ : adts.sampling_frequency();
 			audioInfo_->ChannelCount = adts.channel_configuration();
 			audioInfo_->BitsPerSample = si.size == sound_size::s16bit ? 16 : 8;
-			AudioStarted( this, ref new NetStreamAudioStartedEventArgs( audioInfo_ ) );
+			AudioStarted( this, ref new NetStreamAudioStartedEventArgs( !videoEnabled_, audioInfo_ ) );
 		}
 		return;
 	}
@@ -203,7 +201,7 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 	{
 		audioInfo_->SetInfo( si );
 		audioInfoEnabled_ = true;
-		AudioStarted( this, ref new NetStreamAudioStartedEventArgs( audioInfo_ ) );
+		AudioStarted( this, ref new NetStreamAudioStartedEventArgs( !videoEnabled_, audioInfo_ ) );
 	}
 
 	auto args = ref new NetStreamAudioReceivedEventArgs();
@@ -232,8 +230,9 @@ void NetStream::OnVideoMessage( const rtmp_packet packet, std::vector<uint8> dat
 	if( !videoInfoEnabled_ )
 	{
 		videoInfo_->Format = vf;
+		videoInfo_->Bitrate = videoDataRate_;
 		videoInfoEnabled_ = true;
-		VideoStarted( this, ref new NetStreamVideoStartedEventArgs( videoInfo_ ) );
+		VideoStarted( this, ref new NetStreamVideoStartedEventArgs( !audioEnabled_, videoInfo_ ) );
 	}
 
 	args->Info = videoInfo_;
@@ -252,9 +251,29 @@ void NetStream::OnDataMessage( const rtmp_packet /*packet*/, std::vector<uint8> 
 	}
 
 	const auto& object = amf->GetObjectAt( 1 );
-	if( object->HasKey( "audiosamplerate" ) )
+
+	if( object->HasKey( "videocodecid" ) )
 	{
-		samplingRate_ = static_cast<uint32>( object->GetNamedNumber( "audiosamplerate" ) );
+		if( object->HasKey( "videodatarate" ) )
+		{
+			videoDataRate_ = static_cast<uint16>( object->GetNamedNumber( "videodatarate" ) );
+		}
+	}
+	else
+	{
+		videoEnabled_ = false;
+	}
+
+	if( object->HasKey( "audiocodecid" ) )
+	{
+		if( object->HasKey( "audiosamplerate" ) )
+		{
+			samplingRate_ = static_cast<uint32>( object->GetNamedNumber( "audiosamplerate" ) );
+		}
+	}
+	else
+	{
+		audioEnabled_ = false;
 	}
 }
 

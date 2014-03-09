@@ -38,9 +38,12 @@ void MainPage::OnButtonClicked( Platform::Object^ sender, WUIX::RoutedEventArgs^
 
 void MainPage::OnStarted( Platform::Object^ sender, SimpleVideoClientStartedEventArgs^ args )
 {
-	mediaElement->SetMediaStreamSource( args->MediaStreamSource );
-	mediaElement->MediaEnded += ref new WUIX::RoutedEventHandler( this, &MainPage::OnMediaEnded );
-	mediaElement->Play();
+	Dispatcher->RunAsync( Windows::UI::Core::CoreDispatcherPriority::High, ref new Windows::UI::Core::DispatchedHandler( [=]
+	{
+		mediaElement->SetMediaStreamSource( args->MediaStreamSource );
+		mediaElement->MediaEnded += ref new WUIX::RoutedEventHandler( this, &MainPage::OnMediaEnded );
+		mediaElement->Play();
+	} ) );
 }
 
 void MainPage::OnStopped( Platform::Object^ sender, SimpleVideoClientStoppedEventArgs^ args )

@@ -3,6 +3,7 @@
 
 using namespace Mntone::Rtmp;
 
-NetStreamAudioStartedEventArgs::NetStreamAudioStartedEventArgs( Media::AudioInfo^ info )
-	: Info_( info )
+NetStreamAudioStartedEventArgs::NetStreamAudioStartedEventArgs( bool audioOnly, Media::AudioInfo^ info )
+	: AudioOnly_( audioOnly )
+	, Info_( info )
 { }

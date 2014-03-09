@@ -54,17 +54,18 @@ namespace Mntone { namespace Rtmp {
 		event Windows::Foundation::EventHandler<NetStreamAudioReceivedEventArgs^>^ AudioReceived;
 		event Windows::Foundation::EventHandler<NetStreamVideoStartedEventArgs^>^ VideoStarted;
 		event Windows::Foundation::EventHandler<NetStreamVideoReceivedEventArgs^>^ VideoReceived;
-		
+
 	internal:
 		NetConnection^ parent_;
 		uint32 streamId_;
 
 	private:
-		bool audioInfoEnabled_;
+		bool audioEnabled_, audioInfoEnabled_;
 		Media::AudioInfo^ audioInfo_;
 
-		bool videoInfoEnabled_;
+		bool videoEnabled_, videoInfoEnabled_;
 		Media::VideoInfo^ videoInfo_;
+		uint16 videoDataRate_;
 
 		// for Avc
 		uint8 lengthSizeMinusOne_;

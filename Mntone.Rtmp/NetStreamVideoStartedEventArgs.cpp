@@ -3,6 +3,7 @@
 
 using namespace Mntone::Rtmp;
 
-NetStreamVideoStartedEventArgs::NetStreamVideoStartedEventArgs( Media::VideoInfo^ info )
-	: Info_( info )
+NetStreamVideoStartedEventArgs::NetStreamVideoStartedEventArgs( bool videoOnly, Media::VideoInfo^ info )
+	: VideoOnly_( videoOnly )
+	, Info_( info )
 { }
