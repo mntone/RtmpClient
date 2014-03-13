@@ -2,7 +2,7 @@
 
 namespace mntone { namespace rtmp { namespace utility {
 
-	void convert_big_endian( const void* first, size_t size, void* dest );
+	void convert_big_endian( const void* const first, size_t size, void* const dest );
 	void convert_little_endian( const void *const first, const size_t size, void *const dest );
 
 	uint64 windows_time_to_unix_time( const int64 windows_time );

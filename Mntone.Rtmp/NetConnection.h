@@ -56,7 +56,7 @@ namespace Mntone { namespace Rtmp {
 		void ReceiveHeader1Impl( const std::vector<uint8> result );
 		void ReceiveHeader2Impl( const uint8 format_type, const uint16 chunk_stream_id );
 		void ReceiveBodyImpl( const std::shared_ptr<mntone::rtmp::rtmp_packet> packet );
-		void ReceiveCallbackImpl( const std::shared_ptr<mntone::rtmp::rtmp_packet> packet, const std::vector<uint8> result );
+		void ReceiveCallbackImpl( const std::shared_ptr<const mntone::rtmp::rtmp_packet> packet, const std::vector<uint8> result );
 
 		void OnMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 
@@ -80,8 +80,8 @@ namespace Mntone { namespace Rtmp {
 		Concurrency::task<void> SendNetworkAsync( const mntone::rtmp::type_id_type type, const std::vector<uint8> data );
 		Concurrency::task<void> SendActionAsync( Mntone::Data::Amf::AmfArray^ amf );
 
-		Concurrency::task<void> SendAsync( mntone::rtmp::rtmp_packet packet, const std::vector<uint8> data, const bool isFormatTypeZero = false );
-		std::vector<uint8> CreateHeader( mntone::rtmp::rtmp_packet packet, bool isFormatTypeZero );
+		Concurrency::task<void> SendAsync( mntone::rtmp::rtmp_packet packet, const std::vector<uint8> data, const uint8_t forceFormatType = 255 );
+		std::vector<uint8> CreateHeader( mntone::rtmp::rtmp_packet packet, uint8_t forceFormatType );
 
 	public:
 		event Windows::Foundation::EventHandler<NetStatusUpdatedEventArgs^>^ StatusUpdated;

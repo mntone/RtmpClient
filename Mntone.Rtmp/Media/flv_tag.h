@@ -19,13 +19,13 @@ namespace mntone { namespace rtmp { namespace media {
 		void set_filter( flv_filter value ) noexcept { filter_ = std::move( value ); }
 
 		uint32 data_size() const noexcept;
-		void set_data_size( uint32 value ) noexcept;
+		void set_data_size( uint32 value );
 
 		int32 timestamp() const noexcept;
 		void set_timestamp( int32 value ) noexcept;
 
 		uint32 stream_id() const noexcept;
-		void set_stream_id( uint32 value ) noexcept;
+		void set_stream_id( uint32 value );
 
 	private:
 		flv_tag_type tag_type_ : 5;

@@ -36,7 +36,7 @@ void NetStream::AttachedImpl()
 	Attached( this, ref new NetStreamAttachedEventArgs() );
 }
 
-void NetStream::UnattachedImpl()
+void NetStream::DetachedImpl()
 {
 	if( parent_ != nullptr )
 	{
@@ -177,6 +177,11 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 
 	if( si.format == sound_format::aac )
 	{
+		if( data.size() < 3 )
+		{
+			return;
+		}
+
 		if( data[1] == 0x01 )
 		{
 			auto args = ref new NetStreamAudioReceivedEventArgs();
@@ -185,13 +190,14 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 			args->SetData( std::move( data ), 2 );
 			AudioReceived( this, args );
 		}
-		else if( data[1] == 0x00 )
+		else if( data[1] == 0x00 && !audioInfoEnabled_ )
 		{
 			const auto& adts = *reinterpret_cast<adts_header*>( data.data() );
 			audioInfo_->Format = AudioFormat::Aac;
 			audioInfo_->SampleRate = samplingRate_ != 0 ? samplingRate_ : adts.sampling_frequency();
 			audioInfo_->ChannelCount = adts.channel_configuration();
 			audioInfo_->BitsPerSample = si.size == sound_size::s16bit ? 16 : 8;
+			audioInfoEnabled_ = true;
 			AudioStarted( this, ref new NetStreamAudioStartedEventArgs( !videoEnabled_, audioInfo_ ) );
 		}
 		return;
@@ -254,6 +260,7 @@ void NetStream::OnDataMessage( const rtmp_packet /*packet*/, std::vector<uint8> 
 
 	if( object->HasKey( "videocodecid" ) )
 	{
+		videoEnabled_ = true;
 		if( object->HasKey( "videodatarate" ) )
 		{
 			videoDataRate_ = static_cast<uint16>( object->GetNamedNumber( "videodatarate" ) );
@@ -266,6 +273,7 @@ void NetStream::OnDataMessage( const rtmp_packet /*packet*/, std::vector<uint8> 
 
 	if( object->HasKey( "audiocodecid" ) )
 	{
+		audioEnabled_ = true;
 		if( object->HasKey( "audiosamplerate" ) )
 		{
 			samplingRate_ = static_cast<uint32>( object->GetNamedNumber( "audiosamplerate" ) );

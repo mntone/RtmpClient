@@ -94,11 +94,6 @@ Concurrency::task<void> Connection::Write( const uint8* const data, const size_t
 	return Concurrency::create_task( dataWriter_->StoreAsync() ).then( [] ( const uint32 ) { } );
 }
 
-Concurrency::task<void> Connection::Write( const std::vector<uint8>& data )
-{
-	return Write( data.data(), data.size() );
-}
-
 void Connection::CloseImpl()
 {
 	if( dataWriter_ != nullptr )

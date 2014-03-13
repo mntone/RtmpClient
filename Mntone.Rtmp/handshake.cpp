@@ -38,7 +38,7 @@ void NetConnection::Handshake( HandshakeCallbackHandler^ callbackFunction )
 		*ptr = distribution( engine );
 #endif
 
-	connection_->Write( send_data );
+	connection_->Write( send_data.data(), send_data.size() );
 
 	// ---[ Receive S0+S1 packet ]----------
 	connection_->Read( hs0_size + hs1_size, ref new ConnectionCallbackHandler( [=]( std::vector<uint8> result )
@@ -55,7 +55,7 @@ void NetConnection::Handshake( HandshakeCallbackHandler^ callbackFunction )
 		memcpy( &cs2[0], &result[1], 4 );					// time
 		utility::convert_big_endian( &time, 4, &cs2[4] );	// time2
 		memcpy( &cs2[8], &result[9], hsr_size );				// randomData
-		connection_->Write( cs2 );
+		connection_->Write( cs2.data(), cs2.size() );
 
 		// ---[ Receive S2 packet ]----------
 		connection_->Read( hs2_size, ref new ConnectionCallbackHandler( [=]( std::vector<uint8> result )

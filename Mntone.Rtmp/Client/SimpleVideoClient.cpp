@@ -95,12 +95,16 @@ void SimpleVideoClient::OnAudioStarted( Platform::Object^ sender, NetStreamAudio
 	}
 	else
 	{
+		if( mediaStreamSource_ != nullptr )
+		{
+			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
+		}
 		return;
 	}
 
 	prop->BitsPerSample = info->BitsPerSample;
-	const auto des = ref new AudioStreamDescriptor( prop );
 
+	const auto des = ref new AudioStreamDescriptor( prop );
 	if( mediaStreamSource_ != nullptr )
 	{
 		mediaStreamSource_->AddStreamDescriptor( des );
@@ -118,16 +122,29 @@ void SimpleVideoClient::OnAudioStarted( Platform::Object^ sender, NetStreamAudio
 
 void SimpleVideoClient::OnVideoStarted( Platform::Object^ sender, NetStreamVideoStartedEventArgs^ args )
 {
-	if( args->Info->Format != Media::VideoFormat::Avc )
+	WMM::VideoEncodingProperties^ prop;
+	if( args->Info->Format == Media::VideoFormat::Avc )
 	{
+		prop = WMM::VideoEncodingProperties::CreateH264();
+		prop->ProfileId = static_cast<uint32>( args->Info->ProfileIndication );
+	}
+	//else if( args->Info->Format == Media::VideoFormat::SorensonH263 )
+	//{
+	//	prop = ref new WMM::VideoEncodingProperties();
+	//	prop->Subtype = WMM::MediaEncodingSubtypes::H263;
+	//}
+	else
+	{
+		if( mediaStreamSource_ != nullptr )
+		{
+			Started( this, ref new SimpleVideoClientStartedEventArgs( mediaStreamSource_ ) );
+		}
 		return;
 	}
 
-	auto prop = WMM::VideoEncodingProperties::CreateH264();
-	prop->ProfileId = static_cast<uint32>( args->Info->ProfileIndication );
 	prop->Bitrate = args->Info->Bitrate;
-	const auto des = ref new VideoStreamDescriptor( prop );
 
+	const auto des = ref new VideoStreamDescriptor( prop );
 	if( mediaStreamSource_ != nullptr )
 	{
 		mediaStreamSource_->AddStreamDescriptor( des );

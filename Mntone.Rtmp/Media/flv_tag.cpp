@@ -10,7 +10,7 @@ uint32 flv_tag::data_size() const noexcept
 	utility::convert_big_endian( data_size_, 3, &ret );
 	return ret;
 }
-void flv_tag::set_data_size( uint32 value ) noexcept
+void flv_tag::set_data_size( uint32 value )
 {
 	if( value > 281474976710655 )
 	{
@@ -39,7 +39,7 @@ uint32 flv_tag::stream_id() const noexcept
 	utility::convert_big_endian( stream_id_, 3, &ret );
 	return ret;
 }
-void flv_tag::set_stream_id( uint32 value ) noexcept
+void flv_tag::set_stream_id( uint32 value )
 {
 	if( value > 281474976710655 )
 	{

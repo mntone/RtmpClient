@@ -3,13 +3,15 @@
 
 using namespace mntone::rtmp;
 
-void utility::convert_big_endian( const void* first, size_t size, void* dest )
+void utility::convert_big_endian( const void* const first, size_t size, void* const dest )
 {
 	auto ptr = reinterpret_cast<const uint8*>( first ) + size;
 	auto pdest = reinterpret_cast<uint8*>( dest );
 
 	for( ; first != ptr; ++pdest )
+	{
 		*pdest = *--ptr;
+	}
 }
 
 void utility::convert_little_endian( const void *const first, const size_t size, void *const dest )

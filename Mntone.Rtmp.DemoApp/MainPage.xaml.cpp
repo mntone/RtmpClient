@@ -43,6 +43,7 @@ void MainPage::OnStarted( Platform::Object^ sender, SimpleVideoClientStartedEven
 		mediaElement->SetMediaStreamSource( args->MediaStreamSource );
 		mediaElement->MediaEnded += ref new WUIX::RoutedEventHandler( this, &MainPage::OnMediaEnded );
 		mediaElement->Play();
+		foregroundElement->Visibility = WUIX::Visibility::Collapsed;
 	} ) );
 }
 

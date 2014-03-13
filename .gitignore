@@ -1,6 +1,7 @@
 /bin
 /obj
 /ipch
+/packages
 *.opensdf
 *.sdf
 *.suo

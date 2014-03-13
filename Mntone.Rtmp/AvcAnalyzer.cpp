@@ -74,12 +74,15 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 			return;
 		}
 
-		const auto& dcr = *reinterpret_cast<avc_decoder_configuration_record*>( &data[5] );
-		lengthSizeMinusOne_ = dcr.length_size_minus_one;
-		videoInfo_->Format = VideoFormat::Avc;
-		videoInfo_->ProfileIndication = static_cast<AvcProfileIndication>( dcr.avc_profile_indication );
-		videoInfoEnabled_ = true;
-		VideoStarted( this, ref new NetStreamVideoStartedEventArgs( !audioEnabled_, videoInfo_ ) );
+		if( !videoInfoEnabled_ )
+		{
+			const auto& dcr = *reinterpret_cast<avc_decoder_configuration_record*>( &data[5] );
+			lengthSizeMinusOne_ = dcr.length_size_minus_one;
+			videoInfo_->Format = VideoFormat::Avc;
+			videoInfo_->ProfileIndication = static_cast<AvcProfileIndication>( dcr.avc_profile_indication );
+			videoInfoEnabled_ = true;
+			VideoStarted( this, ref new NetStreamVideoStartedEventArgs( !audioEnabled_, videoInfo_ ) );
+		}
 
 		args->Info = videoInfo_;
 

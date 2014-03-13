@@ -14,7 +14,6 @@ namespace Mntone { namespace Rtmp {
 		void Read( const uint32 length, ConnectionCallbackHandler^ callbackFunction );
 
 		Concurrency::task<void> Write( const uint8* const data, const size_t length );
-		Concurrency::task<void> Write( const std::vector<uint8>& data );
 
 	private:
 		void CloseImpl();

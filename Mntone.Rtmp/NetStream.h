@@ -33,7 +33,7 @@ namespace Mntone { namespace Rtmp {
 
 	internal:
 		void AttachedImpl();
-		void UnattachedImpl();
+		void DetachedImpl();
 
 		void OnMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
 		void OnAudioMessage( const mntone::rtmp::rtmp_packet packet, std::vector<uint8> data );
