@@ -17,7 +17,7 @@ namespace Mntone { namespace Rtmp {
 
 	private:
 		void CloseImpl();
-		void ContinuousRead( std::vector<uint8> data, const uint32 offset, const uint32 length, ConnectionCallbackHandler^ callbackFunction );
+		void ContinuousRead( Windows::Storage::Streams::IBuffer^ data, const uint32 length, ConnectionCallbackHandler^ callbackFunction );
 
 	internal:
 		event Windows::Foundation::TypedEventHandler<Connection^, Windows::Foundation::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^>^ ReadOperationChanged;

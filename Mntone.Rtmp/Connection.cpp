@@ -36,7 +36,43 @@ void Connection::Read( const uint32 length, ConnectionCallbackHandler^ callbackF
 		if( status == AsyncStatus::Completed )
 		{
 			auto buffer = operation->GetResults();
-			callbackFunction( buffer );
+			if( buffer->Length != length )
+			{
+				ContinuousRead( buffer, length - buffer->Length, callbackFunction );
+			}
+			else
+			{
+				callbackFunction( buffer );
+			}
+		}
+	} );
+	ReadOperationChanged( this, read_operation );
+}
+
+void Connection::ContinuousRead( Windows::Storage::Streams::IBuffer^ data, const uint32 length, ConnectionCallbackHandler^ callbackFunction )
+{
+	using namespace Windows::Storage::Streams;
+
+	auto buffer = ref new Buffer( length );
+	auto read_operation = streamSocket_->InputStream->ReadAsync( buffer, length, InputStreamOptions::Partial );
+	read_operation->Completed = ref new AsyncOperationWithProgressCompletedHandler<IBuffer^, uint32>(
+		[this, data, length, callbackFunction]( IAsyncOperationWithProgress<IBuffer^, uint32>^ operation, AsyncStatus status )
+	{
+		if( status == AsyncStatus::Completed )
+		{
+			auto writer = ref new DataWriter();
+			writer->WriteBuffer( data );
+
+			auto buffer = operation->GetResults();
+			writer->WriteBuffer( buffer );
+			if( buffer->Length != length )
+			{
+				ContinuousRead( writer->DetachBuffer(), length - buffer->Length, callbackFunction );
+			}
+			else
+			{
+				callbackFunction( writer->DetachBuffer() );
+			}
 		}
 	} );
 	ReadOperationChanged( this, read_operation );
