@@ -57,7 +57,7 @@ void NetConnection::Handshake( HandshakeCallbackHandler^ callbackFunction )
 
 			// ---[ Send C2 packet ]----------
 			std::vector<uint8> send_c2_data( hs2_size );
-			utility::convert_big_endian( &s1_time, 4, &send_c2_data[4] );	// c2_time
+			utility::convert_big_endian( &s1_time, 4, &send_c2_data[0] );	// c2_time
 			utility::convert_big_endian( &c1_time, 4, &send_c2_data[4] );	// c2_time2
 			reader->ReadBytes( Platform::ArrayReference<uint8>( send_c2_data.data() + 8, send_c2_data.size() - 8 ) ); // random_data
 
