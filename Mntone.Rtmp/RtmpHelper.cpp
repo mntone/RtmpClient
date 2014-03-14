@@ -181,3 +181,20 @@ NetStatusCodeType RtmpHelper::ParseNetStreamCode( const std::wstring code )
 
 	return nsc;
 }
+
+uint32 RtmpHelper::ReadUint24( Windows::Storage::Streams::DataReader^ reader )
+{
+	auto buf = ref new Platform::Array<uint8>( 3 );
+	reader->ReadBytes( buf );
+
+	uint32 ret( 0 );
+	if( reader->ByteOrder == Windows::Storage::Streams::ByteOrder::BigEndian )
+	{
+		mntone::rtmp::utility::convert_big_endian( buf->Data, buf->Length, &ret );
+	}
+	else
+	{
+		mntone::rtmp::utility::convert_little_endian( buf->Data, buf->Length, &ret );
+	}
+	return ret;
+}

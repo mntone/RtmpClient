@@ -53,7 +53,7 @@ namespace Mntone { namespace Rtmp {
 		void OnReadOperationChanged( Connection^ sender, Windows::Foundation::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^ operation );
 		void Receive();
 		void ReceiveContinueImpl( Windows::Foundation::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^ operation );
-		void ReceiveHeader1Impl( const std::vector<uint8> result );
+		void ReceiveHeader1Impl( Windows::Storage::Streams::IBuffer^ result );
 		void ReceiveHeader2Impl( const uint8 format_type, const uint16 chunk_stream_id );
 		void ReceiveBodyImpl( const std::shared_ptr<mntone::rtmp::rtmp_packet> packet );
 		void ReceiveCallbackImpl( const std::shared_ptr<const mntone::rtmp::rtmp_packet> packet, const std::vector<uint8> result );

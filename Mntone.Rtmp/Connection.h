@@ -2,7 +2,7 @@
 
 namespace Mntone { namespace Rtmp {
 
-	delegate void ConnectionCallbackHandler( std::vector<uint8> result );
+	delegate void ConnectionCallbackHandler( Windows::Storage::Streams::IBuffer^ result );
 
 	ref class Connection sealed
 	{
@@ -31,9 +31,7 @@ namespace Mntone { namespace Rtmp {
 	private:
 		bool IsInitialized_;
 		Windows::Networking::Sockets::StreamSocket^ streamSocket_;
-		Windows::Storage::Streams::DataReader^ dataReader_;
 		Windows::Storage::Streams::DataWriter^ dataWriter_;
-		Windows::Networking::Sockets::ControlChannelTrigger^ _controllChannelTrigger_;
 	};
 
 } }

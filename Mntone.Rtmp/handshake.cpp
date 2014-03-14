@@ -17,58 +17,74 @@ void NetConnection::Handshake( HandshakeCallbackHandler^ callbackFunction )
 	// ---[ Send C0+C1 packet ]----------
 	std::vector<uint8> send_data( hs0_size + hs1_size, 0xff );
 
-	// C0 --- protcolVersion: uint8
+	// C0 --- protcol_version: uint8
 	send_data[0] = 0x03; // default: 0x03: plain (or 0x06, 0x08, 0x09: encrypted)
 
 	// C1 --- time: uint32, zero: uint32, random_data: 1528 bytes
-	// [time]
-	auto time = utility::hundred_nano_to_milli( utility::get_windows_time() - startTime_ ) + 1;
-	utility::convert_big_endian( &time, 4, &send_data[1] );
+	auto c1_time = utility::hundred_nano_to_milli( utility::get_windows_time() - startTime_ ) + 1;
+	utility::convert_big_endian( &c1_time, 4, &send_data[1] );	// time
+	std::fill_n( send_data.begin() + 5, 4, 0x00 );				// zero
 
-	// [zero]
-	std::fill_n( send_data.begin() + 5, 4, 0x00 );
-
-	// [randomData_]
+	// random_data
 #if NDEBUG
 	std::mt19937 engine;
 	std::uniform_int_distribution<uint64_t> distribution( 0x0000000000000000, 0xffffffffffffffff );
 	auto sptr = reinterpret_cast<uint64_t*>( &send_data[9] );
 	const auto eptr = sptr + hsr_size / 8u;
 	for( auto ptr = sptr; ptr != eptr; ++ptr )
+	{
 		*ptr = distribution( engine );
+	}
 #endif
 
-	connection_->Write( send_data.data(), send_data.size() );
-
-	// ---[ Receive S0+S1 packet ]----------
-	connection_->Read( hs0_size + hs1_size, ref new ConnectionCallbackHandler( [=]( std::vector<uint8> result )
+	create_task( connection_->Write( send_data.data(), send_data.size() ) ).then( [this, c1_time, send_data, callbackFunction]
 	{
-		// S0 --- protocolVersion: uint8
-		if( result[0] != 0x03 )
-			throw ref new Platform::FailureException();
-
-		// S1 --- time: uint32, zero: uint32, random_data: 1528 bytes
-
-		// ---[ Send C2 packet ]----------
-		// Create C2 data
-		std::vector<uint8> cs2( hs2_size );
-		memcpy( &cs2[0], &result[1], 4 );					// time
-		utility::convert_big_endian( &time, 4, &cs2[4] );	// time2
-		memcpy( &cs2[8], &result[9], hsr_size );				// randomData
-		connection_->Write( cs2.data(), cs2.size() );
-
-		// ---[ Receive S2 packet ]----------
-		connection_->Read( hs2_size, ref new ConnectionCallbackHandler( [=]( std::vector<uint8> result )
+		// ---[ Receive S0+S1 packet ]----------
+		connection_->Read( hs0_size + hs1_size, ref new ConnectionCallbackHandler( [this, c1_time, send_data, callbackFunction]( Windows::Storage::Streams::IBuffer^ result )
 		{
-			// S2 --- time: uint32, time2: uint32, random_echo: 1528 bytes
-			uint32 server_send_client_time( 0 );
-			utility::convert_big_endian( &result[0], 4, &server_send_client_time );
+			auto reader = Windows::Storage::Streams::DataReader::FromBuffer( result );
+			reader->ByteOrder = Windows::Storage::Streams::ByteOrder::BigEndian;
 
-			// check time and random_echo
-			if( time != server_send_client_time || memcmp( &send_data[9], &result[8], hsr_size ) != 0 )
+			// S0 --- protocol_version: uint8
+			if( reader->ReadByte() != 0x03 )
+			{
 				throw ref new Platform::FailureException();
+			}
 
-			callbackFunction();
+			// S1 --- time: uint32, zero: uint32, random_data: 1528 bytes
+			const uint32 s1_time = reader->ReadUInt32();
+			reader->ReadUInt32();
+
+			// ---[ Send C2 packet ]----------
+			std::vector<uint8> send_c2_data( hs2_size );
+			utility::convert_big_endian( &s1_time, 4, &send_c2_data[4] );	// c2_time
+			utility::convert_big_endian( &c1_time, 4, &send_c2_data[4] );	// c2_time2
+			reader->ReadBytes( Platform::ArrayReference<uint8>( send_c2_data.data() + 8, send_c2_data.size() - 8 ) ); // random_data
+
+			create_task( connection_->Write( send_c2_data.data(), send_c2_data.size() ) ).then( [this, c1_time, send_data, callbackFunction]
+			{
+				// ---[ Receive S2 packet ]----------
+				connection_->Read( hs2_size, ref new ConnectionCallbackHandler( [c1_time, send_data, callbackFunction]( Windows::Storage::Streams::IBuffer^ result )
+				{
+					auto reader = Windows::Storage::Streams::DataReader::FromBuffer( result );
+					reader->ByteOrder = Windows::Storage::Streams::ByteOrder::BigEndian;
+
+					// S2 --- time: uint32, time2: uint32, random_data: 1528 bytes
+					const uint32 s2_time = reader->ReadUInt32();
+					const uint32 s2_time2 = reader->ReadUInt32();
+
+					auto s2_random_data = ref new Platform::Array<uint8>( hsr_size );
+					reader->ReadBytes( s2_random_data );
+
+					// check time and random_echo
+					if( c1_time != s2_time || memcmp( &send_data[9], s2_random_data->Data, hsr_size ) != 0 )
+					{
+						throw ref new Platform::FailureException();
+					}
+
+					callbackFunction();
+				} ) );
+			} );
 		} ) );
-	} ) );
+	} );
 }

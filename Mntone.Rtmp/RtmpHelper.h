@@ -10,6 +10,8 @@ namespace Mntone { namespace Rtmp {
 
 		static NetStatusCodeType ParseNetConnectionConnectCode( const std::wstring code );
 		static NetStatusCodeType ParseNetStreamCode( const std::wstring code );
+
+		static uint32 ReadUint24( Windows::Storage::Streams::DataReader^ reader );
 	};
 
 } }

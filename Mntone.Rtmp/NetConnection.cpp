@@ -6,6 +6,7 @@
 
 using namespace Concurrency;
 using namespace Windows::Foundation;
+using namespace Windows::Storage::Streams;
 using namespace mntone::rtmp;
 using namespace Mntone::Rtmp;
 
@@ -123,25 +124,33 @@ void NetConnection::Receive()
 	connection_->Read( 1, ref new ConnectionCallbackHandler( this, &NetConnection::ReceiveHeader1Impl ) );
 }
 
-void NetConnection::ReceiveHeader1Impl( const std::vector<uint8> result )
+void NetConnection::ReceiveHeader1Impl( IBuffer^ result )
 {
-	const uint8_t& format_type = ( result[0] >> 6 ) & 0x03;
-	const uint16& chunk_stream_id = result[0] & 0x3f;
+	auto reader = DataReader::FromBuffer( result );
+	reader->ByteOrder = ByteOrder::BigEndian;
+
+	const auto type_and_id = reader->ReadByte();
+	const uint8 format_type = ( type_and_id >> 6 ) & 0x03;
+	const uint16 chunk_stream_id = type_and_id & 0x3f;
 	if( chunk_stream_id == 0 )
 	{
-		connection_->Read( 1, ref new ConnectionCallbackHandler( [this, format_type]( const std::vector<uint8> result )
+		connection_->Read( 1, ref new ConnectionCallbackHandler( [this, format_type]( IBuffer^ result )
 		{
-			uint16 chunk_stream_id = result[0] + 64;
+			auto reader = DataReader::FromBuffer( result );
+			reader->ByteOrder = ByteOrder::BigEndian;
+
+			const uint16 chunk_stream_id = reader->ReadByte() + 64;
 			ReceiveHeader2Impl( format_type, chunk_stream_id );
 		} ) );
 	}
 	else if( chunk_stream_id == 1 )
 	{
-		connection_->Read( 2, ref new ConnectionCallbackHandler( [this, format_type]( const std::vector<uint8> result )
+		connection_->Read( 2, ref new ConnectionCallbackHandler( [this, format_type]( IBuffer^ result )
 		{
-			uint16 chunk_stream_id;
-			utility::convert_big_endian( &result[0], 2, &chunk_stream_id );
-			chunk_stream_id += 64;
+			auto reader = DataReader::FromBuffer( result );
+			reader->ByteOrder = ByteOrder::BigEndian;
+
+			const uint16 chunk_stream_id = reader->ReadUInt16() + 64;
 			ReceiveHeader2Impl( format_type, chunk_stream_id );
 		} ) );
 	}
@@ -170,19 +179,24 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 	switch( format_type )
 	{
 	case 0:
-		connection_->Read( 11, ref new ConnectionCallbackHandler( [this, packet]( const std::vector<uint8> result )
+		connection_->Read( 11, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 		{
-			packet->timestamp_ = 0; // initialize
-			utility::convert_big_endian( &result[0], 3, &packet->timestamp_ );
-			utility::convert_big_endian( &result[3], 3, &packet->length_ );
-			packet->type_id_ = static_cast<type_id_type>( result[6] );
-			utility::convert_little_endian( &result[7], 4, &packet->stream_id_ ); // LE
+			auto reader = DataReader::FromBuffer( result );
+			reader->ByteOrder = ByteOrder::BigEndian;
+			packet->timestamp_ = RtmpHelper::ReadUint24( reader );
+			packet->length_ = RtmpHelper::ReadUint24( reader );
+			packet->type_id_ = static_cast<type_id_type>( reader->ReadByte() );
+			
+			reader->ByteOrder = ByteOrder::LittleEndian;
+			packet->stream_id_ = reader->ReadUInt32();
 
 			if( packet->timestamp_ == 0xffffff )
 			{
-				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( const std::vector<uint8> result )
+				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 				{
-					utility::convert_big_endian( &result[0], 4, &packet->timestamp_ );
+					auto reader = DataReader::FromBuffer( result );
+					reader->ByteOrder = ByteOrder::BigEndian;
+					packet->timestamp_ = reader->ReadUInt32();
 					ReceiveBodyImpl( packet );
 				} ) );
 			}
@@ -194,18 +208,21 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 		break;
 	
 	case 1:
-		connection_->Read( 7, ref new ConnectionCallbackHandler( [this, packet]( const std::vector<uint8> result )
+		connection_->Read( 7, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 		{
-			packet->timestamp_delta_ = 0; // initialize
-			utility::convert_big_endian( &result[0], 3, &packet->timestamp_delta_ );
-			utility::convert_big_endian( &result[3], 3, &packet->length_ );
-			packet->type_id_ = static_cast<type_id_type>( result[6] );
+			auto reader = DataReader::FromBuffer( result );
+			reader->ByteOrder = ByteOrder::BigEndian;
+			packet->timestamp_delta_ = RtmpHelper::ReadUint24( reader );
+			packet->length_ = RtmpHelper::ReadUint24( reader );
+			packet->type_id_ = static_cast<type_id_type>( reader->ReadByte() );
 
 			if( packet->timestamp_delta_ == 0xffffff )
 			{
-				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( const std::vector<uint8> result )
+				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 				{
-					utility::convert_big_endian( &result[0], 4, &packet->timestamp_delta_ );
+					auto reader = DataReader::FromBuffer( result );
+					reader->ByteOrder = ByteOrder::BigEndian;
+					packet->timestamp_delta_ = reader->ReadUInt32();
 					if( packet->temporary_length_ == 0 )
 					{
 						packet->timestamp_ += packet->timestamp_delta_;
@@ -225,16 +242,19 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 		break;
 	
 	case 2:
-		connection_->Read( 3, ref new ConnectionCallbackHandler( [this, packet]( const std::vector<uint8> result )
+		connection_->Read( 3, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 		{
-			packet->timestamp_delta_ = 0; // initialize
-			utility::convert_big_endian( &result[0], 3, &packet->timestamp_delta_ );
+			auto reader = DataReader::FromBuffer( result );
+			reader->ByteOrder = ByteOrder::BigEndian;
+			packet->timestamp_delta_ = RtmpHelper::ReadUint24( reader );
 
 			if( packet->timestamp_delta_ == 0xffffff )
 			{
-				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( const std::vector<uint8> result )
+				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 				{
-					utility::convert_big_endian( &result[0], 4, &packet->timestamp_delta_ );
+					auto reader = DataReader::FromBuffer( result );
+					reader->ByteOrder = ByteOrder::BigEndian;
+					packet->timestamp_delta_ = reader->ReadUInt32();
 					if( packet->temporary_length_ == 0 )
 					{
 						packet->timestamp_ += packet->timestamp_delta_;
@@ -256,9 +276,11 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 	case 3:
 		if( packet->timestamp_delta_ > 0xffffff )
 		{
-			connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( const std::vector<uint8> result )
+			connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 			{
-				utility::convert_big_endian( &result[0], 4, &packet->timestamp_delta_ );
+				auto reader = DataReader::FromBuffer( result );
+				reader->ByteOrder = ByteOrder::BigEndian;
+				packet->timestamp_delta_ = reader->ReadUInt32();
 				if( packet->temporary_length_ == 0 )
 				{
 					packet->timestamp_ += packet->timestamp_delta_;
@@ -288,12 +310,12 @@ void NetConnection::ReceiveBodyImpl( const std::shared_ptr<rtmp_packet> packet )
 			packet->body_ = std::make_shared<std::vector<uint8>>( packet->length_ );
 		}
 
-		connection_->Read(
-			body_length,
-			ref new ConnectionCallbackHandler( [this, packet]( std::vector<uint8> result )
+		connection_->Read( body_length, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 		{
-			std::copy( result.cbegin(), result.cend(), packet->body_->begin() + packet->temporary_length_ );
-			packet->temporary_length_ += result.size();
+			auto reader = DataReader::FromBuffer( result );
+			const auto& data_size = reader->UnconsumedBufferLength;
+			reader->ReadBytes( Platform::ArrayReference<uint8>( packet->body_->data() + packet->temporary_length_, data_size ) );
+			packet->temporary_length_ += data_size;
 
 			if( packet->temporary_length_ == packet->length_ )
 			{
