@@ -140,6 +140,7 @@
     <ClInclude Include="RtmpScheme.h" />
     <ClInclude Include="RtmpUri.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="rtmp_header.h" />
     <ClInclude Include="rtmp_packet.h" />
     <ClInclude Include="Client\SimpleVideoClient.h" />
     <ClInclude Include="Client\BufferingHelper.h" />

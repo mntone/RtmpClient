@@ -178,5 +178,6 @@
     <ClInclude Include="AvcProfileIndication.h">
       <Filter>Media</Filter>
     </ClInclude>
+    <ClInclude Include="rtmp_header.h" />
   </ItemGroup>
 </Project>

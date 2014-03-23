@@ -6,7 +6,7 @@ using namespace mntone::rtmp::media;
 using namespace Mntone::Rtmp;
 using namespace Mntone::Rtmp::Media;
 
-void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, NetStreamVideoReceivedEventArgs^& args )
+void NetStream::AnalysisAvc( rtmp_header header, std::vector<uint8> data, NetStreamVideoReceivedEventArgs^& args )
 {
 	if( data.size() < 5 )
 	{
@@ -22,7 +22,7 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 		utility::convert_big_endian( &data[2], 3, &composition_time_offset );
 		if( ( composition_time_offset & 0x800000 ) != 0 )
 			composition_time_offset |= 0xffffffffff000000;
-		args->SetPresentationTimestamp( packet.timestamp_ + composition_time_offset );
+		args->SetPresentationTimestamp( header.timestamp + composition_time_offset );
 
 		const uint8 start_code[3] = { 0x00, 0x00, 0x01 };
 		const auto length_size_minus_one = lengthSizeMinusOne_;
@@ -64,7 +64,7 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 		return;
 	}
 
-	args->SetPresentationTimestamp( packet.timestamp_ );
+	args->SetPresentationTimestamp( header.timestamp );
 
 	// AVC sequence header (this is AVCDecoderConfigurationRecord)
 	if( data[1] == 0x00 )
@@ -76,7 +76,7 @@ void NetStream::AnalysisAvc( const rtmp_packet packet, std::vector<uint8> data, 
 
 		if( !videoInfoEnabled_ )
 		{
-			const auto& dcr = *reinterpret_cast<avc_decoder_configuration_record*>( &data[5] );
+			const auto& dcr = *reinterpret_cast<const avc_decoder_configuration_record*>( &data[5] );
 			lengthSizeMinusOne_ = dcr.length_size_minus_one;
 			videoInfo_->Format = VideoFormat::Avc;
 			videoInfo_->ProfileIndication = static_cast<AvcProfileIndication>( dcr.avc_profile_indication );

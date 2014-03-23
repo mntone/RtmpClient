@@ -16,9 +16,9 @@ Mntone::Data::Amf::AmfArray^ NetConnectionCallCommand::Commandify()
 	ary->Append( AmfValue::CreateStringValue( CommandName_ ) );								// Command name
 	ary->Append( AmfValue::CreateNumberValue( static_cast<float64>( TransactionId_ ) ) );	// Transaction id
 	ary->Append( CommandObject_ != nullptr ? CommandObject_ : ref new AmfValue() );
-	if( OptionalArguments_->Size != 0 )
+	if( OptionalArguments_ != nullptr && OptionalArguments_->Size != 0 )
 	{
-		for( auto optionalArgument : OptionalArguments_ )
+		for( auto&& optionalArgument : OptionalArguments_ )
 		{
 			ary->Append( optionalArgument );
 		}

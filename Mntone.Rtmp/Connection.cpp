@@ -78,10 +78,10 @@ void Connection::ContinuousRead( Windows::Storage::Streams::IBuffer^ data, const
 	ReadOperationChanged( this, read_operation );
 }
 
-Concurrency::task<void> Connection::Write( const uint8* const data, const size_t length )
+task<void> Connection::Write( const uint8* const data, const size_t length )
 {
 	dataWriter_->WriteBytes( Platform::ArrayReference<uint8>( const_cast<uint8_t*>( data ), static_cast<uint32>( length ) ) );
-	return Concurrency::create_task( dataWriter_->StoreAsync() ).then( [] ( const uint32 ) { } );
+	return create_task( dataWriter_->StoreAsync() ).then( [] ( const uint32 ) { } );
 }
 
 void Connection::CloseImpl()

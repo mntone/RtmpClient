@@ -9,13 +9,15 @@ Mntone::Data::Amf::AmfArray^ RtmpHelper::ParseAmf( std::vector<uint8> data )
 
 	auto buf = ref new Platform::Array<uint8>( static_cast<uint32>( 4 + data.size() ) );
 	buf[0] = 0x80;
-	memcpy( buf->Data + 1, data.data(), data.size() );
+	memcpy( buf->begin() + 1, data.data(), data.size() );
 	buf[buf->Length - 3] = buf[buf->Length - 2] = 0; buf[buf->Length - 1] = 9;
 
-	AmfArray^ amfArray;
-	if( !AmfArray::TryParse( buf, AmfEncodingType::Amf0, &amfArray ) )
-		amfArray = nullptr;
-	return std::move( amfArray );
+	AmfArray^ ary;
+	if( !AmfArray::TryParse( buf, AmfEncodingType::Amf0, &ary ) )
+	{
+		ary = nullptr;
+	}
+	return ary;
 }
 
 NetStatusCodeType RtmpHelper::ParseNetConnectionConnectCode( const std::wstring code )
@@ -176,7 +178,9 @@ NetStatusCodeType RtmpHelper::ParseNetStreamCode( const std::wstring code )
 				nsc = NetStatusCodeType::NetStreamMulticastStreamOther;
 		}
 		else
+		{
 			nsc = NetStatusCodeType::NetStreamOther;
+		}
 	}
 
 	return nsc;

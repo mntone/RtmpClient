@@ -143,37 +143,37 @@ IAsyncAction^ NetStream::SeekAsync( float64 offset )
 	} );
 }
 
-void NetStream::OnMessage( const rtmp_packet packet, std::vector<uint8> data )
+void NetStream::OnMessage( rtmp_header header, std::vector<uint8> data )
 {
-	switch( packet.type_id_ )
+	switch( header.type_id )
 	{
 	case type_id_type::audio_message:
-		OnAudioMessage( std::move( packet ), std::move( data ) );
+		OnAudioMessage( std::move( header ), std::move( data ) );
 		break;
 
 	case type_id_type::video_message:
-		OnVideoMessage( std::move( packet ), std::move( data ) );
+		OnVideoMessage( std::move( header ), std::move( data ) );
 		break;
 
 	case type_id_type::data_message_amf3:
 	case type_id_type::data_message_amf0:
-		OnDataMessage( std::move( packet ), std::move( data ) );
+		OnDataMessage( std::move( header ), std::move( data ) );
 		break;
 
 	case type_id_type::command_message_amf3:
 	case type_id_type::command_message_amf0:
-		OnCommandMessage( std::move( packet ), std::move( data ) );
+		OnCommandMessage( std::move( header ), std::move( data ) );
 		break;
 
 	case type_id_type::aggregate_message:
-		OnAggregateMessage( std::move( packet ), std::move( data ) );
+		OnAggregateMessage( std::move( header ), std::move( data ) );
 		break;
 	}
 }
 
-void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> data )
+void NetStream::OnAudioMessage( rtmp_header header, std::vector<uint8> data )
 {
-	const auto& si = *reinterpret_cast<sound_info*>( data.data() );
+	const auto& si = *reinterpret_cast<const sound_info*>( data.data() );
 
 	if( si.format == sound_format::aac )
 	{
@@ -186,13 +186,13 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 		{
 			auto args = ref new NetStreamAudioReceivedEventArgs();
 			args->Info = audioInfo_;
-			args->SetTimestamp( packet.timestamp_ );
+			args->SetTimestamp( header.timestamp );
 			args->SetData( std::move( data ), 2 );
 			AudioReceived( this, args );
 		}
 		else if( data[1] == 0x00 && !audioInfoEnabled_ )
 		{
-			const auto& adts = *reinterpret_cast<adts_header*>( data.data() );
+			const auto& adts = *reinterpret_cast<const adts_header*>( data.data() );
 			audioInfo_->Format = AudioFormat::Aac;
 			audioInfo_->SampleRate = samplingRate_ != 0 ? samplingRate_ : adts.sampling_frequency();
 			audioInfo_->ChannelCount = adts.channel_configuration();
@@ -212,24 +212,24 @@ void NetStream::OnAudioMessage( const rtmp_packet packet, std::vector<uint8> dat
 
 	auto args = ref new NetStreamAudioReceivedEventArgs();
 	args->Info = audioInfo_;
-	args->SetTimestamp( packet.timestamp_ );
+	args->SetTimestamp( header.timestamp );
 	args->SetData( std::move( data ), 1 );
 	AudioReceived( this, args );
 }
 
-void NetStream::OnVideoMessage( const rtmp_packet packet, std::vector<uint8> data )
+void NetStream::OnVideoMessage( rtmp_header header, std::vector<uint8> data )
 {
 	const auto& vt = static_cast<video_type>( ( data[0] >> 4 ) & 0x0f );
 	const auto& vf = static_cast<VideoFormat>( data[0] & 0x0f );
 
 	auto args = ref new NetStreamVideoReceivedEventArgs();
 	args->IsKeyframe = vt == video_type::keyframe;
-	args->SetDecodeTimestamp( packet.timestamp_ );
+	args->SetDecodeTimestamp( header.timestamp );
 
 	if( vf == VideoFormat::Avc )
 	{
 		// Need to convert NAL file stream to byte stream
-		AnalysisAvc( std::move( packet ), std::move( data ), args );
+		AnalysisAvc( std::move( header ), std::move( data ), args );
 		return;
 	}
 
@@ -242,12 +242,12 @@ void NetStream::OnVideoMessage( const rtmp_packet packet, std::vector<uint8> dat
 	}
 
 	args->Info = videoInfo_;
-	args->SetPresentationTimestamp( packet.timestamp_ );
+	args->SetPresentationTimestamp( header.timestamp );
 	args->SetData( std::move( data ), 1 );
 	VideoReceived( this, args );
 }
 
-void NetStream::OnDataMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
+void NetStream::OnDataMessage( rtmp_header /*header*/, std::vector<uint8> data )
 {
 	const auto& amf = RtmpHelper::ParseAmf( std::move( data ) );
 	const auto& name = amf->GetStringAt( 0 );
@@ -285,7 +285,7 @@ void NetStream::OnDataMessage( const rtmp_packet /*packet*/, std::vector<uint8> 
 	}
 }
 
-void NetStream::OnCommandMessage( const rtmp_packet /*packet*/, std::vector<uint8> data )
+void NetStream::OnCommandMessage( rtmp_header /*header*/, std::vector<uint8> data )
 {
 	const auto& amf = RtmpHelper::ParseAmf( std::move( data ) );
 	const auto& name = amf->GetStringAt( 0 );
@@ -300,7 +300,7 @@ void NetStream::OnCommandMessage( const rtmp_packet /*packet*/, std::vector<uint
 	StatusUpdated( this, ref new NetStatusUpdatedEventArgs( nsc ) );
 }
 
-void NetStream::OnAggregateMessage( const rtmp_packet packet, std::vector<uint8> data )
+void NetStream::OnAggregateMessage( rtmp_header header, std::vector<uint8> data )
 {
 	if( data.size() < 11 )
 	{
@@ -313,9 +313,9 @@ void NetStream::OnAggregateMessage( const rtmp_packet packet, std::vector<uint8>
 		const auto& tag = *reinterpret_cast<const flv_tag*>( &itr[0] );
 		itr += 11;
 
-		auto clone_packet = packet;
-		clone_packet.timestamp_ = tag.timestamp();
-		clone_packet.type_id_ = static_cast<type_id_type>( tag.tag_type() );
+		auto clone_header = header;
+		clone_header.timestamp = tag.timestamp();
+		clone_header.type_id = static_cast<type_id_type>( tag.tag_type() );
 
 		auto end_of_sequence = itr + tag.data_size();
 
@@ -323,15 +323,15 @@ void NetStream::OnAggregateMessage( const rtmp_packet packet, std::vector<uint8>
 		switch( tag.tag_type() )
 		{
 		case flv_tag_type::audio:
-			OnAudioMessage( std::move( clone_packet ), std::move( subset_data ) );
+			OnAudioMessage( std::move( clone_header ), std::move( subset_data ) );
 			break;
 
 		case flv_tag_type::video:
-			OnVideoMessage( std::move( clone_packet ), std::move( subset_data ) );
+			OnVideoMessage( std::move( clone_header ), std::move( subset_data ) );
 			break;
 
 		case flv_tag_type::script_data:
-			OnDataMessage( std::move( clone_packet ), std::move( subset_data ) );
+			OnDataMessage( std::move( clone_header ), std::move( subset_data ) );
 			break;
 		}
 		itr = end_of_sequence + 4;

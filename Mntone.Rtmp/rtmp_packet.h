@@ -1,26 +1,27 @@
 #pragma once
-#include <memory>
-#include "type_id_type.h"
+#include "rtmp_header.h"
 
 namespace mntone { namespace rtmp {
 
-	struct rtmp_packet
+	class rtmp_packet final
 	{
-		rtmp_packet( uint16 chunk_stream_id )
-			: chunk_stream_id_( chunk_stream_id )
-			, timestamp_delta_( 0 )
-			, length_( 0 )
+	public:
+		rtmp_packet() = delete;
+		rtmp_packet( const rtmp_packet& ) = delete;
+		rtmp_packet( rtmp_packet&& ) = default;
+
+		rtmp_packet& operator=( const rtmp_packet& rhs ) = delete;
+		rtmp_packet& operator=( rtmp_packet&& ) = default;
+
+		explicit rtmp_packet( uint16 chunk_stream_id )
+			: header_( chunk_stream_id )
 			, temporary_length_( 0 )
 		{ }
 
-		uint16 chunk_stream_id_;
-		int64 timestamp_, timestamp_delta_;
-		uint32 length_;
-		type_id_type type_id_;
-		uint32 stream_id_;
-
+	public:
+		rtmp_header header_;
 		uint32 temporary_length_;
-		std::shared_ptr<std::vector<uint8>> body_;
+		std::unique_ptr<std::vector<uint8>> body_;
 	};
 
 } }
