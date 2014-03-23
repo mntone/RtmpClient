@@ -1,23 +1,25 @@
-# RtmpClient for Windows Runtime (Mntone::Rtmp, Windows 8.1)
+# RtmpClient for Windows Runtime (Windows 8.1)
 
 ## License
 This component and demoapp is “2-clause BSD license.”
 You must check “[license.en-US.md](./license.en-US.md).”
 
-## API reference for RtmpClient.
-If you know these in detail, you check “[Document](./Document/)” folder.
+## What’s project?
+This project is treating rtmp streaming. Modern Windows, what is called Metro, can use rtmp video/audio streaming. You can use rtmp streaming easily.
 
-## Alpha version Phase II
-This component is debugged with Windows 8.1. This can operate. However, implementation of error or exit transaction is not completed.
+## API reference for RtmpClient.
+If you know these in detail, you check “[Document](./Document/)” folder. However, this file is not latest!
+
+## Beta version Phase I
+This component is debugged with Windows 8.1. However, implementation of error or exit transaction is not completed.
+
+Thus, this component sometimes changes API endpoints.
 
 ## TODO
-- Implements exit transaction.
-
-## Treatment
-Variable handling.
-
-### Time
-Use FILETIME. It is easy to convert Windows::Foundation::DateTime (.NET System.DateTimeOffset). std::chrono under investigation.
+- rtmps/rtmpt streaming handle
+- SharedObject handle
+- more useful, just like callback assigns parameter.
+- and so on…
 
 ## Related projects
 - [Mntone::Data::Amf](//github.com/mntone/Data.Amf)
