@@ -24,11 +24,12 @@ NetConnection::NetConnection()
 	, rxLimitType_( DEFAULT_LIMIT_TYPE ), txLimitType_( DEFAULT_LIMIT_TYPE )
 	, rxChunkSize_( DEFAULT_CHUNK_SIZE ), txChunkSize_( DEFAULT_CHUNK_SIZE )
 {
-	connection_->ReadOperationChanged += ref new TypedEventHandler<Connection^, IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^>( this, &NetConnection::OnReadOperationChanged );
+	readOperationEventToken_ = connection_->ReadOperationChanged += ref new TypedEventHandler<Connection^, IAsyncOperationWithProgress<IBuffer^, uint32>^>( this, &NetConnection::OnReadOperationChanged );
 }
 
 void NetConnection::CloseImpl()
 {
+	connection_->ReadOperationChanged -= readOperationEventToken_;
 	if( receiveOperation_ != nullptr )
 	{
 		receiveOperation_->Cancel();

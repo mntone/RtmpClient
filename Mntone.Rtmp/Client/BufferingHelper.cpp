@@ -11,14 +11,22 @@ using namespace Mntone::Rtmp;
 using namespace Mntone::Rtmp::Client;
 
 BufferingHelper::BufferingHelper( NetStream^ stream )
-	: isEnable_( true )
+	: stream_( stream )
+	, isEnable_( true )
 {
-	stream->AudioReceived += ref new EventHandler<NetStreamAudioReceivedEventArgs^>( this, &BufferingHelper::OnAudioReceived );
-	stream->VideoReceived += ref new EventHandler<NetStreamVideoReceivedEventArgs^>( this, &BufferingHelper::OnVideoReceived );
+	audioReceivedEventToken_ = stream_->AudioReceived += ref new EventHandler<NetStreamAudioReceivedEventArgs^>( this, &BufferingHelper::OnAudioReceived );
+	videoReceivedEventToken_ = stream_->VideoReceived += ref new EventHandler<NetStreamVideoReceivedEventArgs^>( this, &BufferingHelper::OnVideoReceived );
 }
 
 void BufferingHelper::Stop()
 {
+	if( stream_ != nullptr )
+	{
+		stream_->AudioReceived -= audioReceivedEventToken_;
+		stream_->VideoReceived -= videoReceivedEventToken_;
+		stream_ = nullptr;
+	}
+
 	std::unique_lock<std::mutex> lock_audio( audioMutex_, std::defer_lock );
 	std::unique_lock<std::mutex> lock_video( videoMutex_, std::defer_lock );
 	std::lock( lock_audio, lock_video );

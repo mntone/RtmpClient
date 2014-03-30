@@ -102,6 +102,7 @@ namespace Mntone { namespace Rtmp {
 		int64 startTime_;
 		RtmpUri^ Uri_;
 		Connection^ connection_;
+		Windows::Foundation::EventRegistrationToken readOperationEventToken_;
 		Windows::Foundation::IAsyncOperationWithProgress<Windows::Storage::Streams::IBuffer^, uint32>^ receiveOperation_;
 
 		uint32 latestTransactionId_;

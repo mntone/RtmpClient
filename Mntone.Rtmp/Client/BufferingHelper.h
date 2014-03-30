@@ -27,6 +27,9 @@ namespace Client {
 		void OnVideoReceived( Platform::Object^ sender, NetStreamVideoReceivedEventArgs^ args );
 
 	private:
+		NetStream^ stream_;
+		Windows::Foundation::EventRegistrationToken audioReceivedEventToken_, videoReceivedEventToken_;
+
 		bool isEnable_;
 		mutable std::mutex audioMutex_, videoMutex_;
 		std::condition_variable audioConditionVariable_, videoConditionVariable_;
