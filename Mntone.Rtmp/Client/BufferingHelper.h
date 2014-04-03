@@ -23,6 +23,8 @@ namespace Client {
 		Windows::Foundation::IAsyncOperation<Windows::Media::Core::MediaStreamSample^>^ GetVideoAsync();
 
 	private:
+		~BufferingHelper();
+
 		void OnAudioReceived( Platform::Object^ sender, NetStreamAudioReceivedEventArgs^ args );
 		void OnVideoReceived( Platform::Object^ sender, NetStreamVideoReceivedEventArgs^ args );
 

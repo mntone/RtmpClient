@@ -20,6 +20,8 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri );
 
 	private:
+		~SimpleVideoClient();
+
 		void CloseImpl();
 		void CreateMediaStream( Windows::Media::Core::IMediaStreamDescriptor^ descriptor );
 
@@ -41,6 +43,15 @@ namespace Mntone { namespace Rtmp { namespace Client {
 		event Windows::Foundation::EventHandler<SimpleVideoClientStoppedEventArgs^>^ Stopped;
 
 	private:
+		Windows::Foundation::EventRegistrationToken
+			startingEventToken_,
+			sampleRequestedEventToken_,
+			connectionStatusUpdatedEventToken_,
+			streamAttachedEventToken_,
+			streamStatusUpdatedEventToken_,
+			streamAudioStartedEventToken_,
+			streamVideoStartedEventToken_;
+
 		NetConnection^ connection_;
 		NetStream^ stream_;
 		Windows::Media::Core::MediaStreamSource^ mediaStreamSource_;

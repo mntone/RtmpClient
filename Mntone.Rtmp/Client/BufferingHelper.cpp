@@ -18,6 +18,11 @@ BufferingHelper::BufferingHelper( NetStream^ stream )
 	videoReceivedEventToken_ = stream_->VideoReceived += ref new EventHandler<NetStreamVideoReceivedEventArgs^>( this, &BufferingHelper::OnVideoReceived );
 }
 
+BufferingHelper::~BufferingHelper()
+{
+	Stop();
+}
+
 void BufferingHelper::Stop()
 {
 	if( stream_ != nullptr )
@@ -30,9 +35,12 @@ void BufferingHelper::Stop()
 	std::unique_lock<std::mutex> lock_audio( audioMutex_, std::defer_lock );
 	std::unique_lock<std::mutex> lock_video( videoMutex_, std::defer_lock );
 	std::lock( lock_audio, lock_video );
-	isEnable_ = false;
-	audioConditionVariable_.notify_all();
-	videoConditionVariable_.notify_all();
+	if( isEnable_ )
+	{
+		isEnable_ = false;
+		audioConditionVariable_.notify_all();
+		videoConditionVariable_.notify_all();
+	}
 }
 
 IAsyncOperation<MediaStreamSample^>^ BufferingHelper::GetAudioAsync()

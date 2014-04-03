@@ -33,10 +33,9 @@ namespace Mntone { namespace Rtmp { namespace Command {
 			Mntone::Data::Amf::IAmfValue^ get() { return CommandObject_; }
 			void set( Mntone::Data::Amf::IAmfValue^ value ) { CommandObject_ = value; }
 		}
-		property Windows::Foundation::Collections::IVectorView<Mntone::Data::Amf::IAmfValue^>^ OptionalArguments
+		property Windows::Foundation::Collections::IVector<Mntone::Data::Amf::IAmfValue^>^ OptionalArguments
 		{
-			Windows::Foundation::Collections::IVectorView<Mntone::Data::Amf::IAmfValue^>^ get() { return OptionalArguments_; }
-			void set( Windows::Foundation::Collections::IVectorView<Mntone::Data::Amf::IAmfValue^>^ value ) { OptionalArguments_ = value; }
+			Windows::Foundation::Collections::IVector<Mntone::Data::Amf::IAmfValue^>^ get() { return OptionalArguments_; }
 		}
 
 	internal:
@@ -50,7 +49,7 @@ namespace Mntone { namespace Rtmp { namespace Command {
 		Platform::String^ CommandName_;
 		uint32 TransactionId_;
 		Mntone::Data::Amf::IAmfValue^ CommandObject_;
-		Windows::Foundation::Collections::IVectorView<Mntone::Data::Amf::IAmfValue^>^ OptionalArguments_;
+		Platform::Collections::Vector<Mntone::Data::Amf::IAmfValue^>^ OptionalArguments_;
 	};
 
 } } }

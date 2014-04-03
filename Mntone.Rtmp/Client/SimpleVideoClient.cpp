@@ -10,25 +10,51 @@ namespace WMM = Windows::Media::MediaProperties;
 namespace WUIC = Windows::UI::Core;
 
 SimpleVideoClient::SimpleVideoClient()
-	: mediaStreamSource_( nullptr )
+	: connection_( nullptr )
+	, stream_( nullptr )
+	, mediaStreamSource_( nullptr )
 	, bufferingHelper_( nullptr )
 { }
 
+SimpleVideoClient::~SimpleVideoClient()
+{
+	CloseImpl();
+}
+
 void SimpleVideoClient::CloseImpl()
 {
-	Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
+	if( mediaStreamSource_ != nullptr )
+	{
+		mediaStreamSource_->Starting -= startingEventToken_;
+		mediaStreamSource_->SampleRequested -= sampleRequestedEventToken_;
+		mediaStreamSource_ = nullptr;
+
+		stream_->Attached -= streamAttachedEventToken_;
+		stream_->StatusUpdated -= streamStatusUpdatedEventToken_;
+		stream_->AudioStarted -= streamAudioStartedEventToken_;
+		stream_->VideoStarted -= streamVideoStartedEventToken_;
+		bufferingHelper_ = nullptr;
+		stream_ = nullptr;
+
+		connection_->StatusUpdated -= connectionStatusUpdatedEventToken_;
+		connection_ = nullptr;
+
+		Stopped( this, ref new SimpleVideoClientStoppedEventArgs() );
+	}
 }
 
 void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
 {
+	CloseImpl();
+
 	mediaStreamSource_ = ref new MediaStreamSource( descriptor );
 
 	TimeSpan duration;
 	duration.Duration = std::numeric_limits<int64>::max();
 	mediaStreamSource_->Duration = duration;
 
-	mediaStreamSource_->Starting += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
-	mediaStreamSource_->SampleRequested += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
+	startingEventToken_ = mediaStreamSource_->Starting += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
+	sampleRequestedEventToken_ = mediaStreamSource_->SampleRequested += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );
 }
 
 IAsyncAction^ SimpleVideoClient::ConnectAsync( Uri^ uri )
@@ -39,7 +65,7 @@ IAsyncAction^ SimpleVideoClient::ConnectAsync( Uri^ uri )
 IAsyncAction^ SimpleVideoClient::ConnectAsync( RtmpUri^ uri )
 {
 	connection_ = ref new NetConnection();
-	connection_->StatusUpdated += ref new EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
+	connectionStatusUpdatedEventToken_ = connection_->StatusUpdated += ref new EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetConnectionStatusUpdated );
 	return connection_->ConnectAsync( uri );
 }
 
@@ -49,10 +75,10 @@ void SimpleVideoClient::OnNetConnectionStatusUpdated( Platform::Object^ sender, 
 	if( nsc == NetStatusCodeType::NetConnectionConnectSuccess )
 	{
 		stream_ = ref new NetStream();
-		stream_->Attached += ref new EventHandler<NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
-		stream_->StatusUpdated += ref new EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetStreamStatusUpdated );
-		stream_->AudioStarted += ref new EventHandler<NetStreamAudioStartedEventArgs^>( this, &SimpleVideoClient::OnAudioStarted );
-		stream_->VideoStarted += ref new EventHandler<NetStreamVideoStartedEventArgs^>( this, &SimpleVideoClient::OnVideoStarted );
+		streamAttachedEventToken_ = stream_->Attached += ref new EventHandler<NetStreamAttachedEventArgs^>( this, &SimpleVideoClient::OnAttached );
+		streamStatusUpdatedEventToken_ = stream_->StatusUpdated += ref new EventHandler<NetStatusUpdatedEventArgs^>( this, &SimpleVideoClient::OnNetStreamStatusUpdated );
+		streamAudioStartedEventToken_ = stream_->AudioStarted += ref new EventHandler<NetStreamAudioStartedEventArgs^>( this, &SimpleVideoClient::OnAudioStarted );
+		streamVideoStartedEventToken_ = stream_->VideoStarted += ref new EventHandler<NetStreamVideoStartedEventArgs^>( this, &SimpleVideoClient::OnVideoStarted );
 		bufferingHelper_ = ref new BufferingHelper( stream_ );
 		stream_->AttachAsync( connection_ );
 	}
