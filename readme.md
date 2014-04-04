@@ -1,17 +1,21 @@
-# RtmpClient for Windows Runtime (Windows 8.1)
+# RtmpClient for Windows Runtime
+This client treats rtmp streaming, just like Adobe Flash Player. Now, only rtmp is available.
+
+## Environment
+You can use:
+
+- Windows (8.1),
+- Windows Phone (8.1).
 
 ## License
 This component and demoapp is “2-clause BSD license.”
 You must check “[license.md](./license.md).”
 
-## What’s project?
-This project is treating rtmp streaming. Modern Windows, what is called Metro, can use rtmp video/audio streaming. You can use rtmp streaming easily.
-
-## API reference for RtmpClient.
+## API reference
 If you know these in detail, you check “[Document](./Document/)” folder. However, this file is not latest!
 
-## Beta version Phase I
-This component is debugged with Windows 8.1. However, implementation of error or exit transaction is not completed.
+## Beta version Phase II
+This component is debugged with Windows 8.1 and Windows Phone 8.1 Emulator. However, implementation of error or exit transaction is not completed.
 
 Thus, this component sometimes changes API endpoints.
 
