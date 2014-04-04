@@ -16,9 +16,6 @@ namespace Mntone { namespace Rtmp {
 
 	ref class NetStream;
 
-	[Windows::Foundation::Metadata::DualApiPartition( version = NTDDI_WINBLUE )]
-	[Windows::Foundation::Metadata::MarshalingBehavior( Windows::Foundation::Metadata::MarshalingType::Agile )]
-	[Windows::Foundation::Metadata::Threading( Windows::Foundation::Metadata::ThreadingModel::Both )]
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class NetConnection sealed
 	{
@@ -26,10 +23,19 @@ namespace Mntone { namespace Rtmp {
 		NetConnection();
 
 		// Connect
+		[Windows::Foundation::Metadata::Overload( "ConnectWithDefaultUriAsync" )]
 		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri );
+
+		[Windows::Foundation::Metadata::Overload( "ConnectWithDefaultUriAndCommandAsync" )]
 		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri, Command::NetConnectionConnectCommand^ command );
-		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri );
-		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri, Command::NetConnectionConnectCommand^ connectCommand );
+
+		[Windows::Foundation::Metadata::Overload( "ConnectAsync" )]
+		[Windows::Foundation::Metadata::DefaultOverload]
+		Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri );
+
+		[Windows::Foundation::Metadata::Overload( "ConnectWithCommandAsync" )]
+		[Windows::Foundation::Metadata::DefaultOverload]
+		Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri, Command::NetConnectionConnectCommand^ connectCommand );
 
 		// Call
 		Windows::Foundation::IAsyncAction^ CallAsync( Command::NetConnectionCallCommand^ command );

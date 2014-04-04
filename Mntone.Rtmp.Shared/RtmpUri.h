@@ -3,6 +3,7 @@
 
 namespace Mntone { namespace Rtmp {
 
+	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class RtmpUri sealed
 	{
 	public:

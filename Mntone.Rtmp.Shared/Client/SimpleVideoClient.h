@@ -7,17 +7,18 @@
 
 namespace Mntone { namespace Rtmp { namespace Client {
 
-	[Windows::Foundation::Metadata::DualApiPartition( version = NTDDI_WINBLUE )]
-	[Windows::Foundation::Metadata::MarshalingBehavior( Windows::Foundation::Metadata::MarshalingType::Agile )]
-	[Windows::Foundation::Metadata::Threading( Windows::Foundation::Metadata::ThreadingModel::Both )]
 	[Windows::Foundation::Metadata::WebHostHidden]
 	public ref class SimpleVideoClient sealed
 	{
 	public:
 		SimpleVideoClient();
 
+		[Windows::Foundation::Metadata::Overload( "ConnectWithDefaultUriAsync" )]
 		Windows::Foundation::IAsyncAction^ ConnectAsync( Windows::Foundation::Uri^ uri );
-		[Windows::Foundation::Metadata::DefaultOverload] Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri );
+
+		[Windows::Foundation::Metadata::Overload( "ConnectAsync" )]
+		[Windows::Foundation::Metadata::DefaultOverload]
+		Windows::Foundation::IAsyncAction^ ConnectAsync( RtmpUri^ uri );
 
 	private:
 		~SimpleVideoClient();
