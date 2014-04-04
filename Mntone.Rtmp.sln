@@ -1,13 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
+VisualStudioVersion = 12.0.30324.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.DemoApp", "Mntone.Rtmp.DemoApp\Mntone.Rtmp.DemoApp.vcxproj", "{BC524C91-3CEA-452C-B382-8BC7D089F835}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.DemoApp.Windows", "Mntone.Rtmp.DemoApp.Windows\Mntone.Rtmp.DemoApp.Windows.vcxproj", "{BC524C91-3CEA-452C-B382-8BC7D089F835}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp", "Mntone.Rtmp\Mntone.Rtmp.vcxproj", "{CC1DE3D0-6318-4958-9DD7-4322DF65D25F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.Windows", "Mntone.Rtmp.Windows\Mntone.Rtmp.Windows.vcxproj", "{CC1DE3D0-6318-4958-9DD7-4322DF65D25F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mntone.Rtmp", "Mntone.Rtmp", "{D8D400A7-11F0-4F46-A018-56420C18AF1C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.Shared", "Mntone.Rtmp.Shared\Mntone.Rtmp.Shared.vcxitems", "{2D2B0380-7B60-4340-AC60-6132AD064233}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.WindowsPhone", "Mntone.Rtmp.WindowsPhone\Mntone.Rtmp.WindowsPhone.vcxproj", "{77359FAA-4EF8-449C-8068-5671BAB8EAD6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mntone.Rtmp.DemoApp", "Mntone.Rtmp.DemoApp", "{7D555343-0C4F-4600-876D-C707EDDD5AFA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.DemoApp.Shared", "Mntone.Rtmp.DemoApp.Shared\Mntone.Rtmp.DemoApp.Shared.vcxitems", "{1CA127FD-AD04-4CF2-8A32-9A9A22E5A7B9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.DemoApp.WindowsPhone", "Mntone.Rtmp.DemoApp.WindowsPhone\Mntone.Rtmp.DemoApp.WindowsPhone.vcxproj", "{1265202C-44B4-4745-854A-32058801D59B}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Mntone.Rtmp.Shared\Mntone.Rtmp.Shared.vcxitems*{cc1de3d0-6318-4958-9dd7-4322df65d25f}*SharedItemsImports = 4
+		Mntone.Rtmp.DemoApp.Shared\Mntone.Rtmp.DemoApp.Shared.vcxitems*{bc524c91-3cea-452c-b382-8bc7d089f835}*SharedItemsImports = 4
+		Mntone.Rtmp.DemoApp.Shared\Mntone.Rtmp.DemoApp.Shared.vcxitems*{1ca127fd-ad04-4cf2-8a32-9a9a22e5a7b9}*SharedItemsImports = 9
+		Mntone.Rtmp.Shared\Mntone.Rtmp.Shared.vcxitems*{2d2b0380-7b60-4340-ac60-6132ad064233}*SharedItemsImports = 9
+		Mntone.Rtmp.DemoApp.Shared\Mntone.Rtmp.DemoApp.Shared.vcxitems*{1265202c-44b4-4745-854a-32058801d59b}*SharedItemsImports = 4
+		Mntone.Rtmp.Shared\Mntone.Rtmp.Shared.vcxitems*{77359faa-4ef8-449c-8068-5671bab8ead6}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
 		Debug|Win32 = Debug|Win32
@@ -47,8 +67,40 @@ Global
 		{CC1DE3D0-6318-4958-9DD7-4322DF65D25F}.Release|Win32.Build.0 = Release|Win32
 		{CC1DE3D0-6318-4958-9DD7-4322DF65D25F}.Release|x64.ActiveCfg = Release|x64
 		{CC1DE3D0-6318-4958-9DD7-4322DF65D25F}.Release|x64.Build.0 = Release|x64
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Debug|ARM.ActiveCfg = Debug|ARM
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Debug|ARM.Build.0 = Debug|ARM
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Debug|Win32.Build.0 = Debug|Win32
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Debug|x64.ActiveCfg = Debug|Win32
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Release|ARM.ActiveCfg = Release|ARM
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Release|ARM.Build.0 = Release|ARM
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Release|Win32.ActiveCfg = Release|Win32
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Release|Win32.Build.0 = Release|Win32
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6}.Release|x64.ActiveCfg = Release|Win32
+		{1265202C-44B4-4745-854A-32058801D59B}.Debug|ARM.ActiveCfg = Debug|ARM
+		{1265202C-44B4-4745-854A-32058801D59B}.Debug|ARM.Build.0 = Debug|ARM
+		{1265202C-44B4-4745-854A-32058801D59B}.Debug|ARM.Deploy.0 = Debug|ARM
+		{1265202C-44B4-4745-854A-32058801D59B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1265202C-44B4-4745-854A-32058801D59B}.Debug|Win32.Build.0 = Debug|Win32
+		{1265202C-44B4-4745-854A-32058801D59B}.Debug|Win32.Deploy.0 = Debug|Win32
+		{1265202C-44B4-4745-854A-32058801D59B}.Debug|x64.ActiveCfg = Debug|Win32
+		{1265202C-44B4-4745-854A-32058801D59B}.Release|ARM.ActiveCfg = Release|ARM
+		{1265202C-44B4-4745-854A-32058801D59B}.Release|ARM.Build.0 = Release|ARM
+		{1265202C-44B4-4745-854A-32058801D59B}.Release|ARM.Deploy.0 = Release|ARM
+		{1265202C-44B4-4745-854A-32058801D59B}.Release|Win32.ActiveCfg = Release|Win32
+		{1265202C-44B4-4745-854A-32058801D59B}.Release|Win32.Build.0 = Release|Win32
+		{1265202C-44B4-4745-854A-32058801D59B}.Release|Win32.Deploy.0 = Release|Win32
+		{1265202C-44B4-4745-854A-32058801D59B}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BC524C91-3CEA-452C-B382-8BC7D089F835} = {7D555343-0C4F-4600-876D-C707EDDD5AFA}
+		{CC1DE3D0-6318-4958-9DD7-4322DF65D25F} = {D8D400A7-11F0-4F46-A018-56420C18AF1C}
+		{2D2B0380-7B60-4340-AC60-6132AD064233} = {D8D400A7-11F0-4F46-A018-56420C18AF1C}
+		{77359FAA-4EF8-449C-8068-5671BAB8EAD6} = {D8D400A7-11F0-4F46-A018-56420C18AF1C}
+		{1CA127FD-AD04-4CF2-8A32-9A9A22E5A7B9} = {7D555343-0C4F-4600-876D-C707EDDD5AFA}
+		{1265202C-44B4-4745-854A-32058801D59B} = {7D555343-0C4F-4600-876D-C707EDDD5AFA}
 	EndGlobalSection
 EndGlobal

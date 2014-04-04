@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <CodeSharingProject>248F659F-DAC5-46E8-AC09-60EC9FC95053</CodeSharingProject>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>83bec8aa-60ad-4258-92df-bdb7587513d7</SharedGUID>
+    <ItemsProjectGuid>{2d2b0380-7b60-4340-ac60-6132ad064233}</ItemsProjectGuid>
+    <ItemsRootNamespace>Mntone.Rtmp</ItemsRootNamespace>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)AvcAnalyzer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Client\BufferingHelper.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClient.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClientStartedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClientStoppedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Command\NetConnectionCallCommand.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Command\NetConnectionConnectCommand.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Command\RawRtmpCommand.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Connection.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Handshake.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Media\AudioInfo.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Media\flv_tag.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetConnection.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetConnectionCallbackEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetConnectionClosedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetStatusUpdatedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetStream.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetStreamAttachedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetStreamAudioReceivedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetStreamAudioStartedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetStreamVideoReceivedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)NetStreamVideoStartedEventArgs.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)RtmpHelper.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)RtmpUri.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)utility.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)AvcProfileIndication.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Client\BufferingHelper.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClient.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClientStartedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClientStoppedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\IRtmpCommand.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\NetConnectionCallCommand.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\NetConnectionCommandType.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\NetConnectionConnectCommand.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\NetStreamCommandType.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\RawRtmpCommand.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\SupportSoundType.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\SupportVideoFunctionType.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Command\SupportVideoType.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Connection.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)limit_type.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\aac_id.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\aac_profile.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\aac_protection_absent.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\aac_sampling_frequency.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\adts_header.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\AudioFormat.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\AudioInfo.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\avc_decoder_configuration_record.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\flv_filter.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\flv_tag.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\flv_tag_type.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\sound_format.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\sound_info.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\sound_rate.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\sound_size.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\sound_type.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\VideoFormat.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\VideoInfo.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\video_type.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetConnection.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetConnectionCallbackEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetConnectionClosedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetStatusCodeType.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetStatusUpdatedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetStream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetStreamAttachedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetStreamAudioReceivedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetStreamAudioStartedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetStreamVideoReceivedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)NetStreamVideoStartedEventArgs.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)pch.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)RtmpHelper.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)RtmpScheme.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)RtmpUri.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)rtmp_header.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)rtmp_packet.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)type_id_type.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)UserControlMessageEventType.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)utility.h" />
+  </ItemGroup>
+</Project>
