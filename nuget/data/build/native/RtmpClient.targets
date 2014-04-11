@@ -1,0 +1,44 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Target Name="CheckAnyCPU" Condition="'$(Platform)' != 'x64' AND '$(Platform)' != 'x86' AND '$(Platform)' != 'ARM'" BeforeTargets="BeforeBuild">
+		<Error Text="RtmpClient for Windows Runtime does not support the $(Platform) target platform." />
+	</Target>
+
+	<Target Name="Checkx64" Condition="'$(Platform)|$(PlatformToolset)'=='x64|v120_wp81'" BeforeTargets="BeforeBuild">
+		<Error Text="RtmpClient for Windows Runtime does not support the $(Platform) target platform on Windows Phone 8.1." />
+	</Target>
+	
+	<PropertyGroup Condition="'$(Platform)|$(PlatformToolset)'=='Win32|v120_wp81'" Label="x86 and WinPRT 8.1">
+		<MappedPlatform>x86</MappedPlatform>
+		<MappedPlatformToolset>v120_wp81</MappedPlatformToolset>	
+		<ToolsetFolder>wpa81</ToolsetFolder>	
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Platform)|$(PlatformToolset)'=='ARM|v120_wp81'" Label="ARM and WinPRT 8.1">
+		<MappedPlatform>ARM</MappedPlatform>		
+		<MappedPlatformToolset>v120_wp81</MappedPlatformToolset>	
+		<ToolsetFolder>wpa81</ToolsetFolder>	
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Platform)|$(PlatformToolset)'=='ARM|v120'" Label="ARM and WinRT 8.1">
+		<MappedPlatform>ARM</MappedPlatform>
+		<MappedPlatformToolset>win81</MappedPlatformToolset>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Platform)|$(PlatformToolset)'=='Win32|v120'" Label="x86 and WinRT 8.1">
+		<MappedPlatform>x86</MappedPlatform>
+		<MappedPlatformToolset>win81</MappedPlatformToolset>
+	</PropertyGroup>
+ 	<!--PropertyGroup Condition="'$(Platform)|$(PlatformToolset)'=='x64|v120'" Label="x64 and WinRT 8.1">
+		<MappedPlatform>x64</MappedPlatform>
+		<MappedPlatformToolset>win81</MappedPlatformToolset>
+	</PropertyGroup-->
+
+	<PropertyGroup Condition="'$(ToolsetFolder)'==''">
+			<ToolsetFolder>$(MappedPlatformToolset)</ToolsetFolder>	
+	</PropertyGroup>
+	
+	<ItemGroup>
+	    <Reference Include="Mntone.Rtmp">
+	      <HintPath>$(MSBuildThisFileDirectory)\..\..\lib\$(ToolsetFolder)\$(MappedPlatform)\Mntone.Rtmp.winmd</HintPath>
+	      <IsWinMDFile>true</IsWinMDFile>
+	    </Reference>
+	</ItemGroup>
+</Project>

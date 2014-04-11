@@ -7,7 +7,19 @@ using namespace Mntone::Rtmp;
 
 Connection::Connection()
 	: IsInitialized_( false )
+	, streamSocket_( nullptr )
+	, dataWriter_( nullptr )
 { }
+
+Connection::~Connection()
+{
+	if( dataWriter_ != nullptr )
+	{
+		dataWriter_->DetachStream();
+		delete dataWriter_;
+		dataWriter_ = nullptr;
+	}
+}
 
 task<void> Connection::ConnectAsync( Platform::String^ host, Platform::String^ port )
 {

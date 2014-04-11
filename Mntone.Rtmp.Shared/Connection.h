@@ -9,6 +9,10 @@ namespace Mntone { namespace Rtmp {
 	internal:
 		Connection();
 
+	public:
+		virtual ~Connection();
+
+	internal:
 		Concurrency::task<void> ConnectAsync( Platform::String^ host, Platform::String^ port );
 
 		void Read( const uint32 length, ConnectionCallbackHandler^ callbackFunction );
