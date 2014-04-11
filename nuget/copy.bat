@@ -14,8 +14,12 @@ set REL=Release
 set NAME=Mntone.Rtmp
 set EXT=dll winmd pri
 
+rem license.md
+cd "../"
+copy "license.md" "./nuget/data/license.md"
+
 rem Windows Runtime 8.1 component (IA-32/AMD64/ARM)
-cd "../bin/%IA32%-%REL%/%NAME%.Windows/"
+cd "./bin/%IA32%-%REL%/%NAME%.Windows/"
 md "../../../nuget/data/lib/%WIN81%/%IA32M%/"
 for %%e in (%EXT%) do copy "%NAME%.%%e" "../../../nuget/data/lib/%WIN81%/%IA32M%/" /Y
 cd "../../%AMD64%-%REL%/%NAME%.Windows/"

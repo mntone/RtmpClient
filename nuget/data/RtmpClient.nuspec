@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
+    <metadata minClientVersion="2.5">
+        <id>RtmpClient</id>
+        <version>0.8.0.1</version>
+        <title>RtmpClient for Windows Runtime</title>
+        <authors>mntone</authors>
+        <owners>mntone</owners>
+        <licenseUrl>https://github.com/mntone/RtmpClient/blob/master/license.md</licenseUrl>
+        <projectUrl>https://github.com/mntone/RtmpClient</projectUrl>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <description>RtmpClient for Windows Runtime can communicate with rtmp server.</description>
+        <summary>This component is rtmp available.</summary>
+        <releaseNotes>First NuGet version.</releaseNotes>
+        <copyright>Copyright (c) 2013-2014, mntone. All rights reserved.</copyright>
+        <language>en-US</language>
+        <tags>WinRT Windows WindowsClient WindowsPhone mntone 8.1 Rtmp Flash Adobe Video Audio</tags>
+        <dependencies>
+            <dependency id="ActionMessageFormat" />
+        </dependencies>
+        <references>
+            <reference file="Mntone.Rtmp.winmd" />
+        </references>
+    </metadata>
+    <files>
+        <file src="build\native\RtmpClient.targets" target="build\native\RtmpClient.targets" />
+        <file src="build\win81\RtmpClient.targets" target="build\win81\RtmpClient.targets" />
+        <file src="build\wpa81\RtmpClient.targets" target="build\wpa81\RtmpClient.targets" />
+        <file src="lib\win81\ARM\Mntone.Rtmp.dll" target="lib\win81\ARM\Mntone.Rtmp.dll" />
+        <file src="lib\win81\ARM\Mntone.Rtmp.pri" target="lib\win81\ARM\Mntone.Rtmp.pri" />
+        <file src="lib\win81\ARM\Mntone.Rtmp.winmd" target="lib\win81\ARM\Mntone.Rtmp.winmd" />
+        <file src="lib\win81\x64\Mntone.Rtmp.dll" target="lib\win81\x64\Mntone.Rtmp.dll" />
+        <file src="lib\win81\x64\Mntone.Rtmp.pri" target="lib\win81\x64\Mntone.Rtmp.pri" />
+        <file src="lib\win81\x64\Mntone.Rtmp.winmd" target="lib\win81\x64\Mntone.Rtmp.winmd" />
+        <file src="lib\win81\x86\Mntone.Rtmp.dll" target="lib\win81\x86\Mntone.Rtmp.dll" />
+        <file src="lib\win81\x86\Mntone.Rtmp.pri" target="lib\win81\x86\Mntone.Rtmp.pri" />
+        <file src="lib\win81\x86\Mntone.Rtmp.winmd" target="lib\win81\x86\Mntone.Rtmp.winmd" />
+        <file src="lib\wpa81\ARM\Mntone.Rtmp.dll" target="lib\wpa81\ARM\Mntone.Rtmp.dll" />
+        <file src="lib\wpa81\ARM\Mntone.Rtmp.pri" target="lib\wpa81\ARM\Mntone.Rtmp.pri" />
+        <file src="lib\wpa81\ARM\Mntone.Rtmp.winmd" target="lib\wpa81\ARM\Mntone.Rtmp.winmd" />
+        <file src="lib\wpa81\x86\Mntone.Rtmp.dll" target="lib\wpa81\x86\Mntone.Rtmp.dll" />
+        <file src="lib\wpa81\x86\Mntone.Rtmp.pri" target="lib\wpa81\x86\Mntone.Rtmp.pri" />
+        <file src="lib\wpa81\x86\Mntone.Rtmp.winmd" target="lib\wpa81\x86\Mntone.Rtmp.winmd" />
+        <file src="license.md" target="license.md" />
+    </files>
+</package>

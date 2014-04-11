@@ -3,7 +3,7 @@
 /ipch
 /packages
 /nuget/data/lib
-/nuget/data/*.*
+/nuget/data/license.md
 Generated Files
 *.opensdf
 *.sdf
