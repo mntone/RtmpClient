@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
     <metadata minClientVersion="2.5">
         <id>RtmpClient</id>
-        <version>0.8.0.1</version>
+        <version>0.8.0.2</version>
         <title>RtmpClient for Windows Runtime</title>
         <authors>mntone</authors>
         <owners>mntone</owners>
@@ -11,7 +11,7 @@
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
         <description>RtmpClient for Windows Runtime can communicate with rtmp server.</description>
         <summary>This component is rtmp available.</summary>
-        <releaseNotes>First NuGet version.</releaseNotes>
+        <releaseNotes>x64 component loading fixes.</releaseNotes>
         <copyright>Copyright (c) 2013-2014, mntone. All rights reserved.</copyright>
         <language>en-US</language>
         <tags>WinRT Windows WindowsClient WindowsPhone mntone 8.1 Rtmp Flash Adobe Video Audio</tags>

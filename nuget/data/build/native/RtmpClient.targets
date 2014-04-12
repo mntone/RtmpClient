@@ -26,10 +26,10 @@
 		<MappedPlatform>x86</MappedPlatform>
 		<MappedPlatformToolset>win81</MappedPlatformToolset>
 	</PropertyGroup>
- 	<!--PropertyGroup Condition="'$(Platform)|$(PlatformToolset)'=='x64|v120'" Label="x64 and WinRT 8.1">
+ 	<PropertyGroup Condition="'$(Platform)|$(PlatformToolset)'=='x64|v120'" Label="x64 and WinRT 8.1">
 		<MappedPlatform>x64</MappedPlatform>
 		<MappedPlatformToolset>win81</MappedPlatformToolset>
-	</PropertyGroup-->
+	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(ToolsetFolder)'==''">
 			<ToolsetFolder>$(MappedPlatformToolset)</ToolsetFolder>	
