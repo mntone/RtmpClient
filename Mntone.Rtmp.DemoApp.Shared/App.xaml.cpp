@@ -38,15 +38,15 @@ void App::OnLaunched( LaunchActivatedEventArgs^ e )
 #if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
 		if( rootFrame->ContentTransitions != nullptr )
 		{
-			_transitions = ref new TransitionCollection();
+			transitions_ = ref new TransitionCollection();
 			for( auto transition : rootFrame->ContentTransitions )
 			{
-				_transitions->Append( transition );
+				transitions_->Append( transition );
 			}
 		}
 
 		rootFrame->ContentTransitions = nullptr;
-		_firstNavigatedToken = rootFrame->Navigated += ref new NavigatedEventHandler( this, &App::RootFrame_FirstNavigated );
+		firstNavigatedToken_ = rootFrame->Navigated += ref new NavigatedEventHandler( this, &App::OnFirstNavigated );
 #endif
 
 		if( !rootFrame->Navigate( TypeName( MainPage::typeid ), e->Arguments ) )
@@ -58,7 +58,7 @@ void App::OnLaunched( LaunchActivatedEventArgs^ e )
 }
 
 #if WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP
-void App::RootFrame_FirstNavigated( Object^ sender, NavigationEventArgs^ e )
+void App::OnFirstNavigated( Object^ sender, NavigationEventArgs^ e )
 {
 	auto rootFrame = dynamic_cast<Frame^>( sender );
 	if( rootFrame == nullptr )
@@ -67,18 +67,18 @@ void App::RootFrame_FirstNavigated( Object^ sender, NavigationEventArgs^ e )
 	}
 
 	TransitionCollection^ newTransitions;
-	if( _transitions == nullptr )
+	if( transitions_ == nullptr )
 	{
 		newTransitions = ref new TransitionCollection();
 		newTransitions->Append( ref new NavigationThemeTransition() );
 	}
 	else
 	{
-		newTransitions = _transitions;
+		newTransitions = transitions_;
 	}
 
 	rootFrame->ContentTransitions = newTransitions;
 
-	rootFrame->Navigated -= _firstNavigatedToken;
+	rootFrame->Navigated -= firstNavigatedToken_;
 }
 #endif

@@ -45,7 +45,9 @@ void RtmpUri::ParsePort( int32 port )
 		}
 	}
 	else
+	{
 		Port_ = port;
+	}
 }
 
 void RtmpUri::ParsePath( Platform::String^ path )
