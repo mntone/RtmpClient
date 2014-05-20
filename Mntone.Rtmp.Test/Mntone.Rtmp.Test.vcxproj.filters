@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>969e1b5c-8a5b-45b5-ad22-124b049c7c59</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Package">
+      <UniqueIdentifier>c65f1d4c-a2d3-47b4-82fc-5d9fb3a41134</UniqueIdentifier>
+      <Extensions>appxmanifest;tile;settings</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="RtmpUriUnitTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Images\UnitTestLogo.scale-100.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\UnitTestSmallLogo.scale-100.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\UnitTestSplashScreen.scale-100.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Images\UnitTestStoreLogo.scale-100.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <Filter>Package</Filter>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Mntone.Rtmp.Test_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+  </ItemGroup>
+</Project>

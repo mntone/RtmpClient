@@ -16,6 +16,7 @@ namespace Mntone { namespace Rtmp {
 		virtual Platform::String^ ToString() override sealed;
 
 	private:
+		void Parse( Windows::Foundation::Uri^ uri );
 		void ParseScheme( Platform::String^ schemeName );
 		void ParsePort( int32 port );
 		void ParsePath( Platform::String^ path );

@@ -57,8 +57,6 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <PackageCertificateKeyFile>Mntone.Rtmp.DemoApp.Windows_TemporaryKey.pfx</PackageCertificateKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
     <OutDir>$(SolutionDir)bin\$(Platform)-$(Configuration)\$(MSBuildProjectName)\</OutDir>
     <IntDir>$(SolutionDir)obj\$(Platform)-$(Configuration)\$(MSBuildProjectName)\</IntDir>
     <TargetName>Mntone.Rtmp.DemoApp</TargetName>
@@ -69,7 +67,7 @@
       <WarningLevel>Level4</WarningLevel>
       <FloatingPointModel>Fast</FloatingPointModel>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
     </ClCompile>

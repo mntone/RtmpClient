@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "RtmpUri.h"
 
+using namespace Platform;
 using namespace Mntone::Rtmp;
 
 RtmpUri::RtmpUri()
@@ -8,10 +9,15 @@ RtmpUri::RtmpUri()
 
 RtmpUri::RtmpUri( Platform::String^ uri )
 {
-	RtmpUri( ref new Windows::Foundation::Uri( uri ) );
+	Parse( ref new Windows::Foundation::Uri( uri ) );
 }
 
 RtmpUri::RtmpUri( Windows::Foundation::Uri^ uri )
+{
+	Parse( uri );
+}
+
+void RtmpUri::Parse( Windows::Foundation::Uri^ uri )
 {
 	ParseScheme( uri->SchemeName );
 	Host_ = uri->Host;
@@ -50,27 +56,27 @@ void RtmpUri::ParsePort( int32 port )
 	}
 }
 
-void RtmpUri::ParsePath( Platform::String^ path )
+void RtmpUri::ParsePath( String^ path )
 {
 	std::wstring p( path->Data() );
 
 	if( p[0] != '/' )
-		throw ref new Platform::InvalidArgumentException( "Invalid path." );
+		throw ref new InvalidArgumentException( "Invalid path." );
 
 	auto spos1 = p.find( L'/', 1 );
 	if( spos1 == std::wstring::npos )
 	{
 		auto app = p.substr( 1 );
-		App_ = ref new Platform::String( app.c_str(), static_cast<uint32>( app.length() ) );
+		App_ = StringReference( app.c_str(), app.length() );
 		return;
 	}
 
 	auto app = p.substr( 1, spos1 - 1 );
-	App_ = ref new Platform::String( app.c_str(), static_cast<uint32>( app.length() ) );
+	App_ = StringReference( app.c_str(), app.length() );
 
 	auto spos2 = p.find( L'/', spos1 );
-	auto instance = p.substr( spos1 + 1, spos2 );
-	Instance_ = ref new Platform::String( instance.c_str(), static_cast<uint32>( instance.length() ) );
+	auto instance = p.substr( spos1 + 1, spos2 != spos1 ? spos2 : p.length() - spos1 - 1 );
+	Instance_ = StringReference( instance.c_str(), instance.length() );
 }
 
 Platform::String^ RtmpUri::ToString()

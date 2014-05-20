@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.DemoApp.Shared"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.DemoApp.WindowsPhone", "Mntone.Rtmp.DemoApp\Mntone.Rtmp.DemoApp.WindowsPhone\Mntone.Rtmp.DemoApp.WindowsPhone.vcxproj", "{1265202C-44B4-4745-854A-32058801D59B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mntone.Rtmp.Test", "Mntone.Rtmp.Test\Mntone.Rtmp.Test.vcxproj", "{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Mntone.Rtmp\Mntone.Rtmp.Shared\Mntone.Rtmp.Shared.vcxitems*{cc1de3d0-6318-4958-9dd7-4322df65d25f}*SharedItemsImports = 4
@@ -91,6 +93,24 @@ Global
 		{1265202C-44B4-4745-854A-32058801D59B}.Release|Win32.Build.0 = Release|Win32
 		{1265202C-44B4-4745-854A-32058801D59B}.Release|Win32.Deploy.0 = Release|Win32
 		{1265202C-44B4-4745-854A-32058801D59B}.Release|x64.ActiveCfg = Release|Win32
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|ARM.ActiveCfg = Debug|ARM
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|ARM.Build.0 = Debug|ARM
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|ARM.Deploy.0 = Debug|ARM
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|Win32.Build.0 = Debug|Win32
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|Win32.Deploy.0 = Debug|Win32
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|x64.ActiveCfg = Debug|x64
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|x64.Build.0 = Debug|x64
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Debug|x64.Deploy.0 = Debug|x64
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|ARM.ActiveCfg = Release|ARM
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|ARM.Build.0 = Release|ARM
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|ARM.Deploy.0 = Release|ARM
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|Win32.ActiveCfg = Release|Win32
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|Win32.Build.0 = Release|Win32
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|Win32.Deploy.0 = Release|Win32
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|x64.ActiveCfg = Release|x64
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|x64.Build.0 = Release|x64
+		{0317A45B-1F37-4E7D-A1AA-52D4B9B1F807}.Release|x64.Deploy.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
