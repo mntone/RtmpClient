@@ -12,7 +12,7 @@
 			BasedOn="{StaticResource SubheaderTextBlockStyle}">
 			<Setter
 				Property="Margin"
-				Value="0,0,18,40" />
+				Value="2,0,18,40" />
 		</Style>
 	</Page.Resources>
 
@@ -74,6 +74,7 @@
 			<Button
 				x:Name="backButton"
 				Margin="39,59,40,0"
+				Width="41"
 				Command="{Binding NavigationHelper.GoBackCommand, ElementName=pageRoot}"
 				Style="{StaticResource NavigationBackButtonNormalStyle}"
 				VerticalAlignment="Top"
@@ -104,7 +105,14 @@
 							Storyboard.TargetProperty="Margin">
 							<DiscreteObjectKeyFrame
 								KeyTime="0"
-								Value="18,76,10,33" />
+								Value="19,76,11,33" />
+						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames
+							Storyboard.TargetName="backButton"
+							Storyboard.TargetProperty="Width">
+							<DiscreteObjectKeyFrame
+								KeyTime="0"
+								Value="30" />
 						</ObjectAnimationUsingKeyFrames>
 						<ObjectAnimationUsingKeyFrames
 							Storyboard.TargetName="backButton"

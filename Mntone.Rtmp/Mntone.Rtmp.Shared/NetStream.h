@@ -64,7 +64,7 @@ namespace Mntone { namespace Rtmp {
 
 		bool videoEnabled_, videoInfoEnabled_;
 		Media::VideoInfo^ videoInfo_;
-		uint16 videoDataRate_;
+		uint16 videoDataRate_, videoHeight_, videoWidth_;
 
 		// for Avc
 		uint8 lengthSizeMinusOne_;

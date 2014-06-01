@@ -21,7 +21,6 @@
 				<EntranceThemeTransition />
 			</TransitionCollection>
 		</Grid.ChildrenTransitions>
-
 		<Grid.RowDefinitions>
 			<RowDefinition
 				Height="Auto" />

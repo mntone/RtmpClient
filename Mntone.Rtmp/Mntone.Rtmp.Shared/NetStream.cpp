@@ -18,7 +18,8 @@ using namespace Mntone::Rtmp::Media;
 NetStream::NetStream()
 	: streamId_( 0 )
 	, audioEnabled_( true ), audioInfoEnabled_( false ), audioInfo_( ref new AudioInfo() )
-	, videoEnabled_( true ), videoInfoEnabled_( false ), videoInfo_( ref new VideoInfo() ), videoDataRate_( 0 )
+	, videoEnabled_( true ), videoInfoEnabled_( false ), videoInfo_( ref new VideoInfo() )
+	, videoDataRate_( 0 ), videoHeight_( 0 ), videoWidth_( 0 )
 	, lengthSizeMinusOne_( 0 )
 	, samplingRate_( 0 )
 { }
@@ -242,6 +243,8 @@ void NetStream::OnVideoMessage( rtmp_header header, std::vector<uint8> data )
 	{
 		videoInfo_->Format = vf;
 		videoInfo_->Bitrate = videoDataRate_;
+		videoInfo_->Height = videoHeight_;
+		videoInfo_->Width = videoWidth_;
 		videoInfoEnabled_ = true;
 		VideoStarted( this, ref new NetStreamVideoStartedEventArgs( !audioEnabled_, videoInfo_ ) );
 	}
@@ -269,6 +272,14 @@ void NetStream::OnDataMessage( rtmp_header /*header*/, std::vector<uint8> data )
 		if( object->HasKey( "videodatarate" ) )
 		{
 			videoDataRate_ = static_cast<uint16>( object->GetNamedNumber( "videodatarate" ) );
+		}
+		if( object->HasKey( "height" ) )
+		{
+			videoHeight_ = static_cast<uint16>( object->GetNamedNumber( "height" ) );
+		}
+		if( object->HasKey( "width" ) )
+		{
+			videoWidth_ = static_cast<uint16>( object->GetNamedNumber( "width" ) );
 		}
 	}
 	else

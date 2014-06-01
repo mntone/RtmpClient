@@ -29,11 +29,23 @@ namespace Mntone { namespace Rtmp { namespace Media {
 		internal:
 			void set( uint16 value ) { Bitrate_ = value; }
 		}
+		property uint16 Height
+		{
+			uint16 get() { return Height_; }
+		internal:
+			void set( uint16 value ) { Height_ = value; }
+		}
+		property uint16 Width
+		{
+			uint16 get() { return Width_; }
+		internal:
+			void set( uint16 value ) { Width_ = value; }
+		}
 
 	private:
 		VideoFormat Format_;
 		AvcProfileIndication ProfileIndication_;
-		uint16 Bitrate_;
+		uint16 Bitrate_, Height_, Width_;
 	};
 
 } } }

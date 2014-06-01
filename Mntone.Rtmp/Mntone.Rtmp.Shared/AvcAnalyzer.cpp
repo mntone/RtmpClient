@@ -80,6 +80,8 @@ void NetStream::AnalysisAvc( rtmp_header header, std::vector<uint8> data, NetStr
 			lengthSizeMinusOne_ = dcr.length_size_minus_one;
 			videoInfo_->Format = VideoFormat::Avc;
 			videoInfo_->ProfileIndication = static_cast<AvcProfileIndication>( dcr.avc_profile_indication );
+			videoInfo_->Height = videoHeight_;
+			videoInfo_->Width = videoWidth_;
 			videoInfoEnabled_ = true;
 			VideoStarted( this, ref new NetStreamVideoStartedEventArgs( !audioEnabled_, videoInfo_ ) );
 		}

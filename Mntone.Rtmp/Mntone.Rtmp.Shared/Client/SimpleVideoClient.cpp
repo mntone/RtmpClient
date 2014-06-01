@@ -168,6 +168,8 @@ void SimpleVideoClient::OnVideoStarted( Platform::Object^ sender, NetStreamVideo
 	}
 
 	prop->Bitrate = args->Info->Bitrate;
+	prop->Height = args->Info->Height;
+	prop->Width = args->Info->Width;
 
 	const auto des = ref new VideoStreamDescriptor( prop );
 	if( mediaStreamSource_ != nullptr )
