@@ -3,7 +3,7 @@
 #include "NetConnection.h"
 #include "RtmpHelper.h"
 #include "Media/sound_info.h"
-#include "Media/adts_header.h"
+#include "Media/audio_specific_config.h"
 #include "Media/video_type.h"
 #include "Media/VideoFormat.h"
 #include "Media/flv_tag.h"
@@ -21,7 +21,6 @@ NetStream::NetStream()
 	, videoEnabled_( true ), videoInfoEnabled_( false ), videoInfo_( ref new VideoInfo() )
 	, videoDataRate_( 0 ), videoHeight_( 0 ), videoWidth_( 0 )
 	, lengthSizeMinusOne_( 0 )
-	, samplingRate_( 0 )
 { }
 
 NetStream::~NetStream()
@@ -118,7 +117,7 @@ IAsyncAction^ NetStream::PauseAsync( float64 position )
 	} );
 }
 
-IAsyncAction^ NetStream::ResumeAsync( float64 position ) 
+IAsyncAction^ NetStream::ResumeAsync( float64 position )
 {
 	return create_async( [=]
 	{
@@ -198,10 +197,10 @@ void NetStream::OnAudioMessage( rtmp_header header, std::vector<uint8> data )
 		}
 		else if( data[1] == 0x00 && !audioInfoEnabled_ )
 		{
-			const auto& adts = *reinterpret_cast<const adts_header*>( data.data() );
+			audio_specific_config asc( data.data() + 2, data.size() - 2 );
 			audioInfo_->Format = AudioFormat::Aac;
-			audioInfo_->SampleRate = samplingRate_ != 0 ? samplingRate_ : adts.sampling_frequency();
-			audioInfo_->ChannelCount = adts.channel_configuration();
+			audioInfo_->SampleRate = asc.sampling_frequency();
+			audioInfo_->ChannelCount = asc.channel_configuration();
 			audioInfo_->BitsPerSample = si.size == sound_size::s16bit ? 16 : 8;
 			audioInfoEnabled_ = true;
 			AudioStarted( this, ref new NetStreamAudioStartedEventArgs( !videoEnabled_, audioInfo_ ) );
@@ -290,10 +289,6 @@ void NetStream::OnDataMessage( rtmp_header /*header*/, std::vector<uint8> data )
 	if( object->HasKey( "audiocodecid" ) )
 	{
 		audioEnabled_ = true;
-		if( object->HasKey( "audiosamplerate" ) )
-		{
-			samplingRate_ = static_cast<uint32>( object->GetNamedNumber( "audiosamplerate" ) );
-		}
 	}
 	else
 	{

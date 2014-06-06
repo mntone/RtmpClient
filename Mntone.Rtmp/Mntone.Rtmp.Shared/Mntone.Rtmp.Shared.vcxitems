@@ -14,6 +14,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Media\audio_specific_config.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)AvcAnalyzer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Client\BufferingHelper.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClient.cpp" />
@@ -41,13 +42,15 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)RtmpHelper.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)RtmpUri.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)utility.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)utility\utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\audio_specific_config.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)AvcProfileIndication.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)utility\bit_iterator.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Client\BufferingHelper.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClient.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClientStartedEventArgs.h" />
@@ -101,6 +104,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)rtmp_packet.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)type_id_type.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)UserControlMessageEventType.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)utility.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)utility\utility.h" />
   </ItemGroup>
 </Project>

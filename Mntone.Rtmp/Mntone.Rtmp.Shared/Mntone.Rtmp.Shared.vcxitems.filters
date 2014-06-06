@@ -17,7 +17,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)RtmpHelper.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)RtmpUri.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)utility.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClientStoppedEventArgs.cpp">
       <Filter>Client</Filter>
     </ClCompile>
@@ -45,6 +44,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)Media\AudioInfo.cpp">
       <Filter>Media</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)utility\utility.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Media\audio_specific_config.cpp">
+      <Filter>Media</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)Connection.h" />
@@ -68,7 +73,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)RtmpUri.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)type_id_type.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)UserControlMessageEventType.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)utility.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)Client\SimpleVideoClientStoppedEventArgs.h">
       <Filter>Client</Filter>
     </ClInclude>
@@ -168,6 +172,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)Media\video_type.h">
       <Filter>Media</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)utility\bit_iterator.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)utility\utility.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Media\audio_specific_config.h">
+      <Filter>Media</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Client">
@@ -178,6 +191,9 @@
     </Filter>
     <Filter Include="Media">
       <UniqueIdentifier>{19298dd8-25cc-484b-ae7d-2d721562416d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utility">
+      <UniqueIdentifier>{45bd6394-7aa6-410f-8146-b6332a5f0e8f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

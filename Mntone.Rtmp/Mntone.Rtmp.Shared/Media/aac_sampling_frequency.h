@@ -17,6 +17,7 @@ namespace mntone { namespace rtmp { namespace media {
 		f11025 = 10,
 		f8000 = 11,
 		f7350 = 12,
+		other = 15,
 	};
 
 } } }
