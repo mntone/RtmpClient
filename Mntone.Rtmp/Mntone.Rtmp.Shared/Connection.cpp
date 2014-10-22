@@ -27,6 +27,7 @@ Connection::~Connection()
 task<void> Connection::ConnectAsync( String^ host, String^ port )
 {
 	streamSocket_ = ref new StreamSocket();
+	streamSocket_->Control->KeepAlive = true;
 	streamSocket_->Control->QualityOfService = SocketQualityOfService::LowLatency;
 	auto task = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
 	return create_task( task ).then( [this]
