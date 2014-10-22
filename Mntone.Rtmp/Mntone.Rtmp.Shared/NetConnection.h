@@ -92,6 +92,7 @@ namespace Mntone { namespace Rtmp {
 		Concurrency::task<void> SendNetworkAsync( const mntone::rtmp::type_id_type type, std::vector<uint8> data );
 		Concurrency::task<void> SendActionAsync( Mntone::Data::Amf::AmfArray^ amf );
 
+		Concurrency::task<void> ProcessQueueAsync();
 		Concurrency::task<void> SendAsync( mntone::rtmp::rtmp_header header, std::vector<uint8> data, const uint8 forceFormatType = 255, size_t temporary_length = 0 );
 		std::vector<uint8> CreateHeader( mntone::rtmp::rtmp_header header, uint8_t forceFormatType );
 
@@ -123,7 +124,12 @@ namespace Mntone { namespace Rtmp {
 
 		int32 rxChunkSize_, txChunkSize_;
 		uint32 rxWindowSize_, txWindowSize_;
+		uint32 aPartOfReceivedWindowSize_, aPartOftransmittedWindowSize_;
+		uint32 receivedWindowSize_;
 		mntone::rtmp::limit_type rxLimitType_, txLimitType_;
+
+		std::mutex dataQueueMutex_;
+		std::queue<std::vector<uint8>> dataQueue_;
 	};
 
 } }

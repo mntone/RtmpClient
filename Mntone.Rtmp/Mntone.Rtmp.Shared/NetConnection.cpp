@@ -23,6 +23,8 @@ NetConnection::NetConnection()
 	, rxWindowSize_( DEFAULT_WINDOW_SIZE ), txWindowSize_( DEFAULT_WINDOW_SIZE )
 	, rxLimitType_( DEFAULT_LIMIT_TYPE ), txLimitType_( DEFAULT_LIMIT_TYPE )
 	, rxChunkSize_( DEFAULT_CHUNK_SIZE ), txChunkSize_( DEFAULT_CHUNK_SIZE )
+	, aPartOfReceivedWindowSize_( 0 ), aPartOftransmittedWindowSize_( 0 )
+	, receivedWindowSize_( 0 )
 {
 	readOperationEventToken_ = connection_->ReadOperationChanged += ref new TypedEventHandler<Connection^, IAsyncOperationWithProgress<IBuffer^, uint32>^>( this, &NetConnection::OnReadOperationChanged );
 }
@@ -140,6 +142,7 @@ void NetConnection::OnReadOperationChanged( Connection^ sender, IAsyncOperationW
 
 void NetConnection::Receive()
 {
+	aPartOfReceivedWindowSize_ += 1;
 	connection_->Read( 1, ref new ConnectionCallbackHandler( this, &NetConnection::ReceiveHeader1Impl ) );
 }
 
@@ -153,6 +156,7 @@ void NetConnection::ReceiveHeader1Impl( IBuffer^ result )
 	const uint16 chunk_stream_id = type_and_id & 0x3f;
 	if( chunk_stream_id == 0 )
 	{
+		aPartOfReceivedWindowSize_ += 1;
 		connection_->Read( 1, ref new ConnectionCallbackHandler( [this, format_type]( IBuffer^ result )
 		{
 			auto reader = DataReader::FromBuffer( result );
@@ -164,6 +168,7 @@ void NetConnection::ReceiveHeader1Impl( IBuffer^ result )
 	}
 	else if( chunk_stream_id == 1 )
 	{
+		aPartOfReceivedWindowSize_ += 2;
 		connection_->Read( 2, ref new ConnectionCallbackHandler( [this, format_type]( IBuffer^ result )
 		{
 			auto reader = DataReader::FromBuffer( result );
@@ -198,6 +203,7 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 	switch( format_type )
 	{
 	case 0:
+		aPartOfReceivedWindowSize_ += 11;
 		connection_->Read( 11, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 		{
 			auto reader = DataReader::FromBuffer( result );
@@ -211,6 +217,7 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 
 			if( packet->header_.timestamp == 0xffffff )
 			{
+				aPartOfReceivedWindowSize_ += 4;
 				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 				{
 					auto reader = DataReader::FromBuffer( result );
@@ -227,6 +234,7 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 		break;
 	
 	case 1:
+		aPartOfReceivedWindowSize_ += 7;
 		connection_->Read( 7, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 		{
 			auto reader = DataReader::FromBuffer( result );
@@ -237,6 +245,7 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 
 			if( packet->header_.timestamp_delta == 0xffffff )
 			{
+				aPartOfReceivedWindowSize_ += 4;
 				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 				{
 					auto reader = DataReader::FromBuffer( result );
@@ -261,6 +270,7 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 		break;
 	
 	case 2:
+		aPartOfReceivedWindowSize_ += 3;
 		connection_->Read( 3, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 		{
 			auto reader = DataReader::FromBuffer( result );
@@ -269,6 +279,7 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 
 			if( packet->header_.timestamp_delta == 0xffffff )
 			{
+				aPartOfReceivedWindowSize_ += 4;
 				connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 				{
 					auto reader = DataReader::FromBuffer( result );
@@ -295,6 +306,7 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 	case 3:
 		if( packet->header_.timestamp_delta > 0xffffff )
 		{
+			aPartOfReceivedWindowSize_ += 4;
 			connection_->Read( 4, ref new ConnectionCallbackHandler( [this, packet]( IBuffer^ result )
 			{
 				auto reader = DataReader::FromBuffer( result );
@@ -322,6 +334,7 @@ void NetConnection::ReceiveHeader2Impl( const uint8 format_type, const uint16 ch
 void NetConnection::ReceiveBodyImpl( std::shared_ptr<rtmp_packet> packet )
 {
 	const auto& body_length = std::min<uint32_t>( rxChunkSize_, packet->header_.length - packet->temporary_length_ );
+	aPartOfReceivedWindowSize_ += body_length;
 	if( body_length != 0 )
 	{
 		if( packet->temporary_length_ == 0 )
@@ -336,6 +349,13 @@ void NetConnection::ReceiveBodyImpl( std::shared_ptr<rtmp_packet> packet )
 			reader->ReadBytes( Platform::ArrayReference<uint8>( packet->body_->data() + packet->temporary_length_, data_size ) );
 			packet->temporary_length_ += data_size;
 
+			if( aPartOfReceivedWindowSize_ > rxWindowSize_ )
+			{
+				receivedWindowSize_ += aPartOfReceivedWindowSize_;
+				AcknowledgementAsync( receivedWindowSize_ );
+				aPartOfReceivedWindowSize_ = aPartOfReceivedWindowSize_ - rxWindowSize_;
+			}
+
 			if( packet->temporary_length_ == packet->header_.length )
 			{
 				packet->temporary_length_ = 0;
@@ -349,6 +369,13 @@ void NetConnection::ReceiveBodyImpl( std::shared_ptr<rtmp_packet> packet )
 	}
 	else
 	{
+		if( aPartOfReceivedWindowSize_ > rxWindowSize_ )
+		{
+			receivedWindowSize_ += aPartOfReceivedWindowSize_;
+			AcknowledgementAsync( receivedWindowSize_ );
+			aPartOfReceivedWindowSize_ = aPartOfReceivedWindowSize_ - rxWindowSize_;
+		}
+
 		Receive();
 	}
 }
@@ -427,7 +454,9 @@ void NetConnection::OnAbortMessage( rtmp_header /*header*/, std::vector<uint8> /
 { }
 
 void NetConnection::OnAcknowledgement( rtmp_header /*header*/, std::vector<uint8> /*data*/ )
-{ }
+{
+	ProcessQueueAsync();
+}
 
 void NetConnection::OnUserControlMessage( rtmp_header /*header*/, std::vector<uint8> data )
 {
@@ -679,6 +708,28 @@ task<void> NetConnection::SendActionAsync( const uint32 streamId, Mntone::Data::
 	return SendAsync( std::move( header ), std::move( buf ) );
 }
 
+task<void> NetConnection::ProcessQueueAsync()
+{
+	return create_task( [this]
+	{
+		std::lock_guard<std::mutex> locker( dataQueueMutex_ );
+
+		auto send_data_size = 0u;
+		while( !dataQueue_.empty() )
+		{
+			auto send_data = dataQueue_.front();
+			dataQueue_.pop();
+			connection_->Write( send_data.data(), send_data.size() ).wait();
+			send_data_size += send_data.size();
+			aPartOftransmittedWindowSize_ -= send_data.size();
+			if( send_data_size > txWindowSize_ )
+			{
+				break;
+			}
+		}
+	} );
+}
+
 task<void> NetConnection::SendAsync( rtmp_header header, std::vector<uint8> data, const uint8 forceFormatType, size_t temporary_length )
 {
 	auto send_data = CreateHeader( header, forceFormatType );
@@ -688,6 +739,22 @@ task<void> NetConnection::SendAsync( rtmp_header header, std::vector<uint8> data
 	send_data.resize( header_length + body_length );
 	std::copy_n( data.cbegin() + temporary_length, body_length, send_data.begin() + header_length );
 	temporary_length += static_cast<size_t>( body_length );
+
+	dataQueueMutex_.lock();
+	if( aPartOftransmittedWindowSize_ > txWindowSize_ )
+	{
+		dataQueue_.push( std::move( send_data ) );
+		aPartOftransmittedWindowSize_ += send_data.size();
+		dataQueueMutex_.unlock();
+
+		if( header.length != temporary_length )
+		{
+			return SendAsync( std::move( header ), std::move( data ), 3, temporary_length );
+		}
+		return task_from_result();
+	}
+	aPartOftransmittedWindowSize_ += send_data.size();
+	dataQueueMutex_.unlock();
 
 	auto task = connection_->Write( send_data.data(), send_data.size() );
 	if( header.length != temporary_length )
