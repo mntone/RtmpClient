@@ -8,10 +8,10 @@ namespace mntone { namespace rtmp { namespace media {
 	public:
 		audio_specific_config( const uint8* data, const size_t size );
 
-		void load( const uint8* data, const size_t size ) noexcept;
+		void load( const uint8* data, const size_t size );
 
 	private:
-		int32 get_sampling_frequency( aac_sampling_frequency value ) const noexcept;
+		int32 get_sampling_frequency( aac_sampling_frequency value ) const;
 
 	public:
 		int8 object_type() const noexcept { return object_type_; }

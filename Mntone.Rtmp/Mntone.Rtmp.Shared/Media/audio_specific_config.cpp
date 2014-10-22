@@ -9,9 +9,11 @@ audio_specific_config::audio_specific_config( const uint8* data, const size_t si
 	load( data, size );
 }
 
-void audio_specific_config::load( const uint8* data, const size_t size ) noexcept
+void audio_specific_config::load( const uint8* data, const size_t size )
 {
-	utility::bit_iterator itr( const_cast<const utility::bit_iterator::bit_array_pointer>( data ), size );
+	utility::bit_iterator itr(
+	const_cast<const utility::bit_iterator::bit_array_pointer>( data ),
+	static_cast<utility::bit_iterator::bit_array_length>( size ) );
 
 	object_type_ = itr.get_and_move_length<int8>( 5 );
 	if( object_type_ == 0x1f )
@@ -57,7 +59,7 @@ void audio_specific_config::load( const uint8* data, const size_t size ) noexcep
 	}
 }
 
-int32 audio_specific_config::get_sampling_frequency( aac_sampling_frequency value ) const noexcept
+int32 audio_specific_config::get_sampling_frequency( aac_sampling_frequency value ) const
 {
 	int32 ret;
 	switch( value )

@@ -47,10 +47,8 @@ void SimpleVideoClient::CreateMediaStream( IMediaStreamDescriptor^ descriptor )
 	CloseImpl();
 
 	mediaStreamSource_ = ref new MediaStreamSource( descriptor );
-
-	TimeSpan duration;
-	duration.Duration = std::numeric_limits<int64>::max();
-	mediaStreamSource_->Duration = duration;
+	mediaStreamSource_->BufferTime = TimeSpan{ 5 * 10000000 };
+	mediaStreamSource_->Duration = TimeSpan{ std::numeric_limits<int64>::max() };
 
 	startingEventToken_ = mediaStreamSource_->Starting += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceStartingEventArgs^>( this, &SimpleVideoClient::OnStarting );
 	sampleRequestedEventToken_ = mediaStreamSource_->SampleRequested += ref new TypedEventHandler<MediaStreamSource^, MediaStreamSourceSampleRequestedEventArgs^>( this, &SimpleVideoClient::OnSampleRequested );

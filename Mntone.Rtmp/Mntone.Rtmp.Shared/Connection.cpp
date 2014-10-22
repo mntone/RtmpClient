@@ -2,7 +2,10 @@
 #include "Connection.h"
 
 using namespace Concurrency;
+using namespace Platform;
 using namespace Windows::Foundation;
+using namespace Windows::Networking;
+using namespace Windows::Networking::Sockets;
 using namespace Mntone::Rtmp;
 
 Connection::Connection()
@@ -21,14 +24,12 @@ Connection::~Connection()
 	}
 }
 
-task<void> Connection::ConnectAsync( Platform::String^ host, Platform::String^ port )
+task<void> Connection::ConnectAsync( String^ host, String^ port )
 {
-	using namespace Windows::Networking;
-	using namespace Windows::Networking::Sockets;
-
 	streamSocket_ = ref new StreamSocket();
+	streamSocket_->Control->QualityOfService = SocketQualityOfService::LowLatency;
 	auto task = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
-	return create_task( task ).then( [=]
+	return create_task( task ).then( [this]
 	{
 		dataWriter_ = ref new Windows::Storage::Streams::DataWriter( streamSocket_->OutputStream );
 

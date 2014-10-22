@@ -38,8 +38,7 @@
 			<Grid>
 				<MediaElement
 					x:Name="mediaElement"
-					AudioDeviceType="Multimedia"
-					RealTimePlayback="True" />
+					AudioDeviceType="Multimedia" />
 				<Border
 					x:Name="foregroundElement"
 					Background="Black"
