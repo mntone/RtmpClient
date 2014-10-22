@@ -55,7 +55,7 @@ namespace Mntone { namespace Rtmp {
 		event Windows::Foundation::EventHandler<NetStreamVideoReceivedEventArgs^>^ VideoReceived;
 
 	internal:
-		NetConnection^ parent_;
+		::Platform::WeakReference parent_;
 		uint32 streamId_;
 
 	private:

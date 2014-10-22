@@ -43,7 +43,8 @@ void NetStream::AttachedImpl()
 
 void NetStream::DetachedImpl()
 {
-	if( parent_ != nullptr )
+	auto parent = parent_.Resolve<NetConnection>();
+	if( parent != nullptr )
 	{
 		using namespace Mntone::Data::Amf;
 
@@ -54,7 +55,7 @@ void NetStream::DetachedImpl()
 		cmd->Append( AmfValue::CreateNumberValue( streamId_ ) );
 		SendActionAsync( cmd );
 
-		parent_->UnattachNetStream( this );
+		parent->UnattachNetStream( this );
 		parent_ = nullptr;
 	}
 }
@@ -351,9 +352,10 @@ void NetStream::OnAggregateMessage( rtmp_header header, std::vector<uint8> data 
 
 task<void> NetStream::SendActionAsync( Mntone::Data::Amf::AmfArray^ amf )
 {
-	if( parent_ != nullptr )
+	auto parent = parent_.Resolve<NetConnection>();
+	if( parent != nullptr )
 	{
-		return parent_->SendActionAsync( streamId_, amf );
+		return parent->SendActionAsync( streamId_, amf );
 	}
 
 	return create_task( [] { } );
