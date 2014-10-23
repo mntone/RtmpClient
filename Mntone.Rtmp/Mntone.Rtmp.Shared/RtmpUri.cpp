@@ -22,7 +22,7 @@ void RtmpUri::Parse( Windows::Foundation::Uri^ uri )
 	ParseScheme( uri->SchemeName );
 	Host_ = uri->Host;
 	ParsePort( uri->Port );
-	ParsePath( uri->Path );
+	ParsePath( uri->Path + uri->Query );
 }
 
 void RtmpUri::ParseScheme( Platform::String^ schemeName )
