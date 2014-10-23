@@ -1,7 +1,7 @@
 ﻿<Page
-    x:Class="Mntone.Rtmp.DemoApp.MainPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	x:Class="Mntone.Rtmp.DemoApp.MainPage"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:local="using:Mntone.Rtmp.DemoApp"
 	Unloaded="OnPageUnloaded"
 	SizeChanged="OnSizeChanged">
@@ -24,11 +24,13 @@
 			</TransitionCollection>
 		</Grid.ChildrenTransitions>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="140"/>
+			<RowDefinition
+				Height="140" />
 			<RowDefinition />
 		</Grid.RowDefinitions>
 
-		<Grid Grid.Row="1">
+		<Grid
+			Grid.Row="1">
 			<Grid.RowDefinitions>
 				<RowDefinition />
 				<RowDefinition
@@ -38,11 +40,17 @@
 			<Grid>
 				<MediaElement
 					x:Name="mediaElement"
-					AudioDeviceType="Multimedia" />
+					AudioDeviceType="Multimedia"
+					RealTimePlayback="True" />
 				<Border
 					x:Name="foregroundElement"
 					Background="Black"
 					Opacity=".4"
+					Visibility="Collapsed" />
+				<ProgressRing
+					x:Name="progressRing"
+					Height="60"
+					Width="60"
 					Visibility="Collapsed" />
 			</Grid>
 

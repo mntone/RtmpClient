@@ -3,6 +3,7 @@
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)App.xaml.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)pch.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)SharedMainPage.xaml.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)App.xaml.h" />

@@ -48,15 +48,21 @@
 				<RowDefinition
 					Height="Auto" />
 			</Grid.RowDefinitions>
-			
+
 			<Grid>
 				<MediaElement
 					x:Name="mediaElement"
-					AudioDeviceType="Multimedia" />
+					AudioDeviceType="Multimedia"
+					RealTimePlayback="True" />
 				<Border
 					x:Name="foregroundElement"
 					Background="Black"
 					Opacity=".4"
+					Visibility="Collapsed" />
+				<ProgressRing
+					x:Name="progressRing"
+					Height="60"
+					Width="60"
 					Visibility="Collapsed" />
 			</Grid>
 			<Grid

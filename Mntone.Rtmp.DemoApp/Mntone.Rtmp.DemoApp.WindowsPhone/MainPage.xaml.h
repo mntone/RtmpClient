@@ -14,16 +14,18 @@ namespace Mntone { namespace Rtmp { namespace DemoApp {
 		void OnStarted( Platform::Object^ sender, Mntone::Rtmp::Client::SimpleVideoClientStartedEventArgs^ args );
 		void OnStopped( Platform::Object^ sender, Mntone::Rtmp::Client::SimpleVideoClientStoppedEventArgs^ args );
 
-		void OnMediaEnded( Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e );
+		void OnCurrentStateChanged( ::Platform::Object^ sender, ::Windows::UI::Xaml::RoutedEventArgs^ e );
+		void OnMediaEnded( ::Platform::Object^ sender, ::Windows::UI::Xaml::RoutedEventArgs^ e );
 
 		void OnMediaButtonPressed( Windows::Media::SystemMediaTransportControls^ sender, Windows::Media::SystemMediaTransportControlsButtonPressedEventArgs^ e );
 
 		void CloseClient();
 
 	private:
-		Windows::Foundation::EventRegistrationToken startedEventToken_, stoppedEventToken_;
+		::Windows::Foundation::EventRegistrationToken startedEventToken_, stoppedEventToken_;
 
-		Mntone::Rtmp::Client::SimpleVideoClient^ client_;
+		App^ myAppContext_;
+		Client::SimpleVideoClient^ client_;
 	};
 
 } } }

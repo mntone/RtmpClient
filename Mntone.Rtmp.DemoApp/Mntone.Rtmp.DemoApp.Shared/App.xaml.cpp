@@ -5,6 +5,7 @@ using namespace Platform;
 using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Activation;
 using namespace Windows::Foundation;
+using namespace Windows::System::Display;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Interop;
@@ -12,9 +13,41 @@ using namespace Windows::UI::Xaml::Media::Animation;
 using namespace Windows::UI::Xaml::Navigation;
 using namespace Mntone::Rtmp::DemoApp;
 
+uint32 App::displayRequestRef_ = 0;
+DisplayRequest^ App::displayRequest_ = nullptr;
+
 App::App()
 {
 	InitializeComponent();
+}
+
+void App::DisplayRequestActive()
+{
+	if( displayRequest_ == nullptr )
+	{
+		displayRequest_ = ref new DisplayRequest();
+	}
+
+	if( ++displayRequestRef_ == 1 )
+	{
+		displayRequest_->RequestActive();
+	}
+}
+
+void App::DisplayRequestRelease()
+{
+	if( displayRequest_ == nullptr )
+	{
+		displayRequest_ = ref new DisplayRequest();
+	}
+
+	if( displayRequestRef_ != 0 )
+	{
+		if( --displayRequestRef_ == 0 )
+		{
+			displayRequest_->RequestRelease();
+		}
+	}
 }
 
 void App::OnLaunched( LaunchActivatedEventArgs^ e )
