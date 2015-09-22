@@ -1,4 +1,5 @@
 #pragma once
+#include "RtmpUri.h"
 
 namespace Mntone { namespace Rtmp {
 
@@ -13,7 +14,7 @@ namespace Mntone { namespace Rtmp {
 		virtual ~Connection();
 
 	internal:
-		Concurrency::task<void> ConnectAsync( Platform::String^ host, Platform::String^ port );
+		Concurrency::task<void> ConnectAsync( RtmpUri^ uri );
 
 		void Read( const uint32 length, ConnectionCallbackHandler^ callbackFunction );
 

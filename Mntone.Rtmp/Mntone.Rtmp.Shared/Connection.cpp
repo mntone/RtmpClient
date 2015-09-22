@@ -24,12 +24,15 @@ Connection::~Connection()
 	}
 }
 
-task<void> Connection::ConnectAsync( String^ host, String^ port )
+task<void> Connection::ConnectAsync( RtmpUri^ uri )
 {
 	streamSocket_ = ref new StreamSocket();
 	streamSocket_->Control->KeepAlive = true;
 	streamSocket_->Control->QualityOfService = SocketQualityOfService::LowLatency;
-	auto task = streamSocket_->ConnectAsync( ref new HostName( host ), port, SocketProtectionLevel::PlainSocket );
+	auto task = streamSocket_->ConnectAsync(
+		ref new HostName( uri->Host ),
+		uri->Port.ToString(),
+		uri->Scheme == RtmpScheme::Rtmps ? SocketProtectionLevel::Tls12 : SocketProtectionLevel::PlainSocket );
 	return create_task( task ).then( [this]
 	{
 		dataWriter_ = ref new Windows::Storage::Streams::DataWriter( streamSocket_->OutputStream );

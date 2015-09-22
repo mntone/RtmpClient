@@ -50,12 +50,12 @@ void NetConnection::CloseImpl()
 	// Closed( this, ref new NetConnectionClosedEventArgs() );
 }
 	
-IAsyncAction^ NetConnection::ConnectAsync( Windows::Foundation::Uri^ uri )
+IAsyncAction^ NetConnection::ConnectAsync( ::Uri^ uri )
 {
 	return ConnectAsync( ref new RtmpUri( uri ) );
 }
 
-IAsyncAction^ NetConnection::ConnectAsync( Windows::Foundation::Uri^ uri, Command::NetConnectionConnectCommand^ command )
+IAsyncAction^ NetConnection::ConnectAsync( ::Uri^ uri, Command::NetConnectionConnectCommand^ command )
 {
 	if( command->Type != "connect" )
 	{
@@ -79,7 +79,7 @@ IAsyncAction^ NetConnection::ConnectAsync( RtmpUri^ uri, Command::NetConnectionC
 
 	return create_async( [this, command]
 	{
-		auto connectionTask = connection_->ConnectAsync( Uri_->Host, Uri_->Port.ToString() );
+		auto connectionTask = connection_->ConnectAsync( Uri_ );
 		return connectionTask.then( [this, command]( task<void> prevTask )
 		{
 			try

@@ -32,6 +32,11 @@ void RtmpUri::ParseScheme( Platform::String^ schemeName )
 		Scheme_ = RtmpScheme::Rtmp;
 		return;
 	}
+	else if( schemeName == "rtmps" )
+	{
+		Scheme_ = RtmpScheme::Rtmps;
+		return;
+	}
 
 	throw ref new Platform::InvalidArgumentException( "Invalid scheme name." );
 }
