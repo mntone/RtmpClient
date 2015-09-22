@@ -1,4 +1,7 @@
 # RtmpClient for Windows Runtime
+
+[![NuGet](https://img.shields.io/nuget/v/RtmpClient.svg?style=flat-square)](https://www.nuget.org/packages/RtmpClient/) [![Downloads](https://img.shields.io/nuget/dt/RtmpClient.svg?style=flat-square)](https://www.nuget.org/packages/https://img.shields.io/nuget/v/RtmpClient.svg?style=flat-square/) [![License](https://img.shields.io/github/license/mntone/RtmpClient.svg?style=flat-square)](https://github.com/mntone/RtmpClient/blob/master/license.md)
+
 This client treats rtmp streaming, just like Adobe Flash Player. Now, only rtmp is available.
 
 ## Environment
