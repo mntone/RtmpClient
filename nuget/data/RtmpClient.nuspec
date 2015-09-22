@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2013/01/nuspec.xsd">
     <metadata minClientVersion="2.5">
         <id>RtmpClient</id>
-        <version>0.8.2.0</version>
+        <version>0.8.5.0</version>
         <title>RtmpClient for Windows Runtime</title>
         <authors>mntone</authors>
         <owners>mntone</owners>
@@ -10,9 +10,9 @@
         <projectUrl>https://github.com/mntone/RtmpClient</projectUrl>
         <requireLicenseAcceptance>true</requireLicenseAcceptance>
         <description>RtmpClient for Windows Runtime can communicate with rtmp server.</description>
-        <summary>This component is rtmp streaming available.</summary>
-        <releaseNotes>Windows Phone 8.1 H.264/AVC video streaming issue fix.</releaseNotes>
-        <copyright>Copyright (c) 2013-2014, mntone. All rights reserved.</copyright>
+        <summary>This component is rtmp streaming available. Rtmp is used in media streaming and message communication.</summary>
+        <releaseNotes>Update library ActionMessageFormat for WinRT.</releaseNotes>
+        <copyright>Copyright (c) 2013-2015, mntone. All rights reserved.</copyright>
         <language>en-US</language>
         <tags>WinRT Windows WindowsClient WindowsPhone mntone 8.1 Rtmp Flash Adobe Video Audio</tags>
         <dependencies>
